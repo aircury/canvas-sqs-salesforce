@@ -1,1 +1,2 @@
 simple-salesforce
+requests_oauthlib
