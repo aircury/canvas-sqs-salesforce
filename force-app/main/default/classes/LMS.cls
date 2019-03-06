@@ -10,9 +10,7 @@ public with sharing class LMS {
                 Programme_Name__c,
                 Cohort_Name__c,
                 LMS_Course_Id__c,
-                LMS_Course_Start_Job_Id__c,
-                LMS_Course_End_Job_Id__c,
-                LMS_Start_Date__c, 
+                LMS_Start_Date__c,
                 LMS_End_Date__c
             FROM TL_Programme__c
             WHERE Id = :p.Id
@@ -42,19 +40,7 @@ public with sharing class LMS {
         Map <String, Object> apiResult = CanvasAPI.createCourse(name, programme.Name, startAt, endAt);
         String courseId = String.valueOf(apiResult.get('id'));
 
-        ScheduledLMSUsersProvision startTask = new ScheduledLMSUsersProvision(programme, false);
-        Date startDate = programme.LMS_Start_Date__c;
-        String startSch = String.format('0 0 0 {0} {1} ? {2}', new Object[]{startDate.day(), startDate.month(), startDate.year()});
-        String startJobId = System.Schedule('LMS Users Provision for Course Id ' + courseId, startSch, startTask);
-
-        ScheduledLMSUsersProvision endTask = new ScheduledLMSUsersProvision(programme, true);
-        Date endDate = programme.LMS_End_Date__c;
-        String endSch = String.format('0 0 0 {0} {1} ? {2}', new Object[]{endDate.day(), endDate.month(), endDate.year()});
-        String endJobId = System.Schedule('LMS Users Removal for Course Id ' + courseId, endSch, endTask);
-
         programme.LMS_Course_Id__c = Integer.valueOf(courseId);
-        programme.LMS_Course_Start_Job_Id__c = startJobId;
-        programme.LMS_Course_End_Job_Id__c = endJobId;
 
         update programme;
     }
@@ -65,9 +51,7 @@ public with sharing class LMS {
     */
     public static void deleteCourse(TL_Programme__c p) {
         TL_Programme__c programme = [
-            SELECT LMS_Course_Start_Job_Id__c,
-                LMS_Course_End_Job_Id__c,
-                LMS_Course_Id__c 
+            SELECT LMS_Course_Id__c 
             FROM TL_Programme__c
             WHERE Id = :p.Id
         ][0];
@@ -78,17 +62,7 @@ public with sharing class LMS {
 
         CanvasAPI.deleteCourse(programme.LMS_Course_Id__c.format());
 
-        if (null != programme.LMS_Course_Start_Job_Id__c) {
-            System.abortJob(programme.LMS_Course_Start_Job_Id__c);
-        }
-        
-        if (null != programme.LMS_Course_End_Job_Id__c) {
-            System.abortJob(programme.LMS_Course_End_Job_Id__c);
-        }
-
         programme.LMS_Course_Id__c = null;
-        programme.LMS_Course_Start_Job_Id__c = null;
-        programme.LMS_Course_End_Job_Id__c = null;
 
         update programme;
     }
