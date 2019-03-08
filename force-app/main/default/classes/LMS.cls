@@ -10,6 +10,7 @@ public with sharing class LMS {
                 Programme_Name__c,
                 Cohort_Name__c,
                 LMS_Course_Id__c,
+                LMS_Course_Section_Id__c,
                 LMS_Start_Date__c,
                 LMS_End_Date__c
             FROM TL_Programme__c
@@ -35,12 +36,26 @@ public with sharing class LMS {
             programme.LMS_End_Date__c.month(),
             programme.LMS_End_Date__c.day()
         );
+        
+        if (null != programme.LMS_Course_Id__c) {
+            try {
+                CanvasAPI.findCourseById(String.valueOf(programme.LMS_Course_Id__c));
+                return;
+            } catch (CanvasAPIException caught) {
+                if (!caught.getMessage().contains('The specified resource does not exist')) {
+                    throw caught;
+                }
+            }
+        }
 
         String name = programme.Programme_Name__c + ' ' + programme.Cohort_Name__c;
         Map <String, Object> apiResult = CanvasAPI.createCourse(name, programme.Name, startAt, endAt);
         String courseId = String.valueOf(apiResult.get('id'));
+        apiResult = CanvasAPI.createSection(name, courseId, startAt, endAt);
+        Integer courseSectionId = Integer.valueOf(apiResult.get('id'));
 
         programme.LMS_Course_Id__c = Integer.valueOf(courseId);
+        programme.LMS_Course_Section_Id__c = courseSectionId;
 
         update programme;
     }
@@ -67,38 +82,133 @@ public with sharing class LMS {
         update programme;
     }
 
+    private static void cleanOtherUserLogins(String userId, String email, String provider) {
+        try {
+            CanvasAPI.createUserLogin(userId, email, provider);
+        } catch (CanvasAPIException caught) {
+            if (!caught.getMessage().contains('ID already in use for this account and authentication provider')) {
+                throw caught;
+            }
+        }
+        
+        List <Object> apiResultList = CanvasAPI.listUserLogins(userId);
+        
+        for (Object result: apiResultList) {
+            Map <String, Object> login = (Map <String, Object>) result;
+            String providerType = String.valueOf(login.get('authentication_provider_type'));
+            String loginId = String.valueOf(login.get('id'));
+            if (provider != providerType) {
+                CanvasAPI.removeUserLogin(userId, loginId);
+            }
+        }
+    }
+
     /* Sample test code:
         TL_Programme__c[] programmes = [SELECT Id FROM TL_Programme__c];
         LMS.usersProvision(programmes[2]);
+
+        The participant should have a valid email
     */
     public static void usersProvision(TL_Programme__c p) {
+        Map<Id, Programme_Participant__c> participants = new Map<Id, Programme_Participant__c>([
+            SELECT Id,
+                Programme__r.Id
+            FROM Programme_Participant__c
+            WHERE Programme__r.Id = :p.Id
+        ]);
+
+        onParticipantStatusChange(participants.keySet());
+    }
+
+    public static void usersRemoval(TL_Programme__c p) {
         TL_Programme__c programme = [
-            SELECT Id, 
+            SELECT Id,
                 (SELECT Status__c, 
-                    Participant__r.Email,
-                    Participant__r.Name,
-                    Participant__r.Prefered_Name__c,
-                    Participant__r.Participant_UID__c
+                    Participant__r.Email
                 FROM Programme_Participants__r)
             FROM TL_Programme__c
             WHERE Id = :p.Id
         ][0];
 
         for (Programme_Participant__c participant: programme.Programme_Participants__r) {
+            Contact c = participant.Participant__r;
+            if (null != c.Email) {
+                List <Object> apiResultList = CanvasAPI.findUserByEmail(c.Email);
+                Map <String, Object> apiResult;
+                String userId;
+
+                if (0 < apiResultList.size()) {
+                    apiResult = (Map <String, Object>) apiResultList[0];
+                    userId = String.valueOf(apiResult.get('id'));
+
+                    cleanOtherUserLogins(userId, c.Email, 'canvas');
+                }
+
+                participant.Status__c = 'Complete';
+
+                update participant;
+            }
+        }
+    }
+
+    @future(callout=true)
+    public static void onParticipantStatusChange(Set<ID> participantIds) {
+        List<Programme_Participant__c> participants = [
+            SELECT Id,
+                Status__c,
+                Programme__r.LMS_Start_Date__c,
+                Programme__r.LMS_End_Date__c,
+                Programme__r.LMS_Course_Section_Id__c,
+                Participant__r.Email,
+                Participant__r.Name,
+                Participant__r.Prefered_Name__c,
+                Participant__r.Participant_UID__c
+            FROM Programme_Participant__c
+            WHERE Id IN :participantIds
+        ];
+        Date today = Date.today();
+
+        for (Programme_Participant__c participant: participants) {
+            TL_Programme__c programme = participant.Programme__r;
+            
+            if (programme.LMS_Start_Date__c > today || programme.LMS_End_Date__c <= today) {
+                continue;
+            }
+
             if ('Active' == participant.Status__c) {
                 Contact c = participant.Participant__r;
                 if (null != c.Email) {
-                    Map <String, Object> apiResult = CanvasAPI.createUser(
-                        c.Email,
-                        c.Name,
-                        c.Prefered_Name__c,
-                        c.Participant_UID__c
-                    );
+                    List <Object> apiResultList = CanvasAPI.findUserByEmail(c.Email);
+                    Map <String, Object> apiResult;
+                    String userId;
+
+                    if (0 == apiResultList.size()) {
+                        apiResult = CanvasAPI.createUser(
+                            c.Email,
+                            c.Name,
+                            c.Prefered_Name__c,
+                            c.Participant_UID__c
+                        );
+                    } else {
+                        apiResult = (Map <String, Object>) apiResultList[0];
+                    }
+
+                    userId = String.valueOf(apiResult.get('id'));
+
+                    cleanOtherUserLogins(userId, c.Email, 'saml');
+
+                    CanvasAPI.enrollUser(userId, String.valueOf(programme.LMS_Course_Section_Id__c), 'active');
                 }
             }
         }
     }
 
-    public static void usersRemoval(TL_Programme__c programme) {
+    @future(callout=true)
+    public static void onCourseInsertOrUpdate(Set<ID> programmeIds) {
+        for (TL_Programme__c programme: [SELECT Id, LMS_Access__c FROM TL_Programme__c WHERE Id IN :programmeIds]) {
+            if (true == programme.LMS_Access__c) {
+                createCourse(programme);
+            }
+        }
     }
 }

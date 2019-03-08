@@ -7,7 +7,8 @@
 */
 public with sharing class CanvasAPI {
     /* Sample test code:
-        CanvasAPI.createCourse('Test Course', 'Test', );
+        CanvasAPI.createCourse('Test Course', 'Test', 
+            DateTime.newInstance(2019, 3, 30), DateTime.newInstance(2019, 4, 30));
     */
     public static Map <String, Object> createCourse(String name, String code, DateTime startAt, DateTime endAt) {
         String body =
@@ -24,7 +25,31 @@ public with sharing class CanvasAPI {
             '&course[start_at]=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
             '&course[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
 
-        return apiCall('POST', 'accounts/:account_id/courses', body);
+        return (Map <String, Object>) apiCall('POST', 'accounts/:account_id/courses', body);
+    }
+
+    /* Sample test code:
+        CanvasAPI.createSection('Test Course', '91', 
+            DateTime.newInstance(2019, 3, 30), DateTime.newInstance(2019, 4, 30));
+    */
+    public static Map <String, Object> createSection(String name, String courseId, DateTime startAt, DateTime endAt) {
+        String body =
+            'course_section[name]=' + name +
+            '&course_section[start_at]=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
+            '&course_section[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
+
+        return (Map <String, Object>) apiCall('POST', 'courses/' + courseId + '/sections', body);
+    }
+
+    /* Sample test code:
+        CanvasAPI.enrollUser('26', '49', 'active');
+    */
+    public static Map <String, Object> enrollUser(String userId, String courseSectionId, String state) {
+        String body =
+            'enrollment[user_id]=' + userId +
+            '&enrollment[enrollment_state]=' + state;
+
+        return (Map <String, Object>) apiCall('POST', 'sections/' + courseSectionId + '/enrollments', body);
     }
 
     /* Sample test code:
@@ -33,7 +58,7 @@ public with sharing class CanvasAPI {
     public static Map <String, Object> deleteCourse(String id) {
         String body = 'event=delete';
 
-        return apiCall('DELETE', 'courses/' + id, body);
+        return (Map <String, Object>) apiCall('DELETE', 'courses/' + id, body);
     }
 
     /* Sample test code:
@@ -50,23 +75,71 @@ public with sharing class CanvasAPI {
             '&user[skip_registration]=true' +
             '&pseudonym[send_confirmation]=false' +
             '&pseudonym[sis_user_id]=' + participantUID +
-            //'&pseudonym[authentication_provider_id]=SAML' +
+            '&enable_sis_reactivation=true' +
+            '&pseudonym[authentication_provider_id]=saml' +
             '&pseudonym[force_self_registration]=false';
 
-        return apiCall('POST', 'accounts/:account_id/users', body);
+        return (Map <String, Object>) apiCall('POST', 'accounts/:account_id/users', body);
     }
 
-    private static Map <String, Object> apiCall(String method, String endpoint, String body) {
+    /* Sample test code:
+        CanvasAPI.findUserByEmail('test@example.org');
+    */
+    public static List <Object> findUserByEmail(String email) {
+        String query = 
+            '?search_term=' + email + 
+            '&sort=email';
+
+        return (List <Object>) apiCall('GET', 'accounts/:account_id/users' + query, '');
+    }
+
+    /* Sample test code:
+        CanvasAPI.findCourseById('19');
+    */
+    public static Map <String, Object> findCourseById(String id) {
+        return (Map <String, Object>) apiCall('GET', 'courses/' + id, '');
+    }
+
+    /* Sample test code:
+        CanvasAPI.listUserLogins('test@example.org');
+    */
+    public static List <Object> listUserLogins(String userId) {
+        return (List <Object>) apiCall('GET', 'users/' + userId + '/logins', '');
+    }
+
+    /* Sample test code:
+        CanvasAPI.createUserLogin('115', 'test@example.org', 'saml');
+    */
+    public static Map <String, Object> createUserLogin(String userId, String email, String provider) {
+        String body = 
+            'user[id]=' + userId +
+            '&login[unique_id]=' + email + 
+            '&login[authentication_provider_id]=' + provider;
+
+        return (Map <String, Object>) apiCall('POST', 'accounts/:account_id/logins', body);
+    }
+
+    /* Sample test code:
+        CanvasAPI.removeUserLogin('115', '84');
+    */
+    public static Map <String, Object> removeUserLogin(String userId, String loginId) {
+        return (Map <String, Object>) apiCall('DELETE', 'users/' + userId + '/logins/' + loginId, '');
+    }
+
+    private static Object apiCall(String method, String endpoint, String body) {
         CanvasAPISettings__c customSettings = CanvasAPISettings__c.getOrgDefaults();
         String token = customSettings.Token__c;
         String baseUrl = customSettings.Base_Url__c;
         String accountId = customSettings.Account_Id__c.format();
         HttpRequest req = new HttpRequest();
 
+        endpoint = endpoint.replace(':account_id', accountId);
         req.setMethod(method);
-        req.setEndpoint(baseUrl + endpoint.replace(':account_id', accountId));
+        req.setEndpoint(baseUrl + endpoint);
         req.setHeader('Authorization', 'Bearer ' + token);
-        req.setBody(body);
+        if ('' != body) {
+            req.setBody(body);
+        }
 
         Http http = new Http();
 
@@ -81,9 +154,10 @@ public with sharing class CanvasAPI {
         System.debug('STATUS_CODE: ' + statusCode);
 
         if ('OK' != status || 200 != statusCode) {
-            throw new CanvasAPIException(statusCode.format() + ': ' + status);
+            throw new CanvasAPIException(String.format('{0} {1} {2}: {3}\n{4}',
+                new Object[] {method, endpoint, statusCode.format(), status, resBody}));
         }
 
-        return (Map <String, Object>) JSON.deserializeUntyped(resBody);
+        return JSON.deserializeUntyped(resBody);
     }
 }
