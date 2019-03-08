@@ -16,7 +16,7 @@ global class ScheduledLMSUsersProvision implements Schedulable {
                 LMS.usersProvision(p);
             }
             if (p.LMS_End_Date__c == today) {
-                LMS.usersRemoval(p);
+                LMS.usersComplete(p);
             }
         }
     }

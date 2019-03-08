@@ -120,7 +120,7 @@ public with sharing class LMS {
         onParticipantStatusChange(participants.keySet());
     }
 
-    public static void usersRemoval(TL_Programme__c p) {
+    public static void usersComplete(TL_Programme__c p) {
         TL_Programme__c programme = [
             SELECT Id,
                 (SELECT Status__c, 
@@ -131,23 +131,34 @@ public with sharing class LMS {
         ][0];
 
         for (Programme_Participant__c participant: programme.Programme_Participants__r) {
-            Contact c = participant.Participant__r;
-            if (null != c.Email) {
-                List <Object> apiResultList = CanvasAPI.findUserByEmail(c.Email);
-                Map <String, Object> apiResult;
-                String userId;
+            participant.Status__c = 'Complete';
 
-                if (0 < apiResultList.size()) {
-                    apiResult = (Map <String, Object>) apiResultList[0];
-                    userId = String.valueOf(apiResult.get('id'));
+            update participant;
+        }
+    }
 
-                    cleanOtherUserLogins(userId, c.Email, 'canvas');
-                }
+    public static void enrollUser(String userId, String courseSectionId, Boolean deactivate) {
+        List <Object> apiResultList = CanvasAPI.findEnrollmentId(userId, courseSectionId);
+        Map <String, Object> apiResult;
+        String desiredState = deactivate ? 'active' : 'inactive';
+        String enrollmentId;
 
-                participant.Status__c = 'Complete';
+        if (0 == apiResultList.size()) {
+            apiResultList[0] = CanvasAPI.enrollUser(userId, courseSectionId, 'active');
+        }
 
-                update participant;
-            }
+        apiResult = (Map <String, Object>) apiResultList[0];
+        
+        if (desiredState != String.valueOf(apiResult.get('enrollment_state'))) {
+            return;
+        }
+
+        enrollmentId = String.valueOf(apiResult.get('id'));
+
+        if (deactivate) {
+            CanvasAPI.updateEnrollment(enrollmentId, String.valueOf(apiResult.get('course_id')), 'deactivate');
+        } else {
+            CanvasAPI.reactivateEnrollment(enrollmentId, String.valueOf(apiResult.get('course_id')));
         }
     }
 
@@ -175,30 +186,39 @@ public with sharing class LMS {
                 continue;
             }
 
-            if ('Active' == participant.Status__c) {
-                Contact c = participant.Participant__r;
-                if (null != c.Email) {
-                    List <Object> apiResultList = CanvasAPI.findUserByEmail(c.Email);
-                    Map <String, Object> apiResult;
-                    String userId;
+            Contact c = participant.Participant__r;
+            if (null == c.Email) {
+                continue;
+            }
 
-                    if (0 == apiResultList.size()) {
-                        apiResult = CanvasAPI.createUser(
-                            c.Email,
-                            c.Name,
-                            c.Prefered_Name__c,
-                            c.Participant_UID__c
-                        );
-                    } else {
-                        apiResult = (Map <String, Object>) apiResultList[0];
-                    }
+            List <Object> apiResultList = CanvasAPI.findUserByEmail(c.Email);
+            Map <String, Object> apiResult;
+            String userId;
 
-                    userId = String.valueOf(apiResult.get('id'));
+            if (0 == apiResultList.size()) {
+                apiResultList[0] = CanvasAPI.createUser(
+                    c.Email,
+                    c.Name,
+                    c.Prefered_Name__c,
+                    c.Participant_UID__c
+                );
+            }
 
+            apiResult = (Map <String, Object>) apiResultList[0];
+
+            userId = String.valueOf(apiResult.get('id'));
+
+            switch on participant.Status__c {
+               when 'Active' {
                     cleanOtherUserLogins(userId, c.Email, 'saml');
-
-                    CanvasAPI.enrollUser(userId, String.valueOf(programme.LMS_Course_Section_Id__c), 'active');
-                }
+                    enrollUser(userId, String.valueOf(programme.LMS_Course_Section_Id__c), false);
+               }
+               when 'Inactive' {
+                    enrollUser(userId, String.valueOf(programme.LMS_Course_Section_Id__c), true);
+               }
+               when 'Complete', 'Deferred', 'Withdrawn' {
+                    cleanOtherUserLogins(userId, c.Email, 'canvas');
+               }
             }
         }
     }

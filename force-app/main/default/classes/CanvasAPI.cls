@@ -101,6 +101,34 @@ public with sharing class CanvasAPI {
     }
 
     /* Sample test code:
+        CanvasAPI.findEnrollmentId('19', '60');
+    */
+    public static List <Object> findEnrollmentId(String userId, String courseSectionId) {
+        String query = 
+            '?user_id=' + userId + 
+            '&state[]=active' + 
+            '&state[]=inactive';
+
+        return (List <Object>) apiCall('GET', 'sections/' + courseSectionId + '/enrollments' + query, '');
+    }
+
+    /* Sample test code:
+        CanvasAPI.reactivateEnrollment('19', '60');
+    */
+    public static Map <String, Object> reactivateEnrollment(String id, String courseId) {
+        return (Map <String, Object>) apiCall('PUT', 'courses/' + courseId + '/enrollments/' + id + '/reactivate', '');
+    }
+
+    /* Sample test code:
+        CanvasAPI.updateEnrollment('19', '60', 'deactivate');
+    */
+    public static Map <String, Object> updateEnrollment(String id, String courseId, String task) {
+         String body = 'task=' + task;
+
+        return (Map <String, Object>) apiCall('DELETE', 'courses/' + courseId + '/enrollments/' + id, body);
+    }
+
+    /* Sample test code:
         CanvasAPI.listUserLogins('test@example.org');
     */
     public static List <Object> listUserLogins(String userId) {
