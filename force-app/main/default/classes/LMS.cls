@@ -144,7 +144,7 @@ public with sharing class LMS {
         String enrollmentId;
 
         if (0 == apiResultList.size()) {
-            apiResultList[0] = CanvasAPI.enrollUser(userId, courseSectionId, 'active');
+            apiResultList[0] = CanvasAPI.enrollUser(userId, courseSectionId, desiredState);
         }
 
         apiResult = (Map <String, Object>) apiResultList[0];
@@ -196,6 +196,12 @@ public with sharing class LMS {
             String userId;
 
             if (0 == apiResultList.size()) {
+                if (participant.Status__c == 'Complete' ||
+                    participant.Status__c == 'Deferred' ||
+                    participant.Status__c == 'Withdrawn') {
+                        return;
+                }
+
                 apiResultList[0] = CanvasAPI.createUser(
                     c.Email,
                     c.Name,
@@ -217,7 +223,8 @@ public with sharing class LMS {
                     enrollUser(userId, String.valueOf(programme.LMS_Course_Section_Id__c), true);
                }
                when 'Complete', 'Deferred', 'Withdrawn' {
-                    cleanOtherUserLogins(userId, c.Email, 'canvas');
+                    //TODO: check if user is enrolled in other courses
+                    CanvasAPI.removeUser(userId);
                }
             }
         }

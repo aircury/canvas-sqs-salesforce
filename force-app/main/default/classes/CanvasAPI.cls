@@ -154,6 +154,13 @@ public with sharing class CanvasAPI {
         return (Map <String, Object>) apiCall('DELETE', 'users/' + userId + '/logins/' + loginId, '');
     }
 
+    /* Sample test code:
+        CanvasAPI.removeUser('115');
+    */
+    public static Map <String, Object> removeUser(String userId) {
+        return (Map <String, Object>) apiCall('DELETE', 'accounts/:account_id/users/' + userId, '');
+    }    
+
     private static Object apiCall(String method, String endpoint, String body) {
         CanvasAPISettings__c customSettings = CanvasAPISettings__c.getOrgDefaults();
         String token = customSettings.Token__c;
