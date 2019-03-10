@@ -83,23 +83,27 @@ public with sharing class LMS {
     }
 
     private static void cleanOtherUserLogins(String userId, String email, String provider) {
-        try {
-            CanvasAPI.createUserLogin(userId, email, provider);
-        } catch (CanvasAPIException caught) {
-            if (!caught.getMessage().contains('ID already in use for this account and authentication provider')) {
-                throw caught;
-            }
-        }
-        
+        Boolean providerFound = false;
         List <Object> apiResultList = CanvasAPI.listUserLogins(userId);
+        List <String[]> loginsToRemove = new List <String[]>();
         
         for (Object result: apiResultList) {
             Map <String, Object> login = (Map <String, Object>) result;
             String providerType = String.valueOf(login.get('authentication_provider_type'));
             String loginId = String.valueOf(login.get('id'));
             if (provider != providerType) {
-                CanvasAPI.removeUserLogin(userId, loginId);
+                loginsToRemove.add(new String[]{userId, loginId});
+            } else {
+                providerFound = true;
             }
+        }
+
+        if (!providerFound) {
+            CanvasAPI.createUserLogin(userId, email, provider);
+        }
+
+        for (String[] loginToRemove: loginsToRemove) {
+            CanvasAPI.removeUserLogin(loginToRemove[0], loginToRemove[1]);
         }
     }
 
@@ -144,7 +148,7 @@ public with sharing class LMS {
         String enrollmentId;
 
         if (0 == apiResultList.size()) {
-            apiResultList[0] = CanvasAPI.enrollUser(userId, courseSectionId, desiredState);
+            apiResultList.add(CanvasAPI.enrollUser(userId, courseSectionId, desiredState));
         }
 
         apiResult = (Map <String, Object>) apiResultList[0];
@@ -202,12 +206,12 @@ public with sharing class LMS {
                         return;
                 }
 
-                apiResultList[0] = CanvasAPI.createUser(
+                apiResultList.add(CanvasAPI.createUser(
                     c.Email,
                     c.Name,
                     c.Prefered_Name__c,
                     c.Participant_UID__c
-                );
+                ));
             }
 
             apiResult = (Map <String, Object>) apiResultList[0];
@@ -216,7 +220,6 @@ public with sharing class LMS {
 
             switch on participant.Status__c {
                when 'Active' {
-                    cleanOtherUserLogins(userId, c.Email, 'saml');
                     enrollUser(userId, String.valueOf(programme.LMS_Course_Section_Id__c), false);
                }
                when 'Inactive' {
