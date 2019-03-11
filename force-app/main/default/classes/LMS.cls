@@ -179,33 +179,26 @@ public with sharing class LMS {
 
     @future(callout=true)
     public static void onParticipantStatusChange(Set<ID> participantIds) {
+        Date today = Date.today();
         List<Programme_Participant__c> participants = [
             SELECT Id,
                 Status__c,
-                Programme__r.LMS_Start_Date__c,
-                Programme__r.LMS_End_Date__c,
                 Programme__r.LMS_Course_Section_Id__c,
                 Participant__r.Email,
                 Participant__r.Name,
                 Participant__r.Prefered_Name__c,
                 Participant__r.Participant_UID__c
             FROM Programme_Participant__c
-            WHERE Id IN :participantIds
+            WHERE Id IN :participantIds AND
+                Programme__r.LMS_Access__c = true AND
+                Participant__r.Email != null AND
+                Programme__r.LMS_Start_Date__c <= :today AND
+                Programme__r.LMS_End_Date__c > :today
         ];
-        Date today = Date.today();
 
         for (Programme_Participant__c participant: participants) {
             TL_Programme__c programme = participant.Programme__r;
-            
-            if (programme.LMS_Start_Date__c > today || programme.LMS_End_Date__c <= today) {
-                continue;
-            }
-
             Contact c = participant.Participant__r;
-            if (null == c.Email) {
-                continue;
-            }
-
             List <Object> apiResultList = CanvasAPI.findUserByEmail(c.Email);
             Map <String, Object> apiResult;
             String userId;
@@ -273,15 +266,13 @@ public with sharing class LMS {
     }
 
     private static void doEventInsert(Set<ID> attendeeIds) {
+        Date today = Date.today();
         List<Attendees__c> attendees = [
             SELECT Id,
-                FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c,
-                FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c,
                 Contact__r.Email,
                 Contact__r.Name,
                 Contact__r.Prefered_Name__c,
                 Contact__r.Participant_UID__c,
-                FLIP_Event__r.Send_to_LMS__c,
                 FLIP_Event__r.Event_Date__c,
                 FLIP_Event__r.Event_End_Date__c,
                 FLIP_Event__r.Start_Time__c,
@@ -292,9 +283,13 @@ public with sharing class LMS {
                 FLIP_Event__r.Address_Line_2__c,
                 FLIP_Event__r.Postal_Code__c
             FROM Attendees__c
-            WHERE Id IN :attendeeIds
+            WHERE Id IN :attendeeIds AND
+                FLIP_Event__r.Cohort_lkp__r.LMS_Access__c = true AND
+                FLIP_Event__r.Send_to_LMS__c = true AND
+                FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c <= :today AND
+                FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c > :today AND
+                Contact__r.Email != null
         ];
-        Date today = Date.today();
         String code, title, description, address;
         List <Object> apiResultList;
         Map <String, Object> apiResult;
@@ -302,21 +297,7 @@ public with sharing class LMS {
 
         for (Attendees__c attendee: attendees) {
             FLIP_Event__c event = attendee.FLIP_Event__r;
-            TL_Programme__c programme = event.Cohort_lkp__r;
-            
-            if (!event.Send_to_LMS__c) {
-                continue;
-            }
-
-            if (programme.LMS_Start_Date__c > today || programme.LMS_End_Date__c <= today) {
-                continue;
-            }
-
             Contact c = attendee.Contact__r;
-            if (null == c.Email) {
-                continue;
-            }
-
             DateTime startAt = getEventDateTime(event.Event_Date__c, event.Start_Time__c);
             DateTime endAt = getEventDateTime(event.Event_End_Date__c, event.End_Time__c);
             
@@ -347,21 +328,22 @@ public with sharing class LMS {
     }
 
     private static void doEventDelete(Set<ID> attendeeIds, DateTime startAt, DateTime endAt) {
+        Date today = Date.today();
         List<Attendees__c> attendees = [
             SELECT Id,
-                FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c,
-                FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c,
                 Contact__r.Email,
-                FLIP_Event__r.Send_to_LMS__c,
                 FLIP_Event__r.Event_Date__c,
                 FLIP_Event__r.Event_End_Date__c,
                 FLIP_Event__r.Start_Time__c,
                 FLIP_Event__r.End_Time__c
             FROM Attendees__c
-            WHERE Id IN :attendeeIds
+            WHERE Id IN :attendeeIds  AND
+                FLIP_Event__r.Cohort_lkp__r.LMS_Access__c = true AND
+                FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c <= :today AND
+                FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c > :today AND
+                Contact__r.Email != null
             ALL ROWS
         ];
-        Date today = Date.today();
         String code, title, description, address;
         List <Object> apiResultList;
         Map <String, Object> apiResult;
@@ -369,17 +351,7 @@ public with sharing class LMS {
 
         for (Attendees__c attendee: attendees) {
             FLIP_Event__c event = attendee.FLIP_Event__r;
-            TL_Programme__c programme = event.Cohort_lkp__r;
-            
-            if (programme.LMS_Start_Date__c > today || programme.LMS_End_Date__c <= today) {
-                continue;
-            }
-
             Contact c = attendee.Contact__r;
-            if (null == c.Email) {
-                continue;
-            }
-
             startAt = null == startAt ? getEventDateTime(event.Event_Date__c, event.Start_Time__c) : startAt;
             endAt = null == endAt ? getEventDateTime(event.Event_End_Date__c, event.End_Time__c) : endAt;
             

@@ -8,6 +8,6 @@ trigger Event_Attendees_Provision on Attendees__c (after insert, before delete) 
     }
 
     if (Trigger.isDelete) {
-        LMS.onEventDelete(Trigger.oldMap.keySet());
+        LMS.onEventDelete(Trigger.oldMap.keySet(), null, null);
     }
 }
