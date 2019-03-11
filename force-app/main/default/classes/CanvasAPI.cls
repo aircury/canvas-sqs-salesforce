@@ -148,6 +148,57 @@ public with sharing class CanvasAPI {
     }
 
     /* Sample test code:
+        CanvasAPI.createEvent('user', '115', '115', 'Test Event', 'Test Description',
+            DateTime.newInstance(2019, 3, 30, 10, 0, 0), DateTime.newInstance(2019, 3, 30, 12, 0 ,0),
+            'Test Address');
+    */
+    public static Map <String, Object> createEvent(
+        String context,
+        String id,
+        String userId,
+        String title,
+        String description,
+        DateTime startAt,
+        DateTime endAt,
+        String address
+    ) {
+        String body = 
+            'calendar_event[context_code]=' + context + '_' + id +
+            '&calendar_event[title]=' + title + 
+            '&calendar_event[description]=' + description +
+            '&calendar_event[start_at]=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
+            '&calendar_event[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
+            '&calendar_event[location_address]=' + address;
+
+        String endpoint = 'calendar_events';
+
+        if (null != userId) {
+            endpoint = endpoint + '?as_user_id=' + userId;
+        }
+        return (Map <String, Object>) apiCall('POST', endpoint, body);
+    }
+
+    /* Sample test code:
+        CanvasAPI.listEvents('115', DateTime.newInstance(2019, 3, 30, 10, 0, 0),
+            DateTime.newInstance(2019, 3, 30, 12, 0, 0));
+    */
+    public static List <Object> listUserEvents(String userId, DateTime startAt, DateTime endAt) {
+        String query = 
+            '?start_date=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') + 
+            '&end_date=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
+            '&as_user_id=' + userId;
+
+        return (List <Object>) apiCall('GET', 'calendar_events' + query, '');
+    }
+
+    /* Sample test code:
+        CanvasAPI.removeUserEvent('115', '84');
+    */
+    public static Map <String, Object> removeUserEvent(String userId, String eventId) {
+        return (Map <String, Object>) apiCall('DELETE', 'calendar_events/' + eventId + '?as_user_id=' + userId, '');
+    }
+
+    /* Sample test code:
         CanvasAPI.removeUserLogin('115', '84');
     */
     public static Map <String, Object> removeUserLogin(String userId, String loginId) {
@@ -188,7 +239,7 @@ public with sharing class CanvasAPI {
         System.debug('STATUS: ' + status);
         System.debug('STATUS_CODE: ' + statusCode);
 
-        if ('OK' != status || 200 != statusCode) {
+        if (('OK' != status && 'Created' != status) || (200 > statusCode && 300 <= statusCode)) {
             throw new CanvasAPIException(String.format('{0} {1} {2}: {3}\n{4}',
                 new Object[] {method, endpoint, statusCode.format(), status, resBody}));
         }

@@ -14,6 +14,7 @@ global class ScheduledLMSUsersProvision implements Schedulable {
         for (TL_Programme__c p: programmes) {
             if (p.LMS_Start_Date__c == today) {
                 LMS.usersProvision(p);
+                LMS.userEventsProvision(p);
             }
             if (p.LMS_End_Date__c == today) {
                 LMS.usersComplete(p);

@@ -124,6 +124,17 @@ public with sharing class LMS {
         onParticipantStatusChange(participants.keySet());
     }
 
+    public static void userEventsProvision(TL_Programme__c p) {
+        Map<Id, Attendees__c> attendees = new Map<Id, Attendees__c>([
+            SELECT Id,
+                FLIP_Event__r.Cohort_lkp__r.Id
+            FROM Attendees__c
+            WHERE FLIP_Event__r.Cohort_lkp__r.Id = :p.Id
+        ]);
+
+        onEventInsert(attendees.keySet());
+    }
+
     public static void usersComplete(TL_Programme__c p) {
         TL_Programme__c programme = [
             SELECT Id,
@@ -238,6 +249,152 @@ public with sharing class LMS {
         for (TL_Programme__c programme: [SELECT Id, LMS_Access__c FROM TL_Programme__c WHERE Id IN :programmeIds]) {
             if (true == programme.LMS_Access__c) {
                 createCourse(programme);
+            }
+        }
+    }
+
+    private static DateTime getEventDateTime(Date eventDate, String eventTime) {
+        Integer hour = Integer.valueOf(eventTime.split(':')[0]),
+                minute = Integer.valueOf(eventTime.split(':')[1]);
+
+        return DateTime.newInstance(
+            eventDate.year(),
+            eventDate.month(),
+            eventDate.day(),
+            hour,
+            minute,
+            0
+        );
+    }
+
+    @future(callout=true)
+    public static void onEventInsert(Set<ID> attendeeIds) {
+        List<Attendees__c> attendees = [
+            SELECT Id,
+                FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c,
+                FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c,
+                Contact__r.Email,
+                Contact__r.Name,
+                Contact__r.Prefered_Name__c,
+                Contact__r.Participant_UID__c,
+                FLIP_Event__r.Send_to_LMS__c,
+                FLIP_Event__r.Event_Date__c,
+                FLIP_Event__r.Event_End_Date__c,
+                FLIP_Event__r.Start_Time__c,
+                FLIP_Event__r.End_Time__c,
+                FLIP_Event__r.Event_Name__c,
+                FLIP_Event__r.Event_Description__c,
+                FLIP_Event__r.Address_Line_1__c,
+                FLIP_Event__r.Address_Line_2__c,
+                FLIP_Event__r.Postal_Code__c
+            FROM Attendees__c
+            WHERE Id IN :attendeeIds
+        ];
+        Date today = Date.today();
+        String code, title, description, address;
+        List <Object> apiResultList;
+        Map <String, Object> apiResult;
+        String userId;
+
+        for (Attendees__c attendee: attendees) {
+            FLIP_Event__c event = attendee.FLIP_Event__r;
+            TL_Programme__c programme = event.Cohort_lkp__r;
+            
+            if (!event.Send_to_LMS__c) {
+                continue;
+            }
+
+            if (programme.LMS_Start_Date__c > today || programme.LMS_End_Date__c <= today) {
+                continue;
+            }
+
+            Contact c = attendee.Contact__r;
+            if (null == c.Email) {
+                continue;
+            }
+
+            DateTime startAt = getEventDateTime(event.Event_Date__c, event.Start_Time__c);
+            DateTime endAt = getEventDateTime(event.Event_End_Date__c, event.End_Time__c);
+            
+            apiResultList = CanvasAPI.findUserByEmail(c.Email);
+
+            if (0 == apiResultList.size()) {
+                apiResultList.add(CanvasAPI.createUser(
+                    c.Email,
+                    c.Name,
+                    c.Prefered_Name__c,
+                    c.Participant_UID__c
+                ));
+            }
+
+            apiResult = (Map <String, Object>) apiResultList[0];
+
+            userId = String.valueOf(apiResult.get('id'));
+            title = event.Event_Name__c;
+            description = event.Event_Description__c;
+            address = event.Address_Line_1__c + '\n' + event.Address_Line_2__c + '\n' + event.Postal_Code__c;
+            CanvasAPI.createEvent('user', userId, userId, title, description, startAt, endAt, address);
+        }
+    }
+
+    @future(callout=true)
+    public static void onEventDelete(Set<ID> attendeeIds) {
+        List<Attendees__c> attendees = [
+            SELECT Id,
+                FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c,
+                FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c,
+                Contact__r.Email,
+                FLIP_Event__r.Send_to_LMS__c,
+                FLIP_Event__r.Event_Date__c,
+                FLIP_Event__r.Event_End_Date__c,
+                FLIP_Event__r.Start_Time__c,
+                FLIP_Event__r.End_Time__c
+            FROM Attendees__c
+            WHERE Id IN :attendeeIds
+            ALL ROWS
+        ];
+        Date today = Date.today();
+        String code, title, description, address;
+        List <Object> apiResultList;
+        Map <String, Object> apiResult;
+        String userId;
+
+        for (Attendees__c attendee: attendees) {
+            FLIP_Event__c event = attendee.FLIP_Event__r;
+            TL_Programme__c programme = event.Cohort_lkp__r;
+            
+            if (!event.Send_to_LMS__c) {
+                continue;
+            }
+
+            if (programme.LMS_Start_Date__c > today || programme.LMS_End_Date__c <= today) {
+                continue;
+            }
+
+            Contact c = attendee.Contact__r;
+            if (null == c.Email) {
+                continue;
+            }
+
+            DateTime startAt = getEventDateTime(event.Event_Date__c, event.Start_Time__c);
+            DateTime endAt = getEventDateTime(event.Event_End_Date__c, event.End_Time__c);
+            
+            apiResultList = CanvasAPI.findUserByEmail(c.Email);
+
+            if (0 == apiResultList.size()) {
+                continue;
+            }
+
+            apiResult = (Map <String, Object>) apiResultList[0];
+
+            userId = String.valueOf(apiResult.get('id'));
+            
+            apiResultList = CanvasAPI.listUserEvents(userId, startAt, endAt);
+
+            for (Object result: apiResultList) {
+                Map <String, Object> apiEvent = (Map <String, Object>) result;
+                String eventId = String.valueOf(apiEvent.get('id'));
+                CanvasAPI.removeUserEvent(userId, eventId);
             }
         }
     }
