@@ -152,7 +152,7 @@ public with sharing class LMS {
         }
     }
 
-    public static void enrollUser(String userId, String courseSectionId, Boolean deactivate) {
+    public static void enrollUser(String userId, String courseSectionId, Boolean deactivate, String task) {
         List <Object> apiResultList = CanvasAPI.findEnrollmentId(userId, courseSectionId);
         Map <String, Object> apiResult;
         String desiredState = deactivate ? 'active' : 'inactive';
@@ -171,7 +171,7 @@ public with sharing class LMS {
         enrollmentId = String.valueOf(apiResult.get('id'));
 
         if (deactivate) {
-            CanvasAPI.updateEnrollment(enrollmentId, String.valueOf(apiResult.get('course_id')), 'deactivate');
+            CanvasAPI.updateEnrollment(enrollmentId, String.valueOf(apiResult.get('course_id')), task);
         } else {
             CanvasAPI.reactivateEnrollment(enrollmentId, String.valueOf(apiResult.get('course_id')));
         }
@@ -231,10 +231,10 @@ public with sharing class LMS {
 
             switch on participant.Status__c {
                when 'Active' {
-                    enrollUser(userId, String.valueOf(programme.LMS_Course_Section_Id__c), false);
+                    enrollUser(userId, String.valueOf(programme.LMS_Course_Section_Id__c), false, null);
                }
                when 'Inactive' {
-                    enrollUser(userId, String.valueOf(programme.LMS_Course_Section_Id__c), true);
+                    enrollUser(userId, String.valueOf(programme.LMS_Course_Section_Id__c), true, 'deactivate');
                }
                when 'Complete', 'Deferred', 'Withdrawn' {
                     //TODO: check if user is enrolled in other courses
@@ -253,7 +253,7 @@ public with sharing class LMS {
         }
     }
 
-    private static DateTime getEventDateTime(Date eventDate, String eventTime) {
+    public static DateTime getEventDateTime(Date eventDate, String eventTime) {
         Integer hour = Integer.valueOf(eventTime.split(':')[0]),
                 minute = Integer.valueOf(eventTime.split(':')[1]);
 
@@ -269,6 +269,10 @@ public with sharing class LMS {
 
     @future(callout=true)
     public static void onEventInsert(Set<ID> attendeeIds) {
+        doEventInsert(attendeeIds);
+    }
+
+    private static void doEventInsert(Set<ID> attendeeIds) {
         List<Attendees__c> attendees = [
             SELECT Id,
                 FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c,
@@ -338,7 +342,11 @@ public with sharing class LMS {
     }
 
     @future(callout=true)
-    public static void onEventDelete(Set<ID> attendeeIds) {
+    public static void onEventDelete(Set<ID> attendeeIds, DateTime startAt, DateTime endAt) {
+        doEventDelete(attendeeIds, null, null);
+    }
+
+    private static void doEventDelete(Set<ID> attendeeIds, DateTime startAt, DateTime endAt) {
         List<Attendees__c> attendees = [
             SELECT Id,
                 FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c,
@@ -363,10 +371,6 @@ public with sharing class LMS {
             FLIP_Event__c event = attendee.FLIP_Event__r;
             TL_Programme__c programme = event.Cohort_lkp__r;
             
-            if (!event.Send_to_LMS__c) {
-                continue;
-            }
-
             if (programme.LMS_Start_Date__c > today || programme.LMS_End_Date__c <= today) {
                 continue;
             }
@@ -376,8 +380,8 @@ public with sharing class LMS {
                 continue;
             }
 
-            DateTime startAt = getEventDateTime(event.Event_Date__c, event.Start_Time__c);
-            DateTime endAt = getEventDateTime(event.Event_End_Date__c, event.End_Time__c);
+            startAt = null == startAt ? getEventDateTime(event.Event_Date__c, event.Start_Time__c) : startAt;
+            endAt = null == endAt ? getEventDateTime(event.Event_End_Date__c, event.End_Time__c) : endAt;
             
             apiResultList = CanvasAPI.findUserByEmail(c.Email);
 
@@ -397,5 +401,11 @@ public with sharing class LMS {
                 CanvasAPI.removeUserEvent(userId, eventId);
             }
         }
+    }
+
+    @future(callout=true)
+    public static void onEventUpdate(Set<ID> attendeeIds, DateTime startAt, DateTime endAt) {
+        doEventDelete(attendeeIds, startAt, endAt);
+        doEventInsert(attendeeIds);
     }
 }
