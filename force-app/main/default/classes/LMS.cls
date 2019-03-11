@@ -179,7 +179,6 @@ public with sharing class LMS {
 
     @future(callout=true)
     public static void onParticipantStatusChange(Set<ID> participantIds) {
-        Date today = Date.today();
         List<Programme_Participant__c> participants = [
             SELECT Id,
                 Status__c,
@@ -192,8 +191,8 @@ public with sharing class LMS {
             WHERE Id IN :participantIds AND
                 Programme__r.LMS_Access__c = true AND
                 Participant__r.Email != null AND
-                Programme__r.LMS_Start_Date__c <= :today AND
-                Programme__r.LMS_End_Date__c > :today
+                Programme__r.LMS_Start_Date__c <= TODAY AND
+                Programme__r.LMS_End_Date__c >= TODAY
         ];
 
         for (Programme_Participant__c participant: participants) {
@@ -201,7 +200,7 @@ public with sharing class LMS {
             Contact c = participant.Participant__r;
             List <Object> apiResultList = CanvasAPI.findUserByEmail(c.Email);
             Map <String, Object> apiResult;
-            String userId;
+            String userId, sectionId = String.valueOf(programme.LMS_Course_Section_Id__c);
 
             if (0 == apiResultList.size()) {
                 if (participant.Status__c == 'Complete' ||
@@ -224,14 +223,26 @@ public with sharing class LMS {
 
             switch on participant.Status__c {
                when 'Active' {
-                    enrollUser(userId, String.valueOf(programme.LMS_Course_Section_Id__c), false, null);
+                    enrollUser(userId, sectionId, false, null);
                }
                when 'Inactive' {
-                    enrollUser(userId, String.valueOf(programme.LMS_Course_Section_Id__c), true, 'deactivate');
+                    enrollUser(userId, sectionId, true, 'deactivate');
                }
                when 'Complete', 'Deferred', 'Withdrawn' {
-                    //TODO: check if user is enrolled in other courses
-                    CanvasAPI.removeUser(userId);
+                    Integer otherUserCourses = [SELECT COUNT()
+                        FROM Programme_Participant__c
+                        WHERE Participant__r.Email = :c.Email AND
+                            Programme__r.Id != :programme.Id AND
+                            Programme__r.LMS_Access__c = true AND
+                            Programme__r.LMS_Start_Date__c <= TODAY AND
+                            Programme__r.LMS_End_Date__c > TODAY
+                    ];
+
+                    if (0 < otherUserCourses) {
+                        enrollUser(userId, sectionId, true, 'conclude');
+                    } else {
+                        CanvasAPI.removeUser(userId);
+                    }
                }
             }
         }
@@ -266,7 +277,6 @@ public with sharing class LMS {
     }
 
     private static void doEventInsert(Set<ID> attendeeIds) {
-        Date today = Date.today();
         List<Attendees__c> attendees = [
             SELECT Id,
                 Contact__r.Email,
@@ -286,8 +296,8 @@ public with sharing class LMS {
             WHERE Id IN :attendeeIds AND
                 FLIP_Event__r.Cohort_lkp__r.LMS_Access__c = true AND
                 FLIP_Event__r.Send_to_LMS__c = true AND
-                FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c <= :today AND
-                FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c > :today AND
+                FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c <= TODAY AND
+                FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c > TODAY AND
                 Contact__r.Email != null
         ];
         String code, title, description, address;
@@ -328,7 +338,6 @@ public with sharing class LMS {
     }
 
     private static void doEventDelete(Set<ID> attendeeIds, DateTime startAt, DateTime endAt) {
-        Date today = Date.today();
         List<Attendees__c> attendees = [
             SELECT Id,
                 Contact__r.Email,
@@ -339,8 +348,8 @@ public with sharing class LMS {
             FROM Attendees__c
             WHERE Id IN :attendeeIds  AND
                 FLIP_Event__r.Cohort_lkp__r.LMS_Access__c = true AND
-                FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c <= :today AND
-                FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c > :today AND
+                FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c <= TODAY AND
+                FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c > TODAY AND
                 Contact__r.Email != null
             ALL ROWS
         ];
