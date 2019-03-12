@@ -1,4 +1,4 @@
-trigger LMS_Event_Update on FLIP_Event__c (after update) {
+trigger LMSEventTrigger on FLIP_Event__c (after update) {
     if (system.isFuture()) {
         return;
     }

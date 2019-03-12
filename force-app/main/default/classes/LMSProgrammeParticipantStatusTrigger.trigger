@@ -1,4 +1,4 @@
-trigger Programme_Participant_Status_Update on Programme_Participant__c (after insert, after update) {
+trigger LMSProgrammeParticipantStatusTrigger on Programme_Participant__c (after insert, after update) {
     if (system.isFuture()) {
         return;
     }

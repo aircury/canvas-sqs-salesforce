@@ -1,4 +1,4 @@
-trigger LMS_Course_Provision on TL_Programme__c (after insert, after update) {
+trigger LMSCourseProvisionTrigger on TL_Programme__c (after insert, after update) {
     if (system.isFuture()) {
         return;
     }

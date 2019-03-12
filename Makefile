@@ -7,3 +7,6 @@ function.zip: ProcessSQSRecords.py
 
 install: function.zip
 	aws lambda create-function --function-name ProcessSQSRecord --zip-file fileb://function.zip --handler ProcessSQSRecords.lambda_handler --runtime python2.7 --role arn:aws:iam::471287585525:role/lambda-sqs-role
+
+apex_tests:
+	sfdx force:apex:test:run -r human -c -w 6 -n LMSTest

@@ -1,4 +1,4 @@
-trigger Event_Attendees_Provision on Attendees__c (after insert, before delete) {
+trigger LMSEventAttendeesProvisionTrigger on Attendees__c (after insert, before delete) {
     if (system.isFuture()) {
         return;
     }

@@ -216,7 +216,7 @@ public with sharing class CanvasAPI {
         CanvasAPISettings__c customSettings = CanvasAPISettings__c.getOrgDefaults();
         String token = customSettings.Token__c;
         String baseUrl = customSettings.Base_Url__c;
-        String accountId = customSettings.Account_Id__c.format();
+        String accountId = null == customSettings.Account_Id__c ? '1' : customSettings.Account_Id__c.format();
         HttpRequest req = new HttpRequest();
 
         endpoint = endpoint.replace(':account_id', accountId);

@@ -193,8 +193,22 @@ public with sharing class LMS {
                 Participant__r.Email != null AND
                 Programme__r.LMS_Start_Date__c <= TODAY AND
                 Programme__r.LMS_End_Date__c >= TODAY
+        ], test = [
+            SELECT Id,
+                Status__c,
+                Programme__r.LMS_Access__c,
+                Programme__r.LMS_Start_Date__c,
+                Programme__r.LMS_End_Date__c,
+                Programme__r.LMS_Course_Section_Id__c,
+                Participant__r.Email,
+                Participant__r.Name,
+                Participant__r.Prefered_Name__c,
+                Participant__r.Participant_UID__c
+            FROM Programme_Participant__c
+            WHERE Id IN :participantIds
         ];
 
+        System.debug('participants: ' + test);
         for (Programme_Participant__c participant: participants) {
             TL_Programme__c programme = participant.Programme__r;
             Contact c = participant.Participant__r;
