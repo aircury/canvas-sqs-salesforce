@@ -55,11 +55,11 @@ public with sharing class CanvasAPI {
     /* Sample test code:
         CanvasAPI.deleteCourse(programmes[2]);
     */
-    public static Map <String, Object> deleteCourse(String id) {
-        String body = 'event=delete';
+    // public static Map <String, Object> deleteCourse(String id) {
+    //     String body = 'event=delete';
 
-        return (Map <String, Object>) apiCall('DELETE', 'courses/' + id, body);
-    }
+    //     return (Map <String, Object>) apiCall('DELETE', 'courses/' + id, body);
+    // }
 
     /* Sample test code:
         CanvasAPI.createUser('test@example.org', 'Test User', 'Test Short Name', 'participant123');
@@ -131,21 +131,21 @@ public with sharing class CanvasAPI {
     /* Sample test code:
         CanvasAPI.listUserLogins('test@example.org');
     */
-    public static List <Object> listUserLogins(String userId) {
-        return (List <Object>) apiCall('GET', 'users/' + userId + '/logins', '');
-    }
+    // public static List <Object> listUserLogins(String userId) {
+    //     return (List <Object>) apiCall('GET', 'users/' + userId + '/logins', '');
+    // }
 
     /* Sample test code:
         CanvasAPI.createUserLogin('115', 'test@example.org', 'saml');
     */
-    public static Map <String, Object> createUserLogin(String userId, String email, String provider) {
-        String body = 
-            'user[id]=' + userId +
-            '&login[unique_id]=' + email + 
-            '&login[authentication_provider_id]=' + provider;
+    // public static Map <String, Object> createUserLogin(String userId, String email, String provider) {
+    //     String body = 
+    //         'user[id]=' + userId +
+    //         '&login[unique_id]=' + email + 
+    //         '&login[authentication_provider_id]=' + provider;
 
-        return (Map <String, Object>) apiCall('POST', 'accounts/:account_id/logins', body);
-    }
+    //     return (Map <String, Object>) apiCall('POST', 'accounts/:account_id/logins', body);
+    // }
 
     /* Sample test code:
         CanvasAPI.createEvent('user', '115', '115', 'Test Event', 'Test Description',
@@ -201,9 +201,9 @@ public with sharing class CanvasAPI {
     /* Sample test code:
         CanvasAPI.removeUserLogin('115', '84');
     */
-    public static Map <String, Object> removeUserLogin(String userId, String loginId) {
-        return (Map <String, Object>) apiCall('DELETE', 'users/' + userId + '/logins/' + loginId, '');
-    }
+    // public static Map <String, Object> removeUserLogin(String userId, String loginId) {
+    //     return (Map <String, Object>) apiCall('DELETE', 'users/' + userId + '/logins/' + loginId, '');
+    // }
 
     /* Sample test code:
         CanvasAPI.removeUser('115');

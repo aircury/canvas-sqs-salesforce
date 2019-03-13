@@ -64,48 +64,48 @@ public with sharing class LMS {
         TL_Programme__c[] programmes = [SELECT Id FROM TL_Programme__c];
         LMS.deleteCourse(programmes[2]);
     */
-    public static void deleteCourse(TL_Programme__c p) {
-        TL_Programme__c programme = [
-            SELECT LMS_Course_Id__c 
-            FROM TL_Programme__c
-            WHERE Id = :p.Id
-        ][0];
+    // public static void deleteCourse(TL_Programme__c p) {
+    //     TL_Programme__c programme = [
+    //         SELECT LMS_Course_Id__c 
+    //         FROM TL_Programme__c
+    //         WHERE Id = :p.Id
+    //     ][0];
 
-        if (null == programme.LMS_Course_Id__c) {
-            throw new LMSException('The Programme doesn\'t has a Canvas course associated');
-        }
+    //     if (null == programme.LMS_Course_Id__c) {
+    //         throw new LMSException('The Programme doesn\'t has a Canvas course associated');
+    //     }
 
-        CanvasAPI.deleteCourse(programme.LMS_Course_Id__c.format());
+    //     CanvasAPI.deleteCourse(programme.LMS_Course_Id__c.format());
 
-        programme.LMS_Course_Id__c = null;
+    //     programme.LMS_Course_Id__c = null;
 
-        update programme;
-    }
+    //     update programme;
+    // }
 
-    private static void cleanOtherUserLogins(String userId, String email, String provider) {
-        Boolean providerFound = false;
-        List <Object> apiResultList = CanvasAPI.listUserLogins(userId);
-        List <String[]> loginsToRemove = new List <String[]>();
+    // private static void cleanOtherUserLogins(String userId, String email, String provider) {
+    //     Boolean providerFound = false;
+    //     List <Object> apiResultList = CanvasAPI.listUserLogins(userId);
+    //     List <String[]> loginsToRemove = new List <String[]>();
         
-        for (Object result: apiResultList) {
-            Map <String, Object> login = (Map <String, Object>) result;
-            String providerType = String.valueOf(login.get('authentication_provider_type'));
-            String loginId = String.valueOf(login.get('id'));
-            if (provider != providerType) {
-                loginsToRemove.add(new String[]{userId, loginId});
-            } else {
-                providerFound = true;
-            }
-        }
+    //     for (Object result: apiResultList) {
+    //         Map <String, Object> login = (Map <String, Object>) result;
+    //         String providerType = String.valueOf(login.get('authentication_provider_type'));
+    //         String loginId = String.valueOf(login.get('id'));
+    //         if (provider != providerType) {
+    //             loginsToRemove.add(new String[]{userId, loginId});
+    //         } else {
+    //             providerFound = true;
+    //         }
+    //     }
 
-        if (!providerFound) {
-            CanvasAPI.createUserLogin(userId, email, provider);
-        }
+    //     if (!providerFound) {
+    //         CanvasAPI.createUserLogin(userId, email, provider);
+    //     }
 
-        for (String[] loginToRemove: loginsToRemove) {
-            CanvasAPI.removeUserLogin(loginToRemove[0], loginToRemove[1]);
-        }
-    }
+    //     for (String[] loginToRemove: loginsToRemove) {
+    //         CanvasAPI.removeUserLogin(loginToRemove[0], loginToRemove[1]);
+    //     }
+    // }
 
     /* Sample test code:
         TL_Programme__c[] programmes = [SELECT Id FROM TL_Programme__c];
@@ -193,22 +193,8 @@ public with sharing class LMS {
                 Participant__r.Email != null AND
                 Programme__r.LMS_Start_Date__c <= TODAY AND
                 Programme__r.LMS_End_Date__c >= TODAY
-        ], test = [
-            SELECT Id,
-                Status__c,
-                Programme__r.LMS_Access__c,
-                Programme__r.LMS_Start_Date__c,
-                Programme__r.LMS_End_Date__c,
-                Programme__r.LMS_Course_Section_Id__c,
-                Participant__r.Email,
-                Participant__r.Name,
-                Participant__r.Prefered_Name__c,
-                Participant__r.Participant_UID__c
-            FROM Programme_Participant__c
-            WHERE Id IN :participantIds
         ];
-
-        System.debug('participants: ' + test);
+        
         for (Programme_Participant__c participant: participants) {
             TL_Programme__c programme = participant.Programme__r;
             Contact c = participant.Participant__r;
