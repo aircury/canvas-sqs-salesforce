@@ -3,3 +3,4 @@ venv
 function.zip
 .sfdx
 .vscode
+.env
