@@ -19,10 +19,10 @@ And finally deploy with executed on the directory where the zip was extracted:
 This class needs a Custom Setting named as CanvasAPISettings with 3 fields:
 
 1. Token: to store an API Access token created on Canvas with an admin user
-2. Base_Url: the base url endpoint for the Canvas instance. For example https://ambition.instructure.com/api/v1.
+2. Base_Url: the base url endpoint for the Canvas instance. For example <https://ambition.instructure.com/api/v1.>
    The base url also needs to be added on Remote Sites (Setup->Security Controls->Remote Site Settings)
 3. Account_Id: Canvas account Id used to create courses or users on that Canvas account. For example: account id 1
-    is the "Ambition School Leadership" main and only account on https://ambition.instructure.com
+    is the "Ambition School Leadership" main and only account on <https://ambition.instructure.com>
 
 ### Scheduled Job
 
