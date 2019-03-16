@@ -24,6 +24,6 @@ def lambda_handler(event, context):
 
 
 if __name__ == '__main__':
-    fake_event = {'Records': [{'body': '{test: "Local test"}'}]}
+    fake_event = {'Records': [{'body': '{"data": [{"action": "Test action"}]}'}]}
     lambda_handler(fake_event, None)
 
