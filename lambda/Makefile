@@ -22,9 +22,3 @@ uninstall:
 
 run: venv/lib/python2.7/site-packages/simple_salesforce/__init__.py
 	venv/bin/python2 ProcessSQSRecords.py
-
-apex_tests:
-	sfdx force:apex:test:run -r human -c -w 6 -n LMSTest
-
-apex_deploy:
-	sfdx force:source:deploy --sourcepath force-app

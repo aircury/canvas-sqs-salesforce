@@ -193,7 +193,7 @@ private class LMSTest {
 
         Test.startTest();
 
-        delete event;
+        delete attendee;
 
         Test.stopTest();
     }
@@ -296,5 +296,32 @@ private class LMSTest {
         System.schedule('ScheduleApexTest', '0 0 0 1 1 ?', new ScheduledLMSUsersProvision());
 
         Test.stopTest();
+    }
+
+    @isTest private static void TestLMSException() {
+        TL_Programme__c cohort = new TL_Programme__c(
+            Programme_Definition__c=prDef.Id,
+            Opportunity__c=o.Id,
+            Cohort_Name__c='Test 1',
+            LMS_Access__c=true
+        );
+
+        try {
+            Test.startTest();
+            insert cohort;
+            Test.stopTest();
+        } catch (Exception caught) {
+            System.assert(caught.getTypeName() == 'LMSException');
+        }
+    }
+
+    @isTest private static void TestCanvasAPIException() {
+        try {
+            Test.startTest();
+            CanvasAPI.updateEnrollment('19', '60', 'deactivate');
+            Test.stopTest();
+        } catch (Exception caught) {
+            System.assert(caught.getTypeName() == 'CanvasAPIException', 'Got ' + caught.getTypeName() + ' instead');
+        }
     }
 }

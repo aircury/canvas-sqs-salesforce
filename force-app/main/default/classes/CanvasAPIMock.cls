@@ -21,6 +21,11 @@ global class CanvasAPIMock implements HttpCalloutMock {
             res.setBody('[{"id":"1", "enrollment_state": "deactivate"}]');
         }
 
+        if (endpoint.contains('courses/60/enrollments/19')) {
+            res.setStatusCode(503);
+            res.setStatus('KO');
+        }
+        
         return res;
     }
 }

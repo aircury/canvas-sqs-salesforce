@@ -1,2 +1,1 @@
-public class CanvasAPIException extends Exception {
-}
+public class CanvasAPIException extends Exception {}
