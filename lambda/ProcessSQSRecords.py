@@ -1,8 +1,16 @@
 from __future__ import print_function
 from simple_salesforce import Salesforce, SalesforceLogin
+from canvasapi import Canvas
 
 import os
 import json
+
+
+if __name__ == '__main__':
+    from os.path import join, dirname
+    from dotenv import load_dotenv
+
+    load_dotenv(join(dirname(__file__), '.env'))
 
 
 domain = os.environ.get('SALESFORCE_DOMAIN', 'test')
@@ -13,6 +21,7 @@ session_id, instance = SalesforceLogin(username=os.environ['SALESFORCE_USER'],
                                        domain=domain)
 
 sf = Salesforce(instance=instance, session_id=session_id, domain=domain)
+canvas = Canvas(os.environ['CANVAS_URL'], os.environ['CANVAS_TOKEN'])
 
 
 def lambda_handler(event, context):
@@ -23,9 +32,7 @@ def lambda_handler(event, context):
         for payload in payloads:
             try:
                 login = payload['actor']['extensions']['com.instructure.canvas']
-                # TODO: assert that sis_id is the parameter name sent by canvas
-                uid = login['sis_id']
-                # uid = '1114550'
+                uid = canvas.get_user(login['entity_id']).sis_user_id
                 detail = 'Canvas User: ' + login['user_login']
                 action = payload['action']
                 date = payload['eventTime']
@@ -45,6 +52,7 @@ def lambda_handler(event, context):
             if participants['totalSize'] <= 0:
                 continue
             
+            print(json.dumps(payload))
             for participant in participants['records']:
                 sf.Canvas_Activitiy__c.create({
                         'Canvas_Activity__c': action,

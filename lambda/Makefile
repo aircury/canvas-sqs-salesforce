@@ -15,7 +15,11 @@ function.zip: ProcessSQSRecords.py venv/lib/python2.7/site-packages/simple_sales
 	zip -g function.zip ProcessSQSRecords.py
 
 install: function.zip
-	aws lambda create-function --function-name ProcessSQSRecord --zip-file fileb://function.zip --handler ProcessSQSRecords.lambda_handler --runtime python2.7 --role $$LAMBDA_ROLE --environment Variables={SALESFORCE_USER=$$SALESFORCE_USER,SALESFORCE_PASSWORD=$$SALESFORCE_PASSWORD,SALESFORCE_SECURITY_TOKEN=$$SALESFORCE_SECURITY_TOKEN}
+	aws lambda create-function --function-name ProcessSQSRecord --zip-file \
+	fileb://function.zip --handler ProcessSQSRecords.lambda_handler --runtime python2.7 \
+	--role $$LAMBDA_ROLE --environment Variables={SALESFORCE_USER=$$SALESFORCE_USER,\
+	SALESFORCE_PASSWORD=$$SALESFORCE_PASSWORD,SALESFORCE_SECURITY_TOKEN=$$SALESFORCE_SECURITY_TOKEN,\
+	CANVAS_URL=$$CANVAS_URL,CANVAS_ACCOUNT=$$CANVAS_ACCOUNT,CANVAS_TOKEN=$$CANVAS_TOKEN}
 
 uninstall:
 	aws lambda delete-function --function-name ProcessSQSRecord
