@@ -29,6 +29,20 @@ public with sharing class CanvasAPI {
     }
 
     /* Sample test code:
+        CanvasAPI.updateCourse('37', 'Test Course', 'Test', 
+            DateTime.newInstance(2019, 3, 30), DateTime.newInstance(2019, 4, 30));
+    */
+    public static Map <String, Object> updateCourse(String courseId, String name, String code, DateTime startAt, DateTime endAt) {
+        String body =
+            'course[name]=' + name +
+            '&course[course_code]=' + code +
+            '&course[start_at]=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
+            '&course[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
+
+        return (Map <String, Object>) apiCall('PUT', 'courses/' + courseId, body);
+    }
+
+    /* Sample test code:
         CanvasAPI.createSection('Test Course', '91', 
             DateTime.newInstance(2019, 3, 30), DateTime.newInstance(2019, 4, 30));
     */
@@ -39,6 +53,19 @@ public with sharing class CanvasAPI {
             '&course_section[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
 
         return (Map <String, Object>) apiCall('POST', 'courses/' + courseId + '/sections', body);
+    }
+
+    /* Sample test code:
+        CanvasAPI.updateSection('13', 'Test Course', '91', 
+            DateTime.newInstance(2019, 3, 30), DateTime.newInstance(2019, 4, 30));
+    */
+    public static Map <String, Object> updateSection(String sectionId, String name, DateTime startAt, DateTime endAt) {
+        String body =
+            'course_section[name]=' + name +
+            '&course_section[start_at]=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
+            '&course_section[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
+
+        return (Map <String, Object>) apiCall('PUT', 'sections/' + sectionId, body);
     }
 
     /* Sample test code:
@@ -223,6 +250,7 @@ public with sharing class CanvasAPI {
         req.setMethod(method);
         req.setEndpoint(baseUrl + endpoint);
         req.setHeader('Authorization', 'Bearer ' + token);
+        req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
         if ('' != body) {
             req.setBody(body);
         }

@@ -6,7 +6,6 @@ public with sharing class LMS {
     public static void createCourse(TL_Programme__c p) {
         TL_Programme__c programme = [
             SELECT Id,
-                Name,
                 Programme_Name__c,
                 Cohort_Name__c,
                 LMS_Course_Id__c,
@@ -49,7 +48,7 @@ public with sharing class LMS {
         }
 
         String name = programme.Programme_Name__c + ' ' + programme.Cohort_Name__c;
-        Map <String, Object> apiResult = CanvasAPI.createCourse(name, programme.Name, startAt, endAt);
+        Map <String, Object> apiResult = CanvasAPI.createCourse(name, name, startAt, endAt);
         String courseId = String.valueOf(apiResult.get('id'));
         apiResult = CanvasAPI.createSection(name, courseId, startAt, endAt);
         Integer courseSectionId = Integer.valueOf(apiResult.get('id'));
@@ -249,10 +248,54 @@ public with sharing class LMS {
     }
 
     @future(callout=true)
-    public static void onCourseInsertOrUpdate(Set<ID> programmeIds) {
-        for (TL_Programme__c programme: [SELECT Id, LMS_Access__c FROM TL_Programme__c WHERE Id IN :programmeIds]) {
+    public static void onCourseInsert(ID programmeId) {
+        List<TL_Programme__c> programmes = [
+            SELECT Id,
+                LMS_Access__c
+            FROM TL_Programme__c
+            WHERE Id = :programmeId
+        ];
+
+        for (TL_Programme__c programme: programmes) {
             if (true == programme.LMS_Access__c) {
                 createCourse(programme);
+            }
+        }
+    }
+
+    @future(callout=true)
+    public static void onCourseUpdate(ID programmeId) {
+        List<TL_Programme__c> programmes = [
+            SELECT LMS_Access__c,
+                Programme_Name__c,
+                Cohort_Name__c,
+                LMS_Course_Id__c,
+                LMS_Course_Section_Id__c,
+                LMS_Start_Date__c,
+                LMS_End_Date__c
+            FROM TL_Programme__c
+            WHERE Id = :programmeId
+        ];
+        DateTime startAt, endAt;
+        String name;
+
+        for (TL_Programme__c programme: programmes) {
+            if (true == programme.LMS_Access__c) {
+                startAt = DateTime.newInstance(
+                    programme.LMS_Start_Date__c.year(),
+                    programme.LMS_Start_Date__c.month(),
+                    programme.LMS_Start_Date__c.day()
+                );
+
+                endAt = DateTime.newInstance(
+                    programme.LMS_End_Date__c.year(),
+                    programme.LMS_End_Date__c.month(),
+                    programme.LMS_End_Date__c.day()
+                );
+
+                name = programme.Programme_Name__c + ' ' + programme.Cohort_Name__c;
+                CanvasAPI.updateCourse(String.valueOf(programme.LMS_Course_Id__c), name, name, startAt, endAt);
+                CanvasAPI.updateSection(String.valueOf(programme.LMS_Course_Section_Id__c), name, startAt, endAt);
             }
         }
     }
@@ -265,7 +308,7 @@ public with sharing class LMS {
         if (null == eventDate) {
             return Datetime.now();
         }
-        
+
         Integer hour = Integer.valueOf(eventTime.split(':')[0]),
                 minute = Integer.valueOf(eventTime.split(':')[1]);
 
