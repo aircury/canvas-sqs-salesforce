@@ -68,7 +68,7 @@ public with sharing class CanvasAPI {
         String body = 
             'pseudonym[unique_id]=' + email + 
             '&user[name]=' + name +
-            '&user[short_name]=' + shortName +
+            '&user[short_name]=' + (null != shortName ? shortName : name) +
             '&user[time_zone]=Europe/London' +
             '&user[birthdate]=' +
             '&user[terms_of_use]=false' +
