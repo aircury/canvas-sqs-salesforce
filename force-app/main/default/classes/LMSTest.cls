@@ -84,6 +84,34 @@ private class LMSTest {
         
         Test.stopTest();
     }
+    
+    @isTest private static void TestLMSProgrammeParticipantStatusTriggerName() {
+        TL_Programme__c cohort = new TL_Programme__c(
+            Programme_Definition__c=prDef.Id,
+            Opportunity__c=o.Id,
+            Cohort_Name__c='Test 1',
+            LMS_Access__c=true,
+            LMS_Start_Date__c=Date.today(),
+            LMS_End_Date__c=Date.today() + 1
+        );
+
+        insert cohort;
+
+        Programme_Participant__c participant = new Programme_Participant__c(
+            Cohort__c=cohort.Id,
+            Participant__c=c1.Id,
+            Status__c='Active'
+        );
+        insert participant;
+        
+        Test.startTest();
+
+        participant.ParticipantName__c = 'New Name';
+
+        update participant;
+
+        Test.stopTest();
+    }
 
     @isTest private static void TestLMSProgrammeParticipantStatusTriggerInactive() {
         TL_Programme__c cohort = new TL_Programme__c(

@@ -109,6 +109,14 @@ public with sharing class CanvasAPI {
         return (Map <String, Object>) apiCall('POST', 'accounts/:account_id/users', body);
     }
 
+    public static Map <String, Object> updateUser(String participantUID, String name, String shortName) {
+        String body = 
+            'user[name]=' + name +
+            '&user[short_name]=' + (null != shortName ? shortName : name);
+
+        return (Map <String, Object>) apiCall('PUT', 'users/sis_user_id:' + participantUID, body);
+    }
+
     /* Sample test code:
         CanvasAPI.findUserByEmail('test@example.org');
     */

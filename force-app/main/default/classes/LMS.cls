@@ -248,6 +248,27 @@ public with sharing class LMS {
     }
 
     @future(callout=true)
+    public static void onParticipantNameChange(ID participantId) {
+        List<Programme_Participant__c> participants = [
+            SELECT ParticipantName__c,
+                Participant__r.Prefered_Name__c,
+                Participant__r.Participant_UID__c
+            FROM Programme_Participant__c
+            WHERE Id = :participantId AND
+                Programme__r.LMS_Access__c = true AND
+                Participant__r.Email != null AND
+                Programme__r.LMS_Start_Date__c <= TODAY AND
+                Programme__r.LMS_End_Date__c >= TODAY
+        ];
+        
+        for (Programme_Participant__c participant: participants) {
+            Contact c = participant.Participant__r;
+
+            CanvasAPI.updateUser(c.Participant_UID__c, participant.ParticipantName__c, c.Prefered_Name__c);
+        }
+    }
+
+    @future(callout=true)
     public static void onCourseInsert(ID programmeId) {
         List<TL_Programme__c> programmes = [
             SELECT Id,

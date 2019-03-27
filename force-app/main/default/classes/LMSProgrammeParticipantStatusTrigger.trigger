@@ -6,8 +6,13 @@ trigger LMSProgrammeParticipantStatusTrigger on Programme_Participant__c (after 
     Boolean Status_Changed = false;
     if (Trigger.isUpdate) {
         for (Id participantId : Trigger.newMap.keySet() ) {
-            if (Trigger.oldMap.get( participantId ).Status__c != Trigger.newMap.get( participantId ).Status__c ) {
+            Programme_Participant__c oldP = Trigger.oldMap.get(participantId), newP =Trigger.newMap.get(participantId);
+            if (oldP.Status__c != newP.Status__c ) {
                 Status_Changed = true;
+            }
+
+            if (oldP.ParticipantName__c != newP.ParticipantName__c) {
+                LMS.onParticipantNameChange(participantId);
             }
         }
     }
