@@ -258,6 +258,14 @@ public with sharing class LMS {
     }
 
     public static DateTime getEventDateTime(Date eventDate, String eventTime) {
+        if (null == eventTime) {
+            eventTime = '12:00';
+        }
+
+        if (null == eventDate) {
+            return Datetime.now();
+        }
+        
         Integer hour = Integer.valueOf(eventTime.split(':')[0]),
                 minute = Integer.valueOf(eventTime.split(':')[1]);
 
@@ -288,7 +296,7 @@ public with sharing class LMS {
                 FLIP_Event__r.Start_Time__c,
                 FLIP_Event__r.End_Time__c,
                 FLIP_Event__r.Event_Name__c,
-                FLIP_Event__r.Event_Description__c,
+                FLIP_Event__r.Event_Description_Rich__c,
                 FLIP_Event__r.Address_Line_1__c,
                 FLIP_Event__r.Address_Line_2__c,
                 FLIP_Event__r.Postal_Code__c
@@ -300,7 +308,7 @@ public with sharing class LMS {
                 FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c > TODAY AND
                 Contact__r.Email != null
         ];
-        String code, title, description, address;
+        String code, title, description, address, line1, line2, postalCode;
         List <Object> apiResultList;
         Map <String, Object> apiResult;
         String userId;
@@ -326,8 +334,11 @@ public with sharing class LMS {
 
             userId = String.valueOf(apiResult.get('id'));
             title = event.Event_Name__c;
-            description = event.Event_Description__c;
-            address = event.Address_Line_1__c + '\n' + event.Address_Line_2__c + '\n' + event.Postal_Code__c;
+            description = null == event.Event_Description_Rich__c ? '' : event.Event_Description_Rich__c;
+            line1 = null == event.Address_Line_1__c ? '' : event.Address_Line_1__c;
+            line2 = null == event.Address_Line_2__c ? '' : event.Address_Line_2__c;
+            postalCode = null == event.Postal_Code__c ? '' : event.Postal_Code__c;
+            address = line1 + ' ' + line2 + ' ' + postalCode;
             CanvasAPI.createEvent('user', userId, userId, title, description, startAt, endAt, address);
         }
     }
