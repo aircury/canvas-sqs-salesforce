@@ -2,7 +2,7 @@ include .env
 export
 
 deploy: function.zip
-	aws lambda update-function-code --function-name ProcessSQSRecord --zip-file fileb://function.zip
+	aws lambda update-function-code --function-name $$LAMBDA_NAME --zip-file fileb://function.zip
 
 venv/bin/python2:
 	virtualenv venv
@@ -15,7 +15,7 @@ function.zip: ProcessSQSRecords.py venv/lib/python2.7/site-packages/simple_sales
 	zip -g function.zip ProcessSQSRecords.py
 
 install: function.zip
-	aws lambda create-function --function-name ProcessSQSRecord --zip-file \
+	aws lambda create-function --function-name $$LAMBDA_NAME --zip-file \
 	fileb://function.zip --handler ProcessSQSRecords.lambda_handler --runtime python2.7 \
 	--role $$LAMBDA_ROLE --environment Variables={SALESFORCE_USER=$$SALESFORCE_USER,\
 	SALESFORCE_PASSWORD=$$SALESFORCE_PASSWORD,SALESFORCE_SECURITY_TOKEN=$$SALESFORCE_SECURITY_TOKEN,\

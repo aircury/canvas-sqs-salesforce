@@ -1,6 +1,7 @@
 from __future__ import print_function
 from simple_salesforce import Salesforce, SalesforceLogin
 from canvasapi import Canvas
+from canvasapi.exceptions import Unauthorized
 
 import os
 import json
@@ -38,6 +39,8 @@ def lambda_handler(event, context):
                 date = payload['eventTime']
                 time = payload['eventTime'][11:]
             except KeyError as e:
+                continue
+            except Unauthorized as e:
                 continue
             
             participants = sf.query('''
