@@ -3,8 +3,10 @@ private class LMSTest {
     static Programme_Definition__c prDef;
     static Opportunity o;
     static Contact c1, c2;
+    static CanvasAPIMock apiMock;
     static {
-        Test.setMock(HttpCalloutMock.class, new CanvasAPIMock());
+        apiMock = new CanvasAPIMock();
+        Test.setMock(HttpCalloutMock.class, apiMock);
 
         prDef = new Programme_Definition__c(Programme__c='Test', Status__c='Active');
         insert prDef;
@@ -130,6 +132,7 @@ private class LMSTest {
             Participant__c=c2.Id,
             Status__c='Active'
         );
+        apiMock.setEmptySearch(true);
         insert participant;
        
         Test.startTest();
@@ -138,6 +141,7 @@ private class LMSTest {
         update participant;
 
         Test.stopTest();
+        apiMock.setEmptySearch(false);
     }
 
     @isTest private static void TestLMSProgrammeParticipantStatusTriggerComplete() {

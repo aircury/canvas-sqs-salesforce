@@ -118,12 +118,12 @@ public with sharing class CanvasAPI {
     }
 
     /* Sample test code:
-        CanvasAPI.findUserByEmail('test@example.org');
+        CanvasAPI.findUserByUID('123456');
     */
-    public static List <Object> findUserByEmail(String email) {
+    public static List <Object> findUserByUID(String participantUID) {
         String query = 
-            '?search_term=' + email + 
-            '&sort=email';
+            '?search_term=' + participantUID + 
+            '&sort=sis_id';
 
         return (List <Object>) apiCall('GET', 'accounts/:account_id/users' + query, '');
     }

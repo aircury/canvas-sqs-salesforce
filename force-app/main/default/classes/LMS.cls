@@ -197,7 +197,7 @@ public with sharing class LMS {
         for (Programme_Participant__c participant: participants) {
             TL_Programme__c programme = participant.Programme__r;
             Contact c = participant.Participant__r;
-            List <Object> apiResultList = CanvasAPI.findUserByEmail(c.Email);
+            List <Object> apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
             Map <String, Object> apiResult;
             String userId, sectionId = String.valueOf(programme.LMS_Course_Section_Id__c);
 
@@ -383,7 +383,7 @@ public with sharing class LMS {
             DateTime startAt = getEventDateTime(event.Event_Date__c, event.Start_Time__c);
             DateTime endAt = getEventDateTime(event.Event_End_Date__c, event.End_Time__c);
             
-            apiResultList = CanvasAPI.findUserByEmail(c.Email);
+            apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
 
             if (0 == apiResultList.size()) {
                 apiResultList.add(CanvasAPI.createUser(
@@ -415,7 +415,7 @@ public with sharing class LMS {
     private static void doEventDelete(Set<ID> attendeeIds, DateTime startAt, DateTime endAt) {
         List<Attendees__c> attendees = [
             SELECT Id,
-                Contact__r.Email,
+                Contact__r.Participant_UID__c,
                 FLIP_Event__r.Event_Date__c,
                 FLIP_Event__r.Event_End_Date__c,
                 FLIP_Event__r.Start_Time__c,
@@ -425,7 +425,7 @@ public with sharing class LMS {
                 FLIP_Event__r.Cohort_lkp__r.LMS_Access__c = true AND
                 FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c <= TODAY AND
                 FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c > TODAY AND
-                Contact__r.Email != null
+                Contact__r.Participant_UID__c != null
             ALL ROWS
         ];
         String code, title, description, address;
@@ -439,7 +439,7 @@ public with sharing class LMS {
             startAt = null == startAt ? getEventDateTime(event.Event_Date__c, event.Start_Time__c) : startAt;
             endAt = null == endAt ? getEventDateTime(event.Event_End_Date__c, event.End_Time__c) : endAt;
             
-            apiResultList = CanvasAPI.findUserByEmail(c.Email);
+            apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
 
             if (0 == apiResultList.size()) {
                 continue;

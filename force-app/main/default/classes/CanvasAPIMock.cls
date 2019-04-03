@@ -1,5 +1,11 @@
 @isTest
 global class CanvasAPIMock implements HttpCalloutMock {
+    Boolean emptySearch = false;
+
+    public void setEmptySearch(Boolean value) {
+        emptySearch = value;
+    }
+
     global HTTPResponse respond(HTTPRequest req) {
         HttpResponse res = new HttpResponse();
         res.setHeader('Content-Type', 'application/json');
@@ -10,11 +16,11 @@ global class CanvasAPIMock implements HttpCalloutMock {
         
         res.setBody('{"id":"1"}');
 
-        if (endpoint.contains('accounts/1/users?search_term=test2')) {
+        if (endpoint.contains('accounts/1/users?search_term=') && emptySearch) {
             res.setBody('[]');
         } 
         
-        if (endpoint.contains('accounts/1/users?search_term=test1') ||
+        if ((endpoint.contains('accounts/1/users?search_term=') && !emptySearch) ||
             endpoint.contains('sections/1/enrollments') ||
             endpoint.contains('calendar_events?start_date')
         ) {
