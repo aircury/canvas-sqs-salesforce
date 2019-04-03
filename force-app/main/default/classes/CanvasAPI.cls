@@ -108,6 +108,19 @@ public with sharing class CanvasAPI {
 
         return (Map <String, Object>) apiCall('POST', 'accounts/:account_id/users', body);
     }
+    
+    public static Map <String, Object> createCommunicationChannel(String participantUID, String email) {
+        String body = 
+            'communication_channel[address]=' + email + 
+            '&communication_channel[type]=email' +
+            '&skip_confirmation=true';
+
+        return (Map <String, Object>) apiCall('POST', 'users/sis_user_id:' + participantUID + '/communication_channels', body);
+    }
+
+    public static Map <String, Object> deleteCommunicationChannel(String participantUID, String email) {
+        return (Map <String, Object>) apiCall('DELETE', 'users/sis_user_id:' + participantUID + '/communication_channels/email/' + email, '');
+    }
 
     public static Map <String, Object> updateUser(String participantUID, String name, String shortName) {
         String body = 

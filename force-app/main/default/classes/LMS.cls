@@ -214,6 +214,8 @@ public with sharing class LMS {
                     c.Prefered_Name__c,
                     c.Participant_UID__c
                 ));
+
+                CanvasAPI.createCommunicationChannel(c.Participant_UID__c, c.email);
             }
 
             apiResult = (Map <String, Object>) apiResultList[0];
@@ -244,6 +246,50 @@ public with sharing class LMS {
                     }
                }
             }
+        }
+    }
+
+    @future(callout=true)
+    public static void onContactUpdate(ID contactId, String oldEmail, String newEmail) {
+        List<Programme_Participant__c> participants = [
+            SELECT Participant__r.Name,
+                Participant__r.Email,
+                Participant__r.Prefered_Name__c,
+                Participant__r.Participant_UID__c
+            FROM Programme_Participant__c
+            WHERE Participant__r.Id = :contactId AND
+                Programme__r.LMS_Access__c = true AND
+                Participant__r.Email != null AND
+                Programme__r.LMS_Start_Date__c <= TODAY AND
+                Programme__r.LMS_End_Date__c >= TODAY
+        ];
+        
+        for (Programme_Participant__c participant: participants) {
+            Contact c = participant.Participant__r;
+
+            CanvasAPI.updateUser(c.Participant_UID__c, c.Name, c.Prefered_Name__c);
+
+            if (oldEmail == newEmail) {
+                break;
+            }
+
+            try {
+                CanvasAPI.deleteCommunicationChannel(c.Participant_UID__c, oldEmail);
+            } catch (CanvasAPIException caught) {
+                if (!caught.getMessage().contains('The specified resource does not exist')) {
+                    throw caught;
+                }
+            }
+
+            try {
+                CanvasAPI.createCommunicationChannel(c.Participant_UID__c, newEmail);
+            } catch (CanvasAPIException caught) {
+                if (!caught.getMessage().contains('unique!')) {
+                    throw caught;
+                }
+            }
+
+            break;
         }
     }
 
@@ -392,6 +438,8 @@ public with sharing class LMS {
                     c.Prefered_Name__c,
                     c.Participant_UID__c
                 ));
+
+                CanvasAPI.createCommunicationChannel(c.Participant_UID__c, c.email);
             }
 
             apiResult = (Map <String, Object>) apiResultList[0];
