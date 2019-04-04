@@ -24,6 +24,8 @@ This class needs a Custom Setting named as CanvasAPISettings with 3 fields:
 3. Account_Id: Canvas account Id used to create courses or users on that Canvas account. For example: account id 1
     is the "Ambition School Leadership" main and only account on <https://ambition.instructure.com>
 
+Also, we need to add the Canvas instance url to Setup->Security->Remote site settings.
+
 ### Scheduled Job
 
 In order to provision Canvas user on LMS course start date, a new scheduled Job running the
