@@ -134,20 +134,33 @@ public with sharing class LMS {
         onEventInsert(attendees.keySet());
     }
 
-    public static void usersComplete(TL_Programme__c p) {
+    @future(callout=true)
+    public static void removeUsers(Id programmeId) {
         TL_Programme__c programme = [
             SELECT Id,
-                (SELECT Status__c, 
+                LMS_Course_Section_Id__c,
+                (SELECT Participant__r.Participant_UID__c,
                     Participant__r.Email
                 FROM Programme_Participants__r)
             FROM TL_Programme__c
-            WHERE Id = :p.Id
+            WHERE Id = :programmeId
         ][0];
 
         for (Programme_Participant__c participant: programme.Programme_Participants__r) {
-            participant.Status__c = 'Complete';
+            Contact c = participant.Participant__r;
+            List <Object> apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
+            Map <String, Object> apiResult;
+            String userId, sectionId = String.valueOf(programme.LMS_Course_Section_Id__c);
 
-            update participant;
+            if (0 == apiResultList.size()) {
+                continue;
+            }
+
+            apiResult = (Map <String, Object>) apiResultList[0];
+
+            userId = String.valueOf(apiResult.get('id'));
+
+            removeUser(userId, sectionId, programmeId, c.Email);
         }
     }
 
@@ -173,6 +186,23 @@ public with sharing class LMS {
             CanvasAPI.updateEnrollment(enrollmentId, String.valueOf(apiResult.get('course_id')), task);
         } else {
             CanvasAPI.reactivateEnrollment(enrollmentId, String.valueOf(apiResult.get('course_id')));
+        }
+    }
+
+    public static void removeUser(String userId, String sectionId, Id programmeId, String email) {
+        Integer otherUserCourses = [SELECT COUNT()
+            FROM Programme_Participant__c
+            WHERE Participant__r.Email = :email AND
+                Programme__r.Id != :programmeId AND
+                Programme__r.LMS_Access__c = true AND
+                Programme__r.LMS_Start_Date__c <= TODAY AND
+                Programme__r.LMS_End_Date__c > TODAY
+        ];
+
+        if (0 < otherUserCourses) {
+            enrollUser(userId, sectionId, true, 'conclude');
+        } else {
+            CanvasAPI.removeUser(userId);
         }
     }
 
@@ -230,20 +260,7 @@ public with sharing class LMS {
                     enrollUser(userId, sectionId, true, 'deactivate');
                }
                when 'Complete', 'Deferred', 'Withdrawn' {
-                    Integer otherUserCourses = [SELECT COUNT()
-                        FROM Programme_Participant__c
-                        WHERE Participant__r.Email = :c.Email AND
-                            Programme__r.Id != :programme.Id AND
-                            Programme__r.LMS_Access__c = true AND
-                            Programme__r.LMS_Start_Date__c <= TODAY AND
-                            Programme__r.LMS_End_Date__c > TODAY
-                    ];
-
-                    if (0 < otherUserCourses) {
-                        enrollUser(userId, sectionId, true, 'conclude');
-                    } else {
-                        CanvasAPI.removeUser(userId);
-                    }
+                    removeUser(userId, sectionId, programme.Id, c.Email);
                }
             }
         }
