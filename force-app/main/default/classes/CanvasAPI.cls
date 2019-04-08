@@ -177,22 +177,19 @@ public with sharing class CanvasAPI {
     }
 
     /* Sample test code:
-        CanvasAPI.listUserLogins('test@example.org');
+        CanvasAPI.listUserLogins('123456');
     */
-    // public static List <Object> listUserLogins(String userId) {
-    //     return (List <Object>) apiCall('GET', 'users/' + userId + '/logins', '');
+    // public static List <Object> listUserLogins(String participantUID) {
+    //     return (List <Object>) apiCall('GET', 'users/sis_user_id:' + participantUID + '/logins', '');
     // }
 
     /* Sample test code:
-        CanvasAPI.createUserLogin('115', 'test@example.org', 'saml');
+        CanvasAPI.editUserLogin('123', 'test@example.org');
     */
-    // public static Map <String, Object> createUserLogin(String userId, String email, String provider) {
-    //     String body = 
-    //         'user[id]=' + userId +
-    //         '&login[unique_id]=' + email + 
-    //         '&login[authentication_provider_id]=' + provider;
+    // public static Map <String, Object> editUserLogin(String loginId, String email) {
+    //     String body = 'login[unique_id]=' + email;
 
-    //     return (Map <String, Object>) apiCall('POST', 'accounts/:account_id/logins', body);
+    //     return (Map <String, Object>) apiCall('PUT', 'accounts/:account_id/logins/' + loginId, body);
     // }
 
     /* Sample test code:

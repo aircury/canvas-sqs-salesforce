@@ -306,6 +306,15 @@ public with sharing class LMS {
                 }
             }
 
+            //Update user login
+            // List<Object> apiResultList = CanvasAPI.listUserLogins(c.Participant_UID__c);
+
+            // for (Map <String, Object> apiResult: apiResultList) {
+            //     if (oldEmail == String.valueOf(apiResult.get('unique_id'))) {
+            //         CanvasAPI.editUserLogin(String.valueOf(apiResult.get('id')), newEmail);
+            //     }
+            // }
+
             break;
         }
     }
