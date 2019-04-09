@@ -306,6 +306,8 @@ public with sharing class LMS {
                 }
             }
 
+            CanvasAPI.updateUserEmail(c.Participant_UID__c, newEmail);
+            
             //Update user login
             // List<Object> apiResultList = CanvasAPI.listUserLogins(c.Participant_UID__c);
 
