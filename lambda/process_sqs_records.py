@@ -1,11 +1,11 @@
 from __future__ import print_function
 from simple_salesforce import Salesforce, SalesforceLogin
-from canvasapi import Canvas
 from canvasapi.exceptions import Unauthorized
 
 import os
 import json
-
+import logging
+import canvas_live_events
 
 if __name__ == '__main__':
     from os.path import join, dirname
@@ -14,6 +14,7 @@ if __name__ == '__main__':
     load_dotenv(join(dirname(__file__), '.env'))
 
 
+logging.getLogger().setLevel(os.environ.get('LOG_LEVEL', 'DEBUG'))
 domain = os.environ.get('SALESFORCE_DOMAIN', 'test')
 
 session_id, instance = SalesforceLogin(username=os.environ['SALESFORCE_USER'],
@@ -22,43 +23,53 @@ session_id, instance = SalesforceLogin(username=os.environ['SALESFORCE_USER'],
                                        domain=domain)
 
 sf = Salesforce(instance=instance, session_id=session_id, domain=domain)
-canvas = Canvas(os.environ['CANVAS_URL'], os.environ['CANVAS_TOKEN'])
 
+
+def complete_details(detail, participant, date):
+    return detail.replace('<participant>', participant).replace('<date>', date[:10])
 
 def lambda_handler(event, context):
     for record in event['Records']:
         payload = str(record["body"])
         payloads = json.loads(payload)['data']
-        print(payload)
+        logging.debug(payload)
         for payload in payloads:
             try:
-                login = payload['actor']['extensions']['com.instructure.canvas']
-                uid = canvas.get_user(login['entity_id']).sis_user_id
-                detail = 'Canvas User: ' + login['user_login']
+                actor = payload['actor']
+                typev = payload['type']
                 action = payload['action']
+                objectv = payload['object']
+                object_type = objectv['type']
+                group = payload.get('group', {})
                 date = payload['eventTime']
                 time = payload['eventTime'][11:]
+                liveEvent = canvas_live_events.EVENT_MAP[typev][action][object_type]
             except KeyError as e:
                 continue
+            
+            try:
+                uid, detail, activity = getattr(canvas_live_events, 'process_' + liveEvent)(actor, objectv, group)
+                logging.debug(detail)
             except Unauthorized as e:
                 continue
-            
+
             participants = sf.query('''
-                SELECT Id 
+                SELECT Id,
+                    ParticipantName__c
                 FROM Programme_Participant__c
                 WHERE Programme__r.LMS_Access__c = true AND
                     Programme__r.LMS_Start_Date__c <= TODAY AND
-                    Programme__r.LMS_End_Date__c >= TODAY AND
+                    Programme__r.LMS_End_Date__c > TODAY AND
                     Participant_UID__c = '%s'
             ''' % uid)
 
             if participants['totalSize'] <= 0:
                 continue
             
-            print(json.dumps(payload))
             for participant in participants['records']:
+                detail = complete_details(detail, participant['ParticipantName__c'], date)
                 sf.Canvas_Activitiy__c.create({
-                        'Canvas_Activity__c': action,
+                        'Canvas_Activity__c': activity,
                         'Canvas_Activity_Detail__c': detail,
                         'Date__c': date,
                         'Time__c': time,
@@ -67,6 +78,7 @@ def lambda_handler(event, context):
 
 
 if __name__ == '__main__':
-    fake_event = {'Records': [{'body': '{"data": [{"action": "Test action"}]}'}]}
-    lambda_handler(fake_event, None)
+    with open('event_samples/submission_created.json') as f:
+        fake_event = {'Records': [{'body': '{"data": %s}' % f.read()}]}
+        lambda_handler(fake_event, None)
 

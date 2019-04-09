@@ -1,0 +1,80 @@
+[
+    {
+        "@context": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+        "id": "urn:uuid:5c30bdf3-55a7-46d4-8af4-47997d70a5d7",
+        "type": "AssessmentEvent",
+        "actor": {
+            "id": "urn:instructure:canvas:user:136700000000000172",
+            "type": "Person",
+            "extensions": {
+                "com.instructure.canvas": {
+                    "user_login": "test23@example.org",
+                    "root_account_id": "136700000000000001",
+                    "root_account_lti_guid": "goEDSoAAOglTCWN4wqt23IuebpCVvF9EMiUW1MPU:canvas-lms",
+                    "root_account_uuid": "goEDSoAAOglTCWN4wqt23IuebpCVvF9EMiUW1MPU",
+                    "entity_id": "136700000000000196"
+                }
+            }
+        },
+        "action": "Submitted",
+        "object": {
+            "id": "urn:instructure:canvas:submission:136700000000000193",
+            "type": "Attempt",
+            "extensions": {
+                "com.instructure.canvas": {
+                    "entity_id": "136700000000000193"
+                }
+            },
+            "assignee": {
+                "id": "urn:instructure:canvas:user:136700000000000196",
+                "type": "Person"
+            },
+            "assignable": {
+                "id": "urn:instructure:canvas:quiz:136700000000000126",
+                "type": "Assessment"
+            }
+        },
+        "eventTime": "2019-04-08T15:01:26.000Z",
+        "edApp": {
+            "id": "http://ambition.instructure.com/",
+            "type": "SoftwareApplication"
+        },
+        "group": {
+            "id": "urn:instructure:canvas:course:136700000000000148",
+            "type": "CourseOffering",
+            "extensions": {
+                "com.instructure.canvas": {
+                    "context_type": "Course",
+                    "entity_id": "136700000000000148"
+                }
+            }
+        },
+        "membership": {
+            "id": "urn:instructure:canvas:course:136700000000000148:Learner:136700000000000172",
+            "type": "Membership",
+            "member": {
+                "id": "urn:instructure:canvas:user:136700000000000172",
+                "type": "Person"
+            },
+            "organization": {
+                "id": "urn:instructure:canvas:course:136700000000000148",
+                "type": "CourseOffering"
+            },
+            "roles": [
+                "Learner"
+            ]
+        },
+        "session": {
+            "id": "urn:instructure:canvas:session:71783fd558b93d7b9b692f785476413a",
+            "type": "Session"
+        },
+        "extensions": {
+            "com.instructure.canvas": {
+                "hostname": "ambition.instructure.com",
+                "request_id": "7df0c404-bc36-4800-9531-5e06de117ed4",
+                "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+                "version": "1.0.0"
+            }
+        }
+    }
+]

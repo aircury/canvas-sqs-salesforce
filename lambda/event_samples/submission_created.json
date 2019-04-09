@@ -1,0 +1,85 @@
+[
+    {
+    "@context": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+    "id": "urn:uuid:cd900847-7b3b-4fc0-b672-153113a69b5f",
+    "type": "AssignableEvent",
+    "actor": {
+        "id": "urn:instructure:canvas:user:21070000000000048",
+        "type": "Person",
+        "extensions": {
+            "com.instructure.canvas": {
+                "real_user_id": "111111111111111",
+                "user_login": "test2@test.com",
+                "root_account_id": "21070000000000001",
+                "root_account_lti_guid": "7db438071375c02373713c12c73869ff2f470b68.oxana.instructure.com",
+                "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+                "entity_id": "21070000000000048"
+            }
+        }
+    },
+    "action": "Submitted",
+    "object": {
+        "id": "urn:instructure:canvas:submission:21070000000011091",
+        "type": "Attempt",
+        "dateCreated": "2018-09-20T22:17:58.000Z",
+        "extensions": {
+        "com.instructure.canvas": {
+            "submission_type": "online_text_entry",
+            "entity_id": "21070000000011091"
+        }
+        },
+        "assignee": {
+            "id": "urn:instructure:canvas:user:21070000000000048",
+            "type": "Person"
+        },
+        "assignable": {
+            "id": "urn:instructure:canvas:assignment:21070000000000360",
+            "type": "AssignableDigitalResource"
+        },
+        "count": 1,
+        "body": "<p>this is a test assignment</p>"
+    },
+    "eventTime": "2018-09-20T22:17:58.000Z",
+    "edApp": {
+        "id": "http://oxana.instructure.com/",
+        "type": "SoftwareApplication"
+    },
+    "group": {
+        "id": "urn:instructure:canvas:course:21070000000000565",
+        "type": "CourseOffering",
+        "extensions": {
+            "com.instructure.canvas": {
+                "context_type": "Course",
+                "entity_id": "21070000000000565"
+            }
+        }
+    },
+    "membership": {
+        "id": "urn:instructure:canvas:course:21070000000000565:Learner:21070000000000048",
+        "type": "Membership",
+        "member": {
+            "id": "urn:instructure:canvas:user:21070000000000048",
+            "type": "Person"
+        },
+        "organization": {
+            "id": "urn:instructure:canvas:course:21070000000000565",
+            "type": "CourseOffering"
+        },
+        "roles": [
+            "Learner"
+        ]
+    },
+    "session": {
+        "id": "urn:instructure:canvas:session:fe03cd7d1de8d27ca95e2d6f5fe11891",
+        "type": "Session"
+    },
+    "extensions": {
+        "com.instructure.canvas": {
+            "hostname": "oxana.instructure.com",
+            "request_id": "e17ec787-8899-47a7-8665-9b5f51849e40",
+            "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36",
+            "version": "1.0.0"
+            }
+        }
+    }
+]

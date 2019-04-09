@@ -1,0 +1,47 @@
+[
+    {
+        "@context": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+        "id": "urn:uuid:3ed6a484-ff50-4ee9-b39e-6d2c80f730c7",
+        "type": "SessionEvent",
+        "actor": {
+            "id": "urn:instructure:canvas:user:136700000000000006",
+            "type": "Person",
+            "extensions": {
+                "com.instructure.canvas": {
+                    "user_login": "test23@example.org",
+                    "root_account_id": "136700000000000001",
+                    "root_account_lti_guid": "goEDSoAAOglTCWN4wqt23IuebpCVvF9EMiUW1MPU:canvas-lms",
+                    "root_account_uuid": "goEDSoAAOglTCWN4wqt23IuebpCVvF9EMiUW1MPU",
+                    "entity_id": "136700000000000196"
+                }
+            }
+        },
+        "action": "LoggedIn",
+        "object": {
+            "id": "http://ambition.instructure.com/",
+            "type": "SoftwareApplication",
+            "extensions": {
+                "com.instructure.canvas": {
+                    "redirect_url": "https://ambition.instructure.com/"
+                }
+            }
+        },
+        "eventTime": "2019-04-09T10:28:15.000Z",
+        "edApp": {
+            "id": "http://ambition.instructure.com/",
+            "type": "SoftwareApplication"
+        },
+        "session": {
+            "id": "urn:instructure:canvas:session:a6d8bd29cf1e02c844e2f8efec43b995",
+            "type": "Session"
+        },
+        "extensions": {
+            "com.instructure.canvas": {
+                "hostname": "ambition.instructure.com",
+                "request_id": "681621b6-ca3d-4ef4-b9c9-7892e270291f",
+                "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36",
+                "version": "1.0.0"
+            }
+        }
+    }
+]
