@@ -49,7 +49,7 @@ def lambda_handler(event, context):
                 continue
             
             try:
-                uid, course_id, detail, activity = getattr(canvas_live_events, 'process_' + liveEvent)(actor, objectv, group)
+                uid, course_id, detail, activity, event_name = getattr(canvas_live_events, 'process_' + liveEvent)(actor, objectv, group)
                 logging.debug(detail)
             except AttributeError as e:
                 logging.warning('process_%s not implemented yet' % liveEvent)
@@ -88,6 +88,28 @@ def lambda_handler(event, context):
                         'Programme_Participant__c': participant['Id']
                 })
 
+            if not event_name:
+                continue
+            
+            query = '''
+                SELECT Id
+                FROM Attendees__c
+                WHERE Contact__r.Participant_UID__c = '%s' AND
+                    FLIP_Event__r.Cohort_lkp__r.LMS_Access__c = true AND
+                    FLIP_Event__r.Send_to_LMS__c = true AND
+                    FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c <= TODAY AND
+                    FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c > TODAY AND
+                    Contact__r.Email != null AND
+                    FLIP_Event__r.Event_Name__c = '%s'
+            '''
+
+            attendees = sf.query(query % (uid, event_name))
+
+            if attendees['totalSize'] <= 0:
+                continue
+            
+            for attendee in attendees['records']:
+                sf.Attendees__c.update(attendee['Id'], {'Event_Attended__c': True})
 
 if __name__ == '__main__':
     with open('event_samples/quiz_submitted.json') as f:

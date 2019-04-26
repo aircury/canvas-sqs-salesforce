@@ -4,7 +4,7 @@
         "id": "urn:uuid:5c30bdf3-55a7-46d4-8af4-47997d70a5d7",
         "type": "AssessmentEvent",
         "actor": {
-            "id": "urn:instructure:canvas:user:136700000000000172",
+            "id": "urn:instructure:canvas:user:136700000000000196",
             "type": "Person",
             "extensions": {
                 "com.instructure.canvas": {
@@ -40,12 +40,12 @@
             "type": "SoftwareApplication"
         },
         "group": {
-            "id": "urn:instructure:canvas:course:136700000000000148",
+            "id": "urn:instructure:canvas:course:136700000000000180",
             "type": "CourseOffering",
             "extensions": {
                 "com.instructure.canvas": {
                     "context_type": "Course",
-                    "entity_id": "136700000000000148"
+                    "entity_id": "136700000000000180"
                 }
             }
         },

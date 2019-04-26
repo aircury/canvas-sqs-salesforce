@@ -111,7 +111,7 @@ def process_quiz_submitted(actor, objectv, group):
         (quiz.title, course.name, submission.score, submission.quiz_points_possible)
     activity = 'Quiz Submitted'
 
-    return (uid, clean_course_id(course_id), detail, activity)
+    return (uid, clean_course_id(course_id), detail, activity, quiz.title)
 
 def process_submission_created(actor, objectv, group):
     user_id = actor['extensions']['com.instructure.canvas']['entity_id']
@@ -126,12 +126,12 @@ def process_submission_created(actor, objectv, group):
         (assignment.name, course.name, submission.grade)
     activity = 'Submission Created'
 
-    return (uid, clean_course_id(course_id), detail, activity)
+    return (uid, clean_course_id(course_id), detail, activity, assignment.name)
 
 def process_submission_updated(actor, objectv, group):
-    uid, course_id, detail, activity = process_submission_created(actor, objectv, group)
+    uid, course_id, detail, activity, event_name = process_submission_created(actor, objectv, group)
 
-    return (uid, course_id, detail.replace('created submission', 'updated submission'), activity.replace('Created', 'Updated'))
+    return (uid, course_id, detail.replace('created submission', 'updated submission'), activity.replace('Created', 'Updated'), event_name)
 
 def process_discussion_topic_created(actor, objectv, group):
     user_id = actor['extensions']['com.instructure.canvas']['entity_id']
@@ -141,7 +141,7 @@ def process_discussion_topic_created(actor, objectv, group):
     detail = '<participant> created the discussion "%s" on <date>' % discussion
     activity = 'Discussion Created'
 
-    return (uid, course_id, detail, activity)
+    return (uid, course_id, detail, activity, None)
 
 def process_discussion_entry_created(actor, objectv, group):
     user_id = actor['extensions']['com.instructure.canvas']['entity_id']
@@ -152,12 +152,12 @@ def process_discussion_entry_created(actor, objectv, group):
     detail = '<participant> replied to the discussion "%s" on <date>' % discussion.title
     activity = 'Discussion Replied'
 
-    return (uid, clean_course_id(course_id), detail, activity)
+    return (uid, clean_course_id(course_id), detail, activity, None)
 
 def process_enrollment_created(actor, objectv, group):
-    uid, course_id, detail, activity = process_submission_created(actor, objectv, group)
+    uid, course_id, detail, activity, event_name = process_submission_created(actor, objectv, group)
 
-    return (uid, course_id, detail, activity.replace('Updated', 'Created'))
+    return (uid, course_id, detail, activity.replace('Updated', 'Created'), event_name)
 
 def process_enrollment_updated(actor, objectv, group):
     enrollment_id = objectv['extensions']['com.instructure.canvas']['entity_id']
@@ -169,7 +169,7 @@ def process_enrollment_updated(actor, objectv, group):
     detail = '<participant> status "%s" for role "%s" on programme "%s" on <date>' % (state, role.label, course.name)
     activity = 'Enrollment Updated'
 
-    return (uid, enrollment.course_id, detail, activity) 
+    return (uid, enrollment.course_id, detail, activity, None) 
 
 def process_logged_in(actor, objectv, group):
     user_id = actor['extensions']['com.instructure.canvas']['entity_id']
@@ -177,7 +177,7 @@ def process_logged_in(actor, objectv, group):
     detail = '<participant> logged in on <date>'
     activity = 'Logged In'
 
-    return (uid, None, detail, activity)
+    return (uid, None, detail, activity, None)
 
 def process_logged_out(actor, objectv, group):
     user_id = actor['extensions']['com.instructure.canvas']['entity_id']
@@ -185,5 +185,5 @@ def process_logged_out(actor, objectv, group):
     detail = '<participant> logged out on <date>'
     activity = 'Logged Out'
 
-    return (uid, None, detail, activity)
+    return (uid, None, detail, activity, None)
 
