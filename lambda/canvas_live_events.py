@@ -2,6 +2,8 @@ from canvasapi import Canvas as OriginalCanvas
 from canvasapi.quiz import QuizSubmission, Quiz
 from canvasapi.assignment import Assignment
 from canvasapi.submission import Submission
+from canvasapi.enrollment import Enrollment
+from canvasapi.canvas_object import CanvasObject
 from canvasapi.util import combine_kwargs
 
 import os
@@ -22,7 +24,7 @@ class Canvas(OriginalCanvas):
             Quiz(self.__requester, response.json()['quizzes'][0])
         )
     
-    def get_submission(self, course, assignment, user):
+    def get_submission(self, course, assignment, user, **kwargs):
         uri_str = 'courses/{}/assignments/{}/submissions/{}'
 
         response = self.__requester.request(
@@ -33,7 +35,7 @@ class Canvas(OriginalCanvas):
 
         return Submission(self.__requester, response.json())
 
-    def get_assignment(self, course, assignment):
+    def get_assignment(self, course, assignment, **kwargs):
         uri_str = 'courses/{}/assignments/{}'
 
         response = self.__requester.request(
@@ -44,14 +46,50 @@ class Canvas(OriginalCanvas):
 
         return Assignment(self.__requester, response.json())
 
+    def get_discussion(self, course, id, **kwargs):
+        uri_str = 'courses/{}/discussion_topics/{}'
+
+        response = self.__requester.request(
+            'GET',
+            uri_str.format(course, id),
+            _kwargs=combine_kwargs(**kwargs)
+        )
+
+        return CanvasObject(self.__requester, response.json())
+
+    def get_enrollment(self, id, **kwargs):
+        uri_str = 'accounts/1/enrollments/{}'
+
+        response = self.__requester.request(
+            'GET',
+            uri_str.format(id),
+            _kwargs=combine_kwargs(**kwargs)
+        )
+
+        return Enrollment(self.__requester, response.json())
+
+    def get_role(self, id, **kwargs):
+        uri_str = 'accounts/1/roles/{}'
+
+        response = self.__requester.request(
+            'GET',
+            uri_str.format(id),
+            _kwargs=combine_kwargs(**kwargs)
+        )
+
+        return CanvasObject(self.__requester, response.json())
 
 canvas = Canvas(os.environ['CANVAS_URL'], os.environ['CANVAS_TOKEN'])
 
 EVENT_MAP = {
     # type: action: object->type: canvas_event
     'AssessmentEvent': {'Submitted': {'Attempt':             'quiz_submitted'}},
-    'AssignableEvent': {'Submitted': {'Attempt':             'submission_created'},
-                        'Submitted': {'Modified':            'submission_modified'}},
+    'AssignableEvent': {'Submitted': {'Attempt':             'submission_created',
+                                      'Modified':            'submission_updated'}},
+    'ThreadEvent':     {'Created':   {'Thread':              'discussion_topic_created'}},
+    'MessageEvent':    {'Posted':    {'Message':             'discussion_entry_created'}},
+    'Event':           {'Created':   {'Entity':              'enrollment_created'},
+                        'Modified':  {'Entity':              'enrollment_updated'}},
     'SessionEvent':    {'LoggedIn':  {'SoftwareApplication': 'logged_in'},
                         'LoggedOut': {'SoftwareApplication': 'logged_out'}},
 }
@@ -90,6 +128,47 @@ def process_submission_updated(actor, objectv, group):
     uid, detail, activity = process_submission_created(actor, objectv, group)
 
     return (uid, detail.replace('created submission', 'updated submission'), activity.replace('Created', 'Updated'))
+
+def process_discussion_topic_created(actor, objectv, group):
+    user_id = actor['extensions']['com.instructure.canvas']['entity_id']
+    uid = canvas.get_user(user_id).sis_user_id
+    discussion = objectv['name']
+    detail = '<participant> created the discussion "%s" on <date>' % discussion
+    activity = 'Discussion Created'
+
+    return (uid, detail, activity)
+
+def process_discussion_entry_created(actor, objectv, group):
+    user_id = actor['extensions']['com.instructure.canvas']['entity_id']
+    uid = canvas.get_user(user_id).sis_user_id
+    discussion_id = objectv['isPartOf']['id'].split(':')[-1]
+    course_id = group['extensions']['com.instructure.canvas']['entity_id']
+    discussion = canvas.get_discussion(course_id, discussion_id)
+    detail = '<participant> replied to the discussion "%s" on <date>' % discussion.title
+    activity = 'Discussion Replied'
+
+    return (uid, detail, activity)
+
+def process_enrollment_created(actor, objectv, group):
+    uid, detail, activity = process_submission_created(actor, objectv, group)
+
+    return (uid, detail, activity.replace('Updated', 'Created'))
+
+def process_enrollment_updated(actor, objectv, group):
+    try:
+        enrollment_id = objectv['extensions']['com.instructure.canvas']['entity_id']
+    except KeyError as e:
+        return (None, None, None)
+
+    enrollment = canvas.get_enrollment(enrollment_id)
+    state = enrollment.enrollment_state
+    role = canvas.get_role(enrollment.role_id)
+    uid = enrollment.sis_user_id
+    course = canvas.get_course(enrollment.course_id)
+    detail = '<participant> "%s" from role "%s" on programme "%s" on <date>' % (state, role.label, course.name)
+    activity = 'Enrollment Updated'
+
+    return (uid, detail, activity) 
 
 def process_logged_in(actor, objectv, group):
     user_id = actor['extensions']['com.instructure.canvas']['entity_id']

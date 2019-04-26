@@ -52,7 +52,18 @@ def lambda_handler(event, context):
                 logging.debug(detail)
             except Unauthorized as e:
                 continue
+            except AttributeError as e:
+                logging.warning('process_%s not implemented yet' % liveEvent)
+                logging.warning(payload)
+                continue
+            except Exception as e:
+                logging.error('Error processing %s: \n%s' % (liveEvent, str(e)))
+                logging.error(payload)
+                continue
 
+            if not uid:
+                continue
+            
             participants = sf.query('''
                 SELECT Id,
                     ParticipantName__c
