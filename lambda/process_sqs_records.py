@@ -1,6 +1,5 @@
 from __future__ import print_function
 from simple_salesforce import Salesforce, SalesforceLogin
-from canvasapi.exceptions import Unauthorized
 
 import os
 import json
@@ -44,27 +43,24 @@ def lambda_handler(event, context):
                 date = payload['eventTime']
                 time = payload['eventTime'][11:]
                 liveEvent = canvas_live_events.EVENT_MAP[typev][action][object_type]
-            except KeyError as e:
+            except Exception as e:
+                logging.error('Error mapping live event:\n%s' % str(e))
+                logging.error(payload)
                 continue
             
             try:
-                uid, detail, activity = getattr(canvas_live_events, 'process_' + liveEvent)(actor, objectv, group)
+                uid, course_id, detail, activity = getattr(canvas_live_events, 'process_' + liveEvent)(actor, objectv, group)
                 logging.debug(detail)
-            except Unauthorized as e:
-                continue
             except AttributeError as e:
                 logging.warning('process_%s not implemented yet' % liveEvent)
                 logging.warning(payload)
                 continue
             except Exception as e:
-                logging.error('Error processing %s: \n%s' % (liveEvent, str(e)))
+                logging.error('Error processing %s:\n%s' % (liveEvent, str(e)))
                 logging.error(payload)
                 continue
 
-            if not uid:
-                continue
-            
-            participants = sf.query('''
+            query = '''
                 SELECT Id,
                     ParticipantName__c
                 FROM Programme_Participant__c
@@ -72,7 +68,12 @@ def lambda_handler(event, context):
                     Programme__r.LMS_Start_Date__c <= TODAY AND
                     Programme__r.LMS_End_Date__c > TODAY AND
                     Participant_UID__c = '%s'
-            ''' % uid)
+            '''
+
+            if course_id:
+                query += "AND Programme__r.LMS_Course_Id__c = %s" % course_id
+            
+            participants = sf.query(query % uid)
 
             if participants['totalSize'] <= 0:
                 continue
@@ -89,7 +90,7 @@ def lambda_handler(event, context):
 
 
 if __name__ == '__main__':
-    with open('event_samples/submission_created.json') as f:
+    with open('event_samples/quiz_submitted.json') as f:
         fake_event = {'Records': [{'body': '{"data": %s}' % f.read()}]}
         lambda_handler(fake_event, None)
 

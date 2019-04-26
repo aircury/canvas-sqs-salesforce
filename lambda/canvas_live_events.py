@@ -94,6 +94,10 @@ EVENT_MAP = {
                         'LoggedOut': {'SoftwareApplication': 'logged_out'}},
 }
 
+# For example "1367000000000001480" is "1480" in Salesforce
+def clean_course_id(id):
+    return id[5:].lstrip('0')
+
 def process_quiz_submitted(actor, objectv, group):
     user_id = actor['extensions']['com.instructure.canvas']['entity_id']
     user = canvas.get_user(user_id)
@@ -107,7 +111,7 @@ def process_quiz_submitted(actor, objectv, group):
         (quiz.title, course.name, submission.score, submission.quiz_points_possible)
     activity = 'Quiz Submitted'
 
-    return (uid, detail, activity)
+    return (uid, clean_course_id(course_id), detail, activity)
 
 def process_submission_created(actor, objectv, group):
     user_id = actor['extensions']['com.instructure.canvas']['entity_id']
@@ -122,21 +126,22 @@ def process_submission_created(actor, objectv, group):
         (assignment.name, course.name, submission.grade)
     activity = 'Submission Created'
 
-    return (uid, detail, activity)
+    return (uid, clean_course_id(course_id), detail, activity)
 
 def process_submission_updated(actor, objectv, group):
-    uid, detail, activity = process_submission_created(actor, objectv, group)
+    uid, course_id, detail, activity = process_submission_created(actor, objectv, group)
 
-    return (uid, detail.replace('created submission', 'updated submission'), activity.replace('Created', 'Updated'))
+    return (uid, course_id, detail.replace('created submission', 'updated submission'), activity.replace('Created', 'Updated'))
 
 def process_discussion_topic_created(actor, objectv, group):
     user_id = actor['extensions']['com.instructure.canvas']['entity_id']
     uid = canvas.get_user(user_id).sis_user_id
     discussion = objectv['name']
+    course_id = group['extensions']['com.instructure.canvas']['entity_id']
     detail = '<participant> created the discussion "%s" on <date>' % discussion
     activity = 'Discussion Created'
 
-    return (uid, detail, activity)
+    return (uid, course_id, detail, activity)
 
 def process_discussion_entry_created(actor, objectv, group):
     user_id = actor['extensions']['com.instructure.canvas']['entity_id']
@@ -147,28 +152,24 @@ def process_discussion_entry_created(actor, objectv, group):
     detail = '<participant> replied to the discussion "%s" on <date>' % discussion.title
     activity = 'Discussion Replied'
 
-    return (uid, detail, activity)
+    return (uid, clean_course_id(course_id), detail, activity)
 
 def process_enrollment_created(actor, objectv, group):
-    uid, detail, activity = process_submission_created(actor, objectv, group)
+    uid, course_id, detail, activity = process_submission_created(actor, objectv, group)
 
-    return (uid, detail, activity.replace('Updated', 'Created'))
+    return (uid, course_id, detail, activity.replace('Updated', 'Created'))
 
 def process_enrollment_updated(actor, objectv, group):
-    try:
-        enrollment_id = objectv['extensions']['com.instructure.canvas']['entity_id']
-    except KeyError as e:
-        return (None, None, None)
-
+    enrollment_id = objectv['extensions']['com.instructure.canvas']['entity_id']
     enrollment = canvas.get_enrollment(enrollment_id)
     state = enrollment.enrollment_state
     role = canvas.get_role(enrollment.role_id)
     uid = enrollment.sis_user_id
     course = canvas.get_course(enrollment.course_id)
-    detail = '<participant> "%s" from role "%s" on programme "%s" on <date>' % (state, role.label, course.name)
+    detail = '<participant> status "%s" for role "%s" on programme "%s" on <date>' % (state, role.label, course.name)
     activity = 'Enrollment Updated'
 
-    return (uid, detail, activity) 
+    return (uid, enrollment.course_id, detail, activity) 
 
 def process_logged_in(actor, objectv, group):
     user_id = actor['extensions']['com.instructure.canvas']['entity_id']
@@ -176,7 +177,7 @@ def process_logged_in(actor, objectv, group):
     detail = '<participant> logged in on <date>'
     activity = 'Logged In'
 
-    return (uid, detail, activity)
+    return (uid, None, detail, activity)
 
 def process_logged_out(actor, objectv, group):
     user_id = actor['extensions']['com.instructure.canvas']['entity_id']
@@ -184,5 +185,5 @@ def process_logged_out(actor, objectv, group):
     detail = '<participant> logged out on <date>'
     activity = 'Logged Out'
 
-    return (uid, detail, activity)
+    return (uid, None, detail, activity)
 
