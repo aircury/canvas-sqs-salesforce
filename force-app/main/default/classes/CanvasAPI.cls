@@ -21,9 +21,15 @@ public with sharing class CanvasAPI {
             '&course[self_enrollment]=false' +
             '&course[term_id]=' + //empty to set "Default term"
             '&course[time_zone]=Europe/London' +
-            '&course[course_format]=blended' +
-            '&course[start_at]=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
-            '&course[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
+            '&course[course_format]=blended';
+        
+        if (null != startAt) {
+            body += '&course[start_at]=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
+        }
+
+        if (null != endAt) {
+            body += '&course[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
+        }
 
         return (Map <String, Object>) apiCall('POST', 'accounts/:account_id/courses', body);
     }
@@ -35,10 +41,16 @@ public with sharing class CanvasAPI {
     public static Map <String, Object> updateCourse(String courseId, String name, String code, DateTime startAt, DateTime endAt) {
         String body =
             'course[name]=' + name +
-            '&course[course_code]=' + code +
-            '&course[start_at]=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
-            '&course[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
+            '&course[course_code]=' + code;
 
+        if (null != startAt) {
+            body += '&course[start_at]=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
+        }
+
+        if (null != endAt) {
+            body += '&course[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
+        }
+        
         return (Map <String, Object>) apiCall('PUT', 'courses/' + courseId, body);
     }
 
@@ -48,9 +60,15 @@ public with sharing class CanvasAPI {
     */
     public static Map <String, Object> createSection(String name, String courseId, DateTime startAt, DateTime endAt) {
         String body =
-            'course_section[name]=' + name +
-            '&course_section[start_at]=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
-            '&course_section[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
+            'course_section[name]=' + name;
+        
+        if (null != startAt) {
+            body += '&course_section[start_at]=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
+        }
+
+        if (null != endAt) {
+            body += '&course_section[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
+        }
 
         return (Map <String, Object>) apiCall('POST', 'courses/' + courseId + '/sections', body);
     }
@@ -61,10 +79,16 @@ public with sharing class CanvasAPI {
     */
     public static Map <String, Object> updateSection(String sectionId, String name, DateTime startAt, DateTime endAt) {
         String body =
-            'course_section[name]=' + name +
-            '&course_section[start_at]=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
-            '&course_section[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
+            'course_section[name]=' + name;
 
+        if (null != startAt) {
+            body += '&course_section[start_at]=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
+        }
+
+        if (null != endAt) {
+            body += '&course_section[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
+        }
+        
         return (Map <String, Object>) apiCall('PUT', 'sections/' + sectionId, body);
     }
 

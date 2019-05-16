@@ -16,25 +16,24 @@ public with sharing class LMS {
             WHERE Id = :p.Id
         ][0];
 
-        if (null == programme.LMS_Start_Date__c) {
-            throw new LMSException('LMS Start Date is null');
+        DateTime startAt = null, endAt = null;
+
+        if (null != programme.LMS_Start_Date__c) {
+            startAt = DateTime.newInstance(
+                programme.LMS_Start_Date__c.year(),
+                programme.LMS_Start_Date__c.month(),
+                programme.LMS_Start_Date__c.day()
+            );
         }
 
-        if (null == programme.LMS_End_Date__c) {
-            throw new LMSException('LMS End Date is null');
+        if (null != programme.LMS_End_Date__c) {
+            endAt = DateTime.newInstance(
+                programme.LMS_End_Date__c.year(),
+                programme.LMS_End_Date__c.month(),
+                programme.LMS_End_Date__c.day()
+            );
         }
 
-        DateTime startAt = DateTime.newInstance(
-            programme.LMS_Start_Date__c.year(),
-            programme.LMS_Start_Date__c.month(),
-            programme.LMS_Start_Date__c.day()
-        );
-
-        DateTime endAt = DateTime.newInstance(
-            programme.LMS_End_Date__c.year(),
-            programme.LMS_End_Date__c.month(),
-            programme.LMS_End_Date__c.day()
-        );
         
         if (null != programme.LMS_Course_Id__c) {
             try {
@@ -371,22 +370,26 @@ public with sharing class LMS {
             FROM TL_Programme__c
             WHERE Id = :programmeId
         ];
-        DateTime startAt, endAt;
+        DateTime startAt = null, endAt = null;
         String name;
 
         for (TL_Programme__c programme: programmes) {
             if (true == programme.LMS_Access__c) {
-                startAt = DateTime.newInstance(
-                    programme.LMS_Start_Date__c.year(),
-                    programme.LMS_Start_Date__c.month(),
-                    programme.LMS_Start_Date__c.day()
-                );
+                if (null != programme.LMS_Start_Date__c) {
+                    startAt = DateTime.newInstance(
+                        programme.LMS_Start_Date__c.year(),
+                        programme.LMS_Start_Date__c.month(),
+                        programme.LMS_Start_Date__c.day()
+                    );
+                }
 
-                endAt = DateTime.newInstance(
-                    programme.LMS_End_Date__c.year(),
-                    programme.LMS_End_Date__c.month(),
-                    programme.LMS_End_Date__c.day()
-                );
+                if (null != programme.LMS_End_Date__c) {
+                    endAt = DateTime.newInstance(
+                        programme.LMS_End_Date__c.year(),
+                        programme.LMS_End_Date__c.month(),
+                        programme.LMS_End_Date__c.day()
+                    );
+                }
 
                 name = programme.Programme_Name__c + ' ' + programme.Cohort_Name__c;
                 CanvasAPI.updateCourse(String.valueOf(programme.LMS_Course_Id__c), name, name, startAt, endAt);
