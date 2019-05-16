@@ -74,6 +74,7 @@ public with sharing class CanvasAPI {
     public static Map <String, Object> enrollUser(String userId, String courseSectionId, String state) {
         String body =
             'enrollment[user_id]=' + userId +
+            '&enrollment[role_id]=:participant_role_id' +
             '&enrollment[enrollment_state]=' + state;
 
         return (Map <String, Object>) apiCall('POST', 'sections/' + courseSectionId + '/enrollments', body);
@@ -268,9 +269,11 @@ public with sharing class CanvasAPI {
         String token = customSettings.Token__c;
         String baseUrl = customSettings.Base_Url__c;
         String accountId = null == customSettings.Account_Id__c ? '1' : customSettings.Account_Id__c.format();
+        String roleId = null == customSettings.Participant_Role_Id__c ? '13' : customSettings.Participant_Role_Id__c.format();
         HttpRequest req = new HttpRequest();
 
         endpoint = endpoint.replace(':account_id', accountId);
+        body = body.replace(':participant_role_id', roleId);
         req.setMethod(method);
         req.setEndpoint(baseUrl + endpoint);
         req.setHeader('Authorization', 'Bearer ' + token);
