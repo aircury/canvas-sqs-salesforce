@@ -64,8 +64,7 @@ def lambda_handler(event, context):
                 SELECT Id,
                     ParticipantName__c
                 FROM Programme_Participant__c
-                WHERE Programme__r.LMS_Access__c = true AND
-                    Programme__r.LMS_Start_Date__c <= TODAY AND
+                WHERE Programme__r.LMS_Start_Date__c <= TODAY AND
                     Programme__r.LMS_End_Date__c > TODAY AND
                     Participant_UID__c = '%s'
             '''
@@ -95,7 +94,6 @@ def lambda_handler(event, context):
                 SELECT Id
                 FROM Attendees__c
                 WHERE Contact__r.Participant_UID__c = '%s' AND
-                    FLIP_Event__r.Cohort_lkp__r.LMS_Access__c = true AND
                     FLIP_Event__r.Send_to_LMS__c = true AND
                     FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c <= TODAY AND
                     FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c > TODAY AND
