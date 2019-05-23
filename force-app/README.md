@@ -97,6 +97,8 @@ The actions are executed inmediatelly (live) and consists on:
 * Update the Canvas User name if the ParticipantName__c changed
 * Create or update the Canvas User with the related enrollment status on the related Canvas Course. For 'Active', the enrollment will be 'active' in Canvas. For 'Inactive, the enrollment will be 'inactive' in Canvas. For 'Complete', 'Deferred' or 'Withdrawn' the Canvas User is removed from Canvas only if the Canvas User is not enrolled in another Canvas Course related with any other TL_Programme__c. If the Canvas User is enrolled, then the enrollment status will be updated as 'conclude' on Canvas.
 
+#### Canvas User data sources
+
 The Canvas User email is setted from the Programme_Participant__c related Contact Email field.
 
 The Canvas User name is setted from the Programme_Participant__c related Contact Name field.
@@ -131,7 +133,9 @@ As a Cron Job, the actions are only executed when defined in the Cron Job, and c
   * the related Contact has Email not null
 * Remove Canvas Users if today is LMS_End_Date__c and if the Canvas User is not enrolled in another Canvas Course related with any other TL_Programme__c. If the Canvas User is enrolled, then the enrollment status will be updated as 'conclude' on Canvas.
 
-The Canvas User data is setted like defined in [LMSProgrammeParticipantStatusTrigger trigger lines 100 to 106](#L100-106).
+The Canvas User data is setted like defined in [Canvas User data sources](#canvas-user-data-sources).
+
+#### Canvas Event data sources
 
 The Canvas Event attached to the Canvas User Calendar fields are:
 
@@ -173,23 +177,26 @@ This trigger implements some of the "Events provisioning" requirements:
 
 It acts when an Attendees__c is created or deleted but only when:
 
-* On creation:
-  * the related FLIP_Event__c has Send_to_LMS__c checked
-  * the related TL_Programme__c has:
-    * LMS_Access__c checked.
-    * Today is between LMS_Start_Date__c and LMS_End_Date__c.
-  * the related Contact Email filed is not null
-* On deletion:
-  * the related TL_Programme__c has:
-    * LMS_Access__c checked.
-    * Today is between LMS_Start_Date__c and LMS_End_Date__c.
-  * the related Contact Participant_UID__c filed is not null
+#### On creation
+
+* the related FLIP_Event__c has Send_to_LMS__c checked
+* the related TL_Programme__c has:
+  * LMS_Access__c checked.
+  * Today is between LMS_Start_Date__c and LMS_End_Date__c.
+* the related Contact Email filed is not null
+
+#### On deletion
+
+* the related TL_Programme__c has:
+  * LMS_Access__c checked.
+  * Today is between LMS_Start_Date__c and LMS_End_Date__c.
+* the related Contact Participant_UID__c filed is not null
 
 The actions are executed inmediatelly (live) and consists on:
   
 * Create or delete Canvas Events attached to the Canvas User Calendar
 
-The Canvas Event attached to the Canvas User Calendar fields are the same as defined in [ScheduledLMSUsersProvision trigger lines 138 to 140](#L138-140).
+The Canvas Event attached to the Canvas User Calendar fields are the same as defined in [Canvas Event data sources](#canvas-event-data-sources).
 
 ### [LMSEventTrigger](main/default/classes/LMSEventTrigger.trigger)
 
@@ -212,7 +219,7 @@ It acts when an FLIP_Event__c is updated but only when any of the next FLIP_Even
 
 The actions are executed inmediatelly (live) and consists on:
 
-* Delete all the Canvas Events attached to the Canvas User Calendar for all the Attendees__c related with the FLIP_Event__c. The same restrictions defined on [LMSEventAttendeesProvisionTrigger trigger lines 182 to 186](#L182-L186) applies. To locate the old Canvas Event to remove it, the old Event_Date__c, Start_Time__c, Event_End_Date__c and End_Time__c is used.
-* Create all the Canvas Events attached to the Canvas User Calendar for all the Attendees__c related with the FLIP_Event__c. The same restrictions defined on [LMSEventAttendeesProvisionTrigger trigger lines 176 to 181](#L176-L181) applies.
+* Delete all the Canvas Events attached to the Canvas User Calendar for all the Attendees__c related with the FLIP_Event__c. The same restrictions defined on [LMSEventAttendeesProvisionTrigger "On deletion"](#on-deletion) applies. To locate the old Canvas Event to remove it, the old Event_Date__c, Start_Time__c, Event_End_Date__c and End_Time__c is used.
+* Create all the Canvas Events attached to the Canvas User Calendar for all the Attendees__c related with the FLIP_Event__c. The same restrictions defined on [LMSEventAttendeesProvisionTrigger "On creation"](#on-creation) applies.
 
-The Canvas Event attached to the Canvas User Calendar fields are the same as defined in [ScheduledLMSUsersProvision section lines 138 to 140](#L138-140).
+The Canvas Event attached to the Canvas User Calendar fields are the same as defined in [Canvas Event data sources](#canvas-event-data-sources).
