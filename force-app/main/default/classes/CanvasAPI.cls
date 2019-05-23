@@ -1,9 +1,11 @@
-/* This class needs a Custom Setting named as CanvasAPISettings with 3 fields:
+/* This class needs a Custom Setting named as CanvasAPISettings with 4 fields:
     - Token: to store the an Access token created on Canvas with an admin user
     - Base_Url: the base url endpoint for the Canvas instance. For example https://ambition.instructure.com/api/v1.
         The base url also needs to be added on Remote Sites (Setup->Security Controls->Remote Site Settings)
     - Account_Id: Canvas account Id used to create courses or users on that Canvas account. For example: account id 1
         is the "Ambition School Leadership" main and only account on https://ambition.instructure.com
+    - Participant_Role_Id__c: Role id of the Participant role in Canvas. For example 13 (the default if not filled) is
+        the "Participant" role id on the Canvas instance <https://ambition.instructure.com>.
 */
 public with sharing class CanvasAPI {
     /* Sample test code:
