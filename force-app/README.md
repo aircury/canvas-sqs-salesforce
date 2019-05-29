@@ -1,5 +1,19 @@
 # Salesforce > Canvas Subproject
 
+## Overview
+
+The subproject uses the Canvas REST API to create the user requested resources on the Canvas side.
+
+For example, when a Salesforce user creates or updates a TL_Programme__c object, the implementation will call the Canvas API to create a Course and a Course Section attached to the Course.
+
+## Salesforce objects to Canvas resources mapping
+
+| Salesforce Objects          | Actions                | Canvas Resources                           | Canvas APIs                                                                                                                                                                                                                                  |
+|-----------------------------|------------------------|--------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| TL_Programme__c             | Create, Update         | Courses, Sections                          | [Courses API](https://canvas.instructure.com/doc/api/courses.html), [Sections API](https://canvas.instructure.com/doc/api/sections.html)                                                                                                     |
+| Programme_Participant__c    | Create, Update, Delete | Users, Enrollments, Communication Channels | [Users API](https://canvas.instructure.com/doc/api/users.html), [Enrollments API](https://canvas.instructure.com/doc/api/enrollments.html), [Communication Channels API](https://canvas.instructure.com/doc/api/communication_channels.html) |
+| FLIP_Event__c, Attendees__c | Create, Update, Delete | Calendar Events                            | [Calendar Events API](https://canvas.instructure.com/doc/api/calendar_events.html)                                                                                                                                                           |
+
 ## Apex Classes Deployment
 
 During development, it's recommendable to use the Salesforce CLI to quick upload the code. There is a [Makefile](../Makefile)
@@ -52,7 +66,7 @@ All the bussiness logic has been implemented on the [LMS](main/default/classes/L
 
 All the connection with Canvas API helper functions are on the [CanvasAPI](main/default/classes/CanvasAPI.cls) class. Those functions could trigger the exception [CanvasAPIException](main/default/classes/CanvasAPIException.cls).
 
-The tests are on [LMSTest](main/default/classes/LMSTest.cls) class that uses the [CanvasAPIMock](main/default/classes/CanvasAPIMock.cls) class to simulate Canvas api calls during tests.
+The tests are on [LMSTest](main/default/classes/LMSTest.cls) class that uses the [CanvasAPIMock](main/default/classes/CanvasAPIMock.cls) class to simulate Canvas api calls during tests because it's not a good practice to use real API calls in tests and Salesforce doesn't allow them.
 
 There are 5 triggers and 1 scheduled job to implement all the Salesforce > Canvas requirements defined at <https://docs.google.com/spreadsheets/d/1wrlmlsveUWOU-wRrQCz7IkTjvPRm1Wg3CLgnka4Ec6c>:
 
@@ -128,16 +142,16 @@ It iterates over all the TL_Programme__c with:
 As a Cron Job, the actions are only executed when defined in the Cron Job, and consists on:
 
 * Provision Canvas Users if today is LMS_Start_Date__c according to the Programme_Participant__c currently in the TL_Programme__c. It creates the Canvas Users with the related enrollment status on the related Canvas Course. For 'Active', the enrollment will be 'active' in Canvas. For 'Inactive, the enrollment will be 'inactive' in Canvas. For 'Complete', 'Deferred' or 'Withdrawn' the Canvas User is not created.
-* Add Canvas Events attached to the Canvas User Calendar if today is LMS_Start_Date__c. It iterates over all Attendees__c that:
+* Add Canvas Calendar Events attached to the Canvas User if today is LMS_Start_Date__c. It iterates over all Attendees__c that:
   * are on every FLIP_Event__c defined in the TL_Programme__c that has the Send_to_LMS__c checked
   * the related Contact has Email not null
 * Remove Canvas Users if today is LMS_End_Date__c and if the Canvas User is not enrolled in another Canvas Course related with any other TL_Programme__c. If the Canvas User is enrolled, then the enrollment status will be updated as 'conclude' on Canvas.
 
 The Canvas User data is setted like defined in [Canvas User data sources](#canvas-user-data-sources).
 
-#### Canvas Event data sources
+#### Canvas Calendar Event data sources
 
-The Canvas Event attached to the Canvas User Calendar fields are:
+The Canvas Calendar Event attached to the Canvas User fields are:
 
 * title: from FLIP_Event__c Event_Name__c field.
 * description: from FLIP_Event__c Event_Description_Rich__c field if not empty.
@@ -194,9 +208,9 @@ It acts when an Attendees__c is created or deleted but only when:
 
 The actions are executed inmediatelly (live) and consists on:
   
-* Create or delete Canvas Events attached to the Canvas User Calendar
+* Create or delete Canvas Calendar Events attached to the Canvas User
 
-The Canvas Event attached to the Canvas User Calendar fields are the same as defined in [Canvas Event data sources](#canvas-event-data-sources).
+The Canvas Calendar Event attached to the Canvas User fields are the same as defined in [Canvas Calendar Event data sources](#canvas-event-data-sources).
 
 ### [LMSEventTrigger](main/default/classes/LMSEventTrigger.trigger)
 
@@ -219,7 +233,13 @@ It acts when an FLIP_Event__c is updated but only when any of the next FLIP_Even
 
 The actions are executed inmediatelly (live) and consists on:
 
-* Delete all the Canvas Events attached to the Canvas User Calendar for all the Attendees__c related with the FLIP_Event__c. The same restrictions defined on [LMSEventAttendeesProvisionTrigger "On deletion"](#on-deletion) applies. To locate the old Canvas Event to remove it, the old Event_Date__c, Start_Time__c, Event_End_Date__c and End_Time__c is used.
-* Create all the Canvas Events attached to the Canvas User Calendar for all the Attendees__c related with the FLIP_Event__c. The same restrictions defined on [LMSEventAttendeesProvisionTrigger "On creation"](#on-creation) applies.
+* Delete all the Canvas Calendar Events attached to the Canvas User for all the Attendees__c related with the FLIP_Event__c. The same restrictions defined on [LMSEventAttendeesProvisionTrigger "On deletion"](#on-deletion) applies. To locate the old Canvas Calendar Event to remove it, the old Event_Date__c, Start_Time__c, Event_End_Date__c and End_Time__c is used.
+* Create all the Canvas Calendar Events attached to the Canvas User for all the Attendees__c related with the FLIP_Event__c. The same restrictions defined on [LMSEventAttendeesProvisionTrigger "On creation"](#on-creation) applies.
 
-The Canvas Event attached to the Canvas User Calendar fields are the same as defined in [Canvas Event data sources](#canvas-event-data-sources).
+The Canvas Calendar Event attached to the Canvas User fields are the same as defined in [Canvas Calendar Event data sources](#canvas-event-data-sources).
+
+## Design decisions
+
+* All the requirements except 1 are implemented as triggers. Salesforce doesn't allow to directly execute external API calls from triggers, so all the API calls and next salesforce model updates are executed using Apex Jobs (functions defined as @future(callout=true)). Those jobs can be listed on Setup->Environments->Jobs->Apex Jobs.
+
+* All the connections to the Canvas REST API are authenticated using a unique Canvas administrator user access token. That simplifies the OAuth flow. So, all the actions triggered from Salesforce will be executed on Canvas on behalf of that User. As an administrator user, the action can be on behalf of any Canvas user when needed; for example when adding events to a user calendar.
