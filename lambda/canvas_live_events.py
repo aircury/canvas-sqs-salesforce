@@ -82,6 +82,7 @@ class Canvas(OriginalCanvas):
 canvas = Canvas(os.environ['CANVAS_URL'], os.environ['CANVAS_TOKEN'])
 
 EVENT_MAP = {
+    # https://github.com/instructure/canvas-lms/blob/3afdafe5ae246d22bcaaa841bd63c036853c075d/doc/api/caliper_live_events.md#event-mapping inverse
     # type: action: object->type: canvas_event
     'AssessmentEvent': {'Submitted': {'Attempt':             'quiz_submitted'}},
     'AssignableEvent': {'Submitted': {'Attempt':             'submission_created',
