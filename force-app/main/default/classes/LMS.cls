@@ -244,7 +244,13 @@ public with sharing class LMS {
                     c.Participant_UID__c
                 ));
 
-                CanvasAPI.createCommunicationChannel(c.Participant_UID__c, c.email);
+                try {
+                    CanvasAPI.createCommunicationChannel(c.Participant_UID__c, c.Email);
+                } catch (CanvasAPIException caught) {
+                    if (!caught.getMessage().contains('unique!')) {
+                        throw caught;
+                    }
+                }
             }
 
             apiResult = (Map <String, Object>) apiResultList[0];
@@ -470,7 +476,13 @@ public with sharing class LMS {
                     c.Participant_UID__c
                 ));
 
-                CanvasAPI.createCommunicationChannel(c.Participant_UID__c, c.email);
+                try {
+                    CanvasAPI.createCommunicationChannel(c.Participant_UID__c, c.Email);
+                } catch (CanvasAPIException caught) {
+                    if (!caught.getMessage().contains('unique!')) {
+                        throw caught;
+                    }
+                }
             }
 
             apiResult = (Map <String, Object>) apiResultList[0];
