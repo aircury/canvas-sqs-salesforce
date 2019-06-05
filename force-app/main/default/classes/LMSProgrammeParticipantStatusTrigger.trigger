@@ -18,6 +18,10 @@ trigger LMSProgrammeParticipantStatusTrigger on Programme_Participant__c (after 
     }
     
     if (Trigger.isInsert || Status_Changed) {
-        LMS.onParticipantStatusChange(Trigger.newMap.keySet());
+        if (system.isBatch()) {
+            LMS.doParticipantStatusChange(Trigger.newMap.keySet());
+        } else {
+            LMS.onParticipantStatusChange(Trigger.newMap.keySet());
+        }
     }
 }

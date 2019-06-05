@@ -207,6 +207,10 @@ public with sharing class LMS {
 
     @future(callout=true)
     public static void onParticipantStatusChange(Set<ID> participantIds) {
+        doParticipantStatusChange(participantIds);
+    }
+
+    public static void doParticipantStatusChange(Set<ID> participantIds) {
         List<Programme_Participant__c> participants = [
             SELECT Id,
                 Status__c,
