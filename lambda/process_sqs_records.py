@@ -74,18 +74,16 @@ def lambda_handler(event, context):
             
             participants = sf.query(query % uid)
 
-            if participants['totalSize'] <= 0:
-                continue
-            
-            for participant in participants['records']:
-                detail = complete_details(detail, participant['ParticipantName__c'], date)
-                sf.Canvas_Activitiy__c.create({
-                        'Canvas_Activity__c': activity,
-                        'Canvas_Activity_Detail__c': detail,
-                        'Date__c': date,
-                        'Time__c': time,
-                        'Programme_Participant__c': participant['Id']
-                })
+            if participants['totalSize'] > 0:
+                for participant in participants['records']:
+                    detail = complete_details(detail, participant['ParticipantName__c'], date)
+                    sf.Canvas_Activitiy__c.create({
+                            'Canvas_Activity__c': activity,
+                            'Canvas_Activity_Detail__c': detail,
+                            'Date__c': date,
+                            'Time__c': time,
+                            'Programme_Participant__c': participant['Id']
+                    })
 
             if not event_name:
                 continue
