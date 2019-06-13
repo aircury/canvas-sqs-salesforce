@@ -92,7 +92,6 @@ def lambda_handler(event, context):
                 SELECT Id
                 FROM Attendees__c
                 WHERE Contact__r.Participant_UID__c = '%s' AND
-                    FLIP_Event__r.Send_to_LMS__c = true AND
                     FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c <= TODAY AND
                     FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c > TODAY AND
                     Contact__r.Email != null AND

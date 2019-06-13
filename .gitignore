@@ -5,3 +5,6 @@ function.zip
 .vscode
 .env
 *.pyc
+.env.dev
+.env.production
+.env.staging
