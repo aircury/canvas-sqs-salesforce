@@ -15,4 +15,3 @@ trigger LMSContactTrigger on Contact (after update) {
         }
     }
 }
-

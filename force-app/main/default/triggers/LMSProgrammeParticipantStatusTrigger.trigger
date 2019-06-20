@@ -1,8 +1,16 @@
+/*
+ * >>- Changelog -<<
+ * Date           Developer   Comment
+ * 19-06-2019     Ekta        Updated to collect participantId in a set participantIdsWithChangedNameSet
+ *                            and call LMS.onParticipantNameChange(-) method
+ * 	
+ * 	 
+*/ 
 trigger LMSProgrammeParticipantStatusTrigger on Programme_Participant__c (after insert, after update) {
     if (system.isFuture()) {
         return;
     }
-    
+    Set<Id> participantIdsWithChangedNameSet =  new Set<Id>();
     Boolean Status_Changed = false;
     if (Trigger.isUpdate) {
         for (Id participantId : Trigger.newMap.keySet() ) {
@@ -12,9 +20,14 @@ trigger LMSProgrammeParticipantStatusTrigger on Programme_Participant__c (after 
             }
 
             if (oldP.ParticipantName__c != newP.ParticipantName__c) {
-                LMS.onParticipantNameChange(participantId);
+                //LMS.onParticipantNameChange(participantId);
+                participantIdsWithChangedNameSet.add(participantId);
             }
         }
+    }
+    
+    if(participantIdsWithChangedNameSet.size() > 0) {
+        LMS.onParticipantNameChange(participantIdsWithChangedNameSet);
     }
     
     if (Trigger.isInsert || Status_Changed) {

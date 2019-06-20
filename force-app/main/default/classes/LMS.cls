@@ -1,3 +1,12 @@
+/*
+ * >>- Changelog -<<
+ * Date           Developer   Comment
+ * 19-06-2019     Ekta        Updated onParticipantNameChange method parameter from ID to Set<ID>
+ * 							  to avoid Too many future calls: 51 and solve the Dataloader Error Case.
+ * 	
+ * 	 
+*/ 
+
 public with sharing class LMS {
     /* Sample test code:
         TL_Programme__c[] programmes = [SELECT Id FROM TL_Programme__c];
@@ -329,9 +338,11 @@ public with sharing class LMS {
             break;
         }
     }
-
+    
+    
+	//Updated method parameter from ID to Set<ID> to avoid Too many future calls: 51 and solve the Dataloader Error Case.
     @future(callout=true)
-    public static void onParticipantNameChange(ID participantId) {
+    public static void onParticipantNameChange(Set<ID> participantId) {
         List<Programme_Participant__c> participants = [
             SELECT ParticipantName__c,
                 Participant__r.Prefered_Name__c,
