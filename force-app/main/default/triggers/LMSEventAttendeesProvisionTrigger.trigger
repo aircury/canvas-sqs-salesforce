@@ -4,10 +4,10 @@ trigger LMSEventAttendeesProvisionTrigger on Attendees__c (after insert, before 
     }
     
     if (Trigger.isInsert) {
-        LMS.onEventInsert(Trigger.newMap.keySet());
+         System.enqueueJob(new LMSEventInsertJob(Trigger.newMap.keySet(), null));
     }
 
     if (Trigger.isDelete) {
-        LMS.onEventDelete(Trigger.oldMap.keySet(), null, null);
+        System.enqueueJob(new LMSEventDeleteJob(Trigger.oldMap.keySet(), null, null, null));
     }
 }

@@ -31,10 +31,6 @@ trigger LMSProgrammeParticipantStatusTrigger on Programme_Participant__c (after 
     }
     
     if (Trigger.isInsert || Status_Changed) {
-        if (system.isBatch()) {
-            LMS.doParticipantStatusChange(Trigger.newMap.keySet());
-        } else {
-            LMS.onParticipantStatusChange(Trigger.newMap.keySet());
-        }
+        System.enqueueJob(new LMSParticipantStatusChangeJob(Trigger.newMap.keySet(), null));
     }
 }

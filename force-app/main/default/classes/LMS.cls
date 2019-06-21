@@ -122,65 +122,48 @@ public with sharing class LMS {
     */
     public static void usersProvision(TL_Programme__c p) {
         Map<Id, Programme_Participant__c> participants = new Map<Id, Programme_Participant__c>([
-            SELECT Id,
-                Programme__r.Id
+            SELECT Id
             FROM Programme_Participant__c
             WHERE Programme__r.Id = :p.Id
         ]);
-        Set<Id> participantsBatch = new Set<Id>();
 
-        for (Id participanId: participants.keySet()) {
-            participantsBatch.add(participanId);
-            if (participantsBatch.size() == 16) { //onParticipantStatusChange can do 6 callouts at max, so 16*6 = 96 <= 100 callout limit
-                onParticipantStatusChange(participantsBatch);
-                participantsBatch.clear();
-            }
-        }
-
-        if (participantsBatch.size() > 0) {
-            onParticipantStatusChange(participantsBatch);
-        }
-    }
-
-    public static void userEventsProvision(TL_Programme__c p) {
         Map<Id, Attendees__c> attendees = new Map<Id, Attendees__c>([
-            SELECT Id,
-                FLIP_Event__r.Cohort_lkp__r.Id
+            SELECT Id
             FROM Attendees__c
             WHERE FLIP_Event__r.Cohort_lkp__r.Id = :p.Id
         ]);
-        Set<Id> attendeesBatch = new Set<Id>();
 
-        for (Id attendeeId: attendees.keySet()) {
-            attendeesBatch.add(attendeeId);
-            if (attendeesBatch.size() == 16) { //onEventInsert can do 4 callouts at max, so 25*4 = 100 <= 100 callout limit
-                onEventInsert(attendeesBatch);
-                attendeesBatch.clear();
-            }
-        }
-
-        if (attendeesBatch.size() > 0) {
-            onEventInsert(attendeesBatch);
-        }
+        System.enqueueJob(new LMSParticipantStatusChangeJob(participants.keySet(), new LMSEventInsertJob(attendees.keySet(), null)));
     }
 
-    @future(callout=true)
-    public static void removeUsers(Id programmeId) {
-        TL_Programme__c programme = [
-            SELECT Id,
-                LMS_Course_Section_Id__c,
-                (SELECT Participant__r.Participant_UID__c,
-                    Participant__r.Email
-                FROM Programme_Participants__r)
-            FROM TL_Programme__c
-            WHERE Id = :programmeId
-        ][0];
+    public static void removeUsers(TL_Programme__c p) {
+         Map<Id, Programme_Participant__c> participants = new Map<Id, Programme_Participant__c>([
+            SELECT Id
+            FROM Programme_Participant__c
+            WHERE Programme__r.Id = :p.Id
+        ]);
 
-        for (Programme_Participant__c participant: programme.Programme_Participants__r) {
+        System.enqueueJob(new LMSRemoveUsersJob(participants.keySet(), null));
+    }
+
+    public static void doRemoveUsers(Set<ID> participantIds) {
+        List<Programme_Participant__c> participants = [
+            SELECT Id,
+                Programme__r.LMS_Course_Section_Id__c,
+                Programme__r.Id,
+                Participant__r.Email,
+                Participant__r.Participant_UID__c
+            FROM Programme_Participant__c
+            WHERE Id IN :participantIds AND
+                Programme__r.LMS_Access__c = true AND
+                Participant__r.Email != null
+        ];
+        
+        for (Programme_Participant__c participant: participants) {
             Contact c = participant.Participant__r;
             List <Object> apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
             Map <String, Object> apiResult;
-            String userId, sectionId = String.valueOf(programme.LMS_Course_Section_Id__c);
+            String userId, sectionId = String.valueOf(participant.Programme__r.LMS_Course_Section_Id__c);
 
             if (0 == apiResultList.size()) {
                 continue;
@@ -190,7 +173,7 @@ public with sharing class LMS {
 
             userId = String.valueOf(apiResult.get('id'));
 
-            removeUser(userId, sectionId, programmeId, c.Email);
+            removeUser(userId, sectionId, participant.Programme__r.Id, c.Email);
         }
     }
 
@@ -234,11 +217,6 @@ public with sharing class LMS {
         } else {
             CanvasAPI.removeUser(userId);
         }
-    }
-
-    @future(callout=true)
-    public static void onParticipantStatusChange(Set<ID> participantIds) {
-        doParticipantStatusChange(participantIds);
     }
 
     public static void doParticipantStatusChange(Set<ID> participantIds) {
@@ -308,6 +286,10 @@ public with sharing class LMS {
 
     @future(callout=true)
     public static void onContactUpdate(ID contactId, String oldEmail, String newEmail) {
+        doContactUpdate(contactId, oldEmail, newEmail);
+    }
+
+    public static void doContactUpdate(ID contactId, String oldEmail, String newEmail) {
         List<Programme_Participant__c> participants = [
             SELECT Participant__r.Name,
                 Participant__r.Email,
@@ -463,12 +445,7 @@ public with sharing class LMS {
         );
     }
 
-    @future(callout=true)
-    public static void onEventInsert(Set<ID> attendeeIds) {
-        doEventInsert(attendeeIds);
-    }
-
-    private static void doEventInsert(Set<ID> attendeeIds) {
+    public static void doEventInsert(Set<ID> attendeeIds) {
         List<Attendees__c> attendees = [
             SELECT Id,
                 Contact__r.Email,
@@ -535,12 +512,7 @@ public with sharing class LMS {
         }
     }
 
-    @future(callout=true)
-    public static void onEventDelete(Set<ID> attendeeIds, DateTime startAt, DateTime endAt) {
-        doEventDelete(attendeeIds, null, null);
-    }
-
-    private static void doEventDelete(Set<ID> attendeeIds, DateTime startAt, DateTime endAt) {
+    public static void doEventDelete(Set<ID> attendeeIds, DateTime startAt, DateTime endAt) {
         List<Attendees__c> attendees = [
             SELECT Id,
                 Contact__r.Participant_UID__c,
@@ -587,9 +559,7 @@ public with sharing class LMS {
         }
     }
 
-    @future(callout=true)
     public static void onEventUpdate(Set<ID> attendeeIds, DateTime startAt, DateTime endAt) {
-        doEventDelete(attendeeIds, startAt, endAt);
-        doEventInsert(attendeeIds);
+        System.enqueueJob(new LMSEventDeleteJob(attendeeIds, startAt, endAt, new LMSEventInsertJob(attendeeIds, null)));
     }
 }

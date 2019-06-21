@@ -345,29 +345,56 @@ private class LMSTest {
 
         insert cohort;
 
-        Account a;
-        Contact c;
-        Programme_Participant__c participant;
+        FLIP_Event__c event = new FLIP_Event__c(
+            Event_Date__c=Date.today(),
+            Event_End_Date__c=Date.today(),
+            Start_Time__c='10:00',
+            End_Time__c='11:00',
+            Event_Name__c='Test Event',
+            Event_Description__c='Test Description',
+            Address_Line_1__c='Test Address Line 1',
+            Address_Line_2__c='Test Address Line 2',
+            Postal_Code__c='SE1 8JX',
+            Send_to_LMS__c=true,
+            Cohort_lkp__c=cohort.Id
+        );
 
-        for (Integer i = 1; i <= 50; i = i +1) {
-            a = new Account(Name='TestAccount');
-            insert a;
+        insert event;
+
+        Account a = new Account(Name='TestAccount');
+        insert a;
+
+        List<Contact> contacts = new List<Contact>();
+        List<Programme_Participant__c> participants = new List<Programme_Participant__c>();
+        List<Attendees__c> attendees = new List<Attendees__c>();
+
+        for (Integer i = 1; i <= 30; i = i +1) {
+            contacts.add(new Contact(FirstName = 'Test', LastName= 'Test', AccountId = a.Id, Email='test' + String.valueOf(i) + '@example.org'));
+        }
+
+        insert contacts;
         
-            c = new Contact(FirstName = 'Test', LastName= 'Test', AccountId = a.Id, Email='test' + String.valueOf(i) + '@example.org');
-            insert c;
-
-            participant = new Programme_Participant__c(
+        for (Contact c: contacts) {
+            participants.add(new Programme_Participant__c(
                 Cohort__c=cohort.Id,
                 Participant__c=c.Id,
                 Status__c='Active'
-            );
-            
-            insert participant;
+            ));
+
+            attendees.add(new Attendees__c(
+                FLIP_Event__c=event.Id,
+                Contact__c=c.Id
+            ));
         }
+
+        insert participants;
+        insert attendees;
 
         Test.startTest();
 
-        System.schedule('ScheduleApexTest', '0 0 0 1 1 ?', new ScheduledLMSUsersProvision());
+        LMS.usersProvision(cohort);
+        LMS.removeUsers(cohort);
+        delete attendees;
 
         Test.stopTest();
     }

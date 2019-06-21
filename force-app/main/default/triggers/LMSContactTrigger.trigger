@@ -11,7 +11,11 @@ trigger LMSContactTrigger on Contact (after update) {
             oldContact.Prefered_Name__c != newContact.Prefered_Name__c ||
             oldContact.Email != newContact.Email
         ) {
-            LMS.onContactUpdate(contactId, oldContact.Email, newContact.Email);
+            if (system.isBatch()) {
+                LMS.doContactUpdate(contactId, oldContact.Email, newContact.Email);
+            } else {
+                LMS.onContactUpdate(contactId, oldContact.Email, newContact.Email);
+            }
         }
     }
 }

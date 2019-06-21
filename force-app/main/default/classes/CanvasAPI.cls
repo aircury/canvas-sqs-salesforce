@@ -304,6 +304,8 @@ public with sharing class CanvasAPI {
         req.setEndpoint(baseUrl + endpoint);
         req.setHeader('Authorization', 'Bearer ' + token);
         req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
+        req.setTimeout(60000);
+
         if ('' != body) {
             req.setBody(body);
         }
