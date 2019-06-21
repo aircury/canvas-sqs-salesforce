@@ -333,6 +333,45 @@ private class LMSTest {
         Test.stopTest();
     }
 
+    @isTest private static void TestScheduledLMSUsersBatchProvision() {
+        TL_Programme__c cohort = new TL_Programme__c(
+            Programme_Definition__c=prDef.Id,
+            Opportunity__c=o.Id,
+            Cohort_Name__c='Test 1',
+            LMS_Access__c=true,
+            LMS_Start_Date__c=Date.today(),
+            LMS_End_Date__c=Date.today() + 1
+        );
+
+        insert cohort;
+
+        Account a;
+        Contact c;
+        Programme_Participant__c participant;
+
+        for (Integer i = 1; i <= 50; i = i +1) {
+            a = new Account(Name='TestAccount');
+            insert a;
+        
+            c = new Contact(FirstName = 'Test', LastName= 'Test', AccountId = a.Id, Email='test' + String.valueOf(i) + '@example.org');
+            insert c;
+
+            participant = new Programme_Participant__c(
+                Cohort__c=cohort.Id,
+                Participant__c=c.Id,
+                Status__c='Active'
+            );
+            
+            insert participant;
+        }
+
+        Test.startTest();
+
+        System.schedule('ScheduleApexTest', '0 0 0 1 1 ?', new ScheduledLMSUsersProvision());
+
+        Test.stopTest();
+    }
+
     @isTest private static void TestScheduledLMSUsersProvisionComplete() {
         TL_Programme__c cohort = new TL_Programme__c(
             Programme_Definition__c=prDef.Id,

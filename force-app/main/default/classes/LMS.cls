@@ -127,8 +127,19 @@ public with sharing class LMS {
             FROM Programme_Participant__c
             WHERE Programme__r.Id = :p.Id
         ]);
+        Set<Id> participantsBatch = new Set<Id>();
 
-        onParticipantStatusChange(participants.keySet());
+        for (Id participanId: participants.keySet()) {
+            participantsBatch.add(participanId);
+            if (participantsBatch.size() == 16) { //onParticipantStatusChange can do 6 callouts at max, so 16*6 = 96 <= 100 callout limit
+                onParticipantStatusChange(participantsBatch);
+                participantsBatch.clear();
+            }
+        }
+
+        if (participantsBatch.size() > 0) {
+            onParticipantStatusChange(participantsBatch);
+        }
     }
 
     public static void userEventsProvision(TL_Programme__c p) {
@@ -138,8 +149,19 @@ public with sharing class LMS {
             FROM Attendees__c
             WHERE FLIP_Event__r.Cohort_lkp__r.Id = :p.Id
         ]);
+        Set<Id> attendeesBatch = new Set<Id>();
 
-        onEventInsert(attendees.keySet());
+        for (Id attendeeId: attendees.keySet()) {
+            attendeesBatch.add(attendeeId);
+            if (attendeesBatch.size() == 16) { //onEventInsert can do 4 callouts at max, so 25*4 = 100 <= 100 callout limit
+                onEventInsert(attendeesBatch);
+                attendeesBatch.clear();
+            }
+        }
+
+        if (attendeesBatch.size() > 0) {
+            onEventInsert(attendeesBatch);
+        }
     }
 
     @future(callout=true)
