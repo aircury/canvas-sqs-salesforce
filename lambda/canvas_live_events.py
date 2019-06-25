@@ -85,12 +85,12 @@ EVENT_MAP = {
     # https://github.com/instructure/canvas-lms/blob/3afdafe5ae246d22bcaaa841bd63c036853c075d/doc/api/caliper_live_events.md#event-mapping inverse
     # type: action: object->type: canvas_event
     'AssessmentEvent': {'Submitted': {'Attempt':             'quiz_submitted'}},
-    'AssignableEvent': {'Submitted': {'Attempt':             'submission_created',
-                                      'Modified':            'submission_updated'}},
+    'AssignableEvent': {'Submitted': {'Attempt':             'submission_created'}},
     'ThreadEvent':     {'Created':   {'Thread':              'discussion_topic_created'}},
     'MessageEvent':    {'Posted':    {'Message':             'discussion_entry_created'}},
     'Event':           {'Created':   {'Entity':              'enrollment_created'},
-                        'Modified':  {'Entity':              'enrollment_updated'}},
+                        'Modified':  {'Entity':              'enrollment_updated',
+                                      'Attempt':             'submission_updated'}},
     'SessionEvent':    {'LoggedIn':  {'SoftwareApplication': 'logged_in'},
                         'LoggedOut': {'SoftwareApplication': 'logged_out'}},
 }
