@@ -156,7 +156,7 @@ def process_discussion_entry_created(actor, objectv, group):
     return (uid, clean_course_id(course_id), detail, activity, None)
 
 def process_enrollment_created(actor, objectv, group):
-    uid, course_id, detail, activity, event_name = process_submission_created(actor, objectv, group)
+    uid, course_id, detail, activity, event_name = process_enrollment_updated(actor, objectv, group)
 
     return (uid, course_id, detail, activity.replace('Updated', 'Created'), event_name)
 
