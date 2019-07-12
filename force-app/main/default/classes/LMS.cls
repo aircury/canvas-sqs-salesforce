@@ -345,10 +345,11 @@ public with sharing class LMS {
     
     
 	//Updated method parameter from ID to Set<ID> to avoid Too many future calls: 51 and solve the Dataloader Error Case.
-    @future(callout=true)
-    public static void onParticipantNameChange(Set<ID> participantId) {
+    public static void doParticipantNameChange(Set<ID> participantId) {
         List<Programme_Participant__c> participants = [
             SELECT ParticipantName__c,
+                Participant__r.Email,
+                Participant__r.Name,
                 Participant__r.Prefered_Name__c,
                 Participant__r.Participant_UID__c
             FROM Programme_Participant__c
@@ -358,11 +359,31 @@ public with sharing class LMS {
                 Programme__r.LMS_Start_Date__c <= TODAY AND
                 Programme__r.LMS_End_Date__c >= TODAY
         ];
-        
+        List <Object> apiResultList;
+
         for (Programme_Participant__c participant: participants) {
             Contact c = participant.Participant__r;
 
-            CanvasAPI.updateUser(c.Participant_UID__c, participant.ParticipantName__c, c.Prefered_Name__c);
+            apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
+
+            if (0 == apiResultList.size()) {
+                apiResultList.add(CanvasAPI.createUser(
+                    c.Email,
+                    c.Name,
+                    c.Prefered_Name__c,
+                    c.Participant_UID__c
+                ));
+
+                try {
+                    CanvasAPI.createCommunicationChannel(c.Participant_UID__c, c.Email);
+                } catch (CanvasAPIException caught) {
+                    if (!caught.getMessage().contains('unique!')) {
+                        throw caught;
+                    }
+                }
+            } else {
+                CanvasAPI.updateUser(c.Participant_UID__c, participant.ParticipantName__c, c.Prefered_Name__c);
+            }
         }
     }
 

@@ -1,19 +1,21 @@
-public with sharing class LMSRemoveUsersJob implements Queueable, Database.AllowsCallouts {
-    static final Integer BATCH_SIZE = 25; //doRemoveUsers can do 4 callouts at max, so 25*4 = 100 <= 100 callout limit
+public with sharing class LMSParticipantNameChangeJob implements Queueable, Database.AllowsCallouts {
+    static final Integer BATCH_SIZE = 33; //onParticipantStatusChange can do 3 callouts at max, so 33*3 = 99 <= 100 callout limit
     Set<Id> participants;
     Queueable nextJob;
 
-    public LMSRemoveUsersJob(Set<Id> p, Queueable j) {
+    public LMSParticipantNameChangeJob(Set<Id> p, Queueable j) {
         participants = p;
         nextJob = j;
     }
 
     public void execute(QueueableContext context) {
         if (participants.size() <= BATCH_SIZE) {
-            LMS.doRemoveUsers(participants);
+            LMS.doParticipantNameChange(participants);
 
             if (nextJob != null) {
-                System.enqueueJob(nextJob);
+                if (!Test.isRunningTest()) {
+                    System.enqueueJob(nextJob);
+                }
             }
 
             return;
@@ -24,7 +26,7 @@ public with sharing class LMSRemoveUsersJob implements Queueable, Database.Allow
         for (Id participantId: participants) {
             participantsBatch.add(participantId);
             if (participantsBatch.size() == BATCH_SIZE) { 
-                LMS.doRemoveUsers(participantsBatch);
+                LMS.doParticipantNameChange(participantsBatch);
                 break;
             }
         }
@@ -32,7 +34,7 @@ public with sharing class LMSRemoveUsersJob implements Queueable, Database.Allow
         participants.removeAll(participantsBatch);
 
         if (!Test.isRunningTest()) {
-            System.enqueueJob(new LMSRemoveUsersJob(participants, nextJob));
+            System.enqueueJob(new LMSParticipantNameChangeJob(participants, nextJob));
         }
     }
 }

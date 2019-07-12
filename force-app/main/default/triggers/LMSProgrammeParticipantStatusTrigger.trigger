@@ -25,9 +25,15 @@ trigger LMSProgrammeParticipantStatusTrigger on Programme_Participant__c (after 
             }
         }
     }
-    
+
+    if (Status_Changed && participantIdsWithChangedNameSet.size() > 0) {
+        System.enqueueJob(new LMSParticipantStatusChangeJob(Trigger.newMap.keySet(), new LMSParticipantNameChangeJob(participantIdsWithChangedNameSet, null)));
+
+        return;
+    }
+
     if(participantIdsWithChangedNameSet.size() > 0) {
-        LMS.onParticipantNameChange(participantIdsWithChangedNameSet);
+        System.enqueueJob(new LMSParticipantNameChangeJob(participantIdsWithChangedNameSet, null));
     }
     
     if (Trigger.isInsert || Status_Changed) {

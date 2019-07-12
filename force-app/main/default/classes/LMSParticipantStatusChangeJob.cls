@@ -1,5 +1,5 @@
 public with sharing class LMSParticipantStatusChangeJob implements Queueable, Database.AllowsCallouts {
-    static final Integer BATCH_SIZE = 16; //onParticipantStatusChange can do 6 callouts at max, so 16*6 = 96 <= 100 callout limit
+    static final Integer BATCH_SIZE = 16; //doParticipantStatusChange can do 6 callouts at max, so 16*6 = 96 <= 100 callout limit
     Set<Id> participants;
     Queueable nextJob;
 

@@ -1,5 +1,5 @@
 public with sharing class LMSEventInsertJob implements Queueable, Database.AllowsCallouts {
-    static final Integer BATCH_SIZE = 25; //onEventInsert can do 4 callouts at max, so 25*4 = 100 <= 100 callout limit
+    static final Integer BATCH_SIZE = 25; //doEventInsert can do 4 callouts at max, so 25*4 = 100 <= 100 callout limit
     Set<Id> attendees;
     Queueable nextJob;
 
