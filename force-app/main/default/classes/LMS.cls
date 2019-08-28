@@ -331,13 +331,14 @@ public with sharing class LMS {
             CanvasAPI.updateUserEmail(c.Participant_UID__c, newEmail);
             
             //Update user login
-            // List<Object> apiResultList = CanvasAPI.listUserLogins(c.Participant_UID__c);
+            List<Object> apiResultList = CanvasAPI.listUserLogins(c.Participant_UID__c);
 
-            // for (Map <String, Object> apiResult: apiResultList) {
-            //     if (oldEmail == String.valueOf(apiResult.get('unique_id'))) {
-            //         CanvasAPI.editUserLogin(String.valueOf(apiResult.get('id')), newEmail);
-            //     }
-            // }
+            for (Object result: apiResultList) {
+                Map <String, Object> apiResult = (Map <String, Object>) result;
+                if (oldEmail == String.valueOf(apiResult.get('unique_id'))) {
+                    CanvasAPI.editUserLogin(String.valueOf(apiResult.get('id')), newEmail);
+                }
+            }
 
             break;
         }

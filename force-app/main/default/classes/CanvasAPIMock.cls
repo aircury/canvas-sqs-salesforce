@@ -32,6 +32,10 @@ global class CanvasAPIMock implements HttpCalloutMock {
             res.setStatus('KO');
         }
         
+        if (endpoint.contains('/logins')) {
+            res.setBody('[]');
+        }
+
         return res;
     }
 }

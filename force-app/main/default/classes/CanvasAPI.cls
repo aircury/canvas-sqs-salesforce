@@ -212,18 +212,18 @@ public with sharing class CanvasAPI {
     /* Sample test code:
         CanvasAPI.listUserLogins('123456');
     */
-    // public static List <Object> listUserLogins(String participantUID) {
-    //     return (List <Object>) apiCall('GET', 'users/sis_user_id:' + participantUID + '/logins', '');
-    // }
+    public static List <Object> listUserLogins(String participantUID) {
+        return (List <Object>) apiCall('GET', 'users/sis_user_id:' + participantUID + '/logins', '');
+    }
 
     /* Sample test code:
         CanvasAPI.editUserLogin('123', 'test@example.org');
     */
-    // public static Map <String, Object> editUserLogin(String loginId, String email) {
-    //     String body = 'login[unique_id]=' + email;
+    public static Map <String, Object> editUserLogin(String loginId, String email) {
+        String body = 'login[unique_id]=' + email;
 
-    //     return (Map <String, Object>) apiCall('PUT', 'accounts/:account_id/logins/' + loginId, body);
-    // }
+        return (Map <String, Object>) apiCall('PUT', 'accounts/:account_id/logins/' + loginId, body);
+    }
 
     /* Sample test code:
         CanvasAPI.createEvent('user', '115', '115', 'Test Event', 'Test Description',
