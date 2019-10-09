@@ -88,9 +88,7 @@ EVENT_MAP = {
     'AssignableEvent': {'Submitted': {'Attempt':             'submission_created'}},
     'ThreadEvent':     {'Created':   {'Thread':              'discussion_topic_created'}},
     'MessageEvent':    {'Posted':    {'Message':             'discussion_entry_created'}},
-    'Event':           {'Created':   {'Entity':              'enrollment_created'},
-                        'Modified':  {'Entity':              'enrollment_updated',
-                                      'Attempt':             'submission_updated'}},
+    'Event':           {'Modified':  {'Attempt':             'submission_updated'}},
     'SessionEvent':    {'LoggedIn':  {'SoftwareApplication': 'logged_in'},
                         'LoggedOut': {'SoftwareApplication': 'logged_out'}},
 }
