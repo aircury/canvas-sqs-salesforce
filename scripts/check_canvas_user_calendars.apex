@@ -24,6 +24,8 @@ List <Object> apiResultList;
 Map <String, Object> apiResult;
 String userId;
 
+System.debug(LoggingLevel.INFO, 'Attendees: ' + attendees.size());
+
 for (Attendees__c attendee: attendees) {
     if (i < start) {
         i = i + 1;
@@ -44,7 +46,7 @@ for (Attendees__c attendee: attendees) {
     i = i + 1;
 
     if (0 == apiResultList.size()) {
-        System.debug(LoggingLevel.WARN, 'Non existent user ' + start + '-' + (start+maxIterations) + ': ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Cohort_lkp__r.Name + ' ' + event.Event_Name__c);
+        System.debug(LoggingLevel.INFO, 'Non existent user ' + start + '-' + (start+maxIterations) + ': ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Cohort_lkp__r.Name + ' ' + event.Event_Name__c);
         continue;
     }
 
@@ -53,6 +55,6 @@ for (Attendees__c attendee: attendees) {
     userId = String.valueOf(apiResult.get('id'));
     apiResultList = CanvasAPI.listUserEvents(userId, startAt, endAt);
     if (0 == apiResultList.size()) {
-        System.debug(LoggingLevel.WARN, 'Non existent calendar event ' + start + '-' + (start+maxIterations) + ': ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Cohort_lkp__r.Name + ' ' + event.Event_Name__c);
+        System.debug(LoggingLevel.INFO, 'Non existent calendar event ' + start + '-' + (start+maxIterations) + ': ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Cohort_lkp__r.Name + ' ' + event.Event_Name__c);
     }
 }
