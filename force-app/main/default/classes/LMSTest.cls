@@ -369,7 +369,7 @@ private class LMSTest {
         List<Programme_Participant__c> participants = new List<Programme_Participant__c>();
         List<Attendees__c> attendees = new List<Attendees__c>();
 
-        for (Integer i = 1; i <= 30; i = i +1) {
+        for (Integer i = 1; i <= 15; i = i +1) {
             contacts.add(new Contact(FirstName = 'Test', LastName= 'Test', AccountId = a.Id, Email='test' + String.valueOf(i) + '@example.org'));
         }
 
@@ -485,7 +485,7 @@ private class LMSTest {
         List<Programme_Participant__c> participants = new List<Programme_Participant__c>();
         List<Attendees__c> attendees = new List<Attendees__c>();
 
-        for (Integer i = 1; i <= 35; i = i +1) {
+        for (Integer i = 1; i <= 15; i = i +1) {
             contacts.add(new Contact(FirstName = 'Test', LastName= 'Test', AccountId = a.Id, Email='test' + String.valueOf(i) + '@example.org'));
         }
 

@@ -17,17 +17,17 @@ trigger LMSEventTrigger on FLIP_Event__c (after update) {
             oldEvent.Address_Line_2__c != newEvent.Address_Line_2__c ||
             oldEvent.Postal_Code__c != newEvent.Postal_Code__c
         ) {
-            Map<Id, Attendees__c> attendees = new Map<Id, Attendees__c>([
+            List<Attendees__c> attendees = [
                 SELECT Id,
                     FLIP_Event__r.Id
                 FROM Attendees__c
                 WHERE FLIP_Event__r.Id = :eventId
-            ]);
+            ];
 
             Datetime oldStart = LMS.getEventDateTime(oldEvent.Event_Date__c, oldEvent.Start_Time__c),
                 oldEnd = LMS.getEventDateTime(oldEvent.Event_End_Date__c, oldEvent.End_Time__c);
             
-            LMS.onEventUpdate(attendees.keySet(), oldStart, oldEnd);
+            LMS.onEventUpdate(attendees, oldStart, oldEnd);
         }
     }
 }

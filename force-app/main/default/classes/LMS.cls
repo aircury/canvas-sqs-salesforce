@@ -121,32 +121,36 @@ public with sharing class LMS {
         The participant should have a valid email
     */
     public static void usersProvision(TL_Programme__c p) {
-        Map<Id, Programme_Participant__c> participants = new Map<Id, Programme_Participant__c>([
+        List<Programme_Participant__c> participants = [
             SELECT Id
             FROM Programme_Participant__c
             WHERE Programme__r.Id = :p.Id
-        ]);
+        ];
 
-        Map<Id, Attendees__c> attendees = new Map<Id, Attendees__c>([
+        List<Attendees__c> attendees = [
             SELECT Id
             FROM Attendees__c
             WHERE FLIP_Event__r.Cohort_lkp__r.Id = :p.Id
-        ]);
+        ];
 
-        System.enqueueJob(new LMSParticipantStatusChangeJob(participants.keySet(), new LMSEventInsertJob(attendees.keySet(), null)));
+        LMSParticipantStatusChangeJob job = new LMSParticipantStatusChangeJob(participants, new LMSEventInsertJob(attendees, null));
+        
+        Database.executeBatch(job, job.batchSize());
     }
 
     public static void removeUsers(TL_Programme__c p) {
-         Map<Id, Programme_Participant__c> participants = new Map<Id, Programme_Participant__c>([
+         List<Programme_Participant__c> participants = [
             SELECT Id
             FROM Programme_Participant__c
             WHERE Programme__r.Id = :p.Id
-        ]);
+        ];
 
-        System.enqueueJob(new LMSRemoveUsersJob(participants.keySet(), null));
+        LMSRemoveUsersJob job = new LMSRemoveUsersJob(participants, null);
+
+        Database.executeBatch(job, job.batchSize());
     }
 
-    public static void doRemoveUsers(Set<ID> participantIds) {
+    public static List<String> doRemoveUsers(Set<ID> participantIds) {
         List<Programme_Participant__c> participants = [
             SELECT Id,
                 Programme__r.LMS_Course_Section_Id__c,
@@ -175,6 +179,8 @@ public with sharing class LMS {
 
             removeUser(userId, sectionId, participant.Programme__r.Id, c.Email);
         }
+
+        return new List<String>();
     }
 
     public static void enrollUser(String userId, String courseSectionId, Boolean deactivate, String task) {
@@ -219,11 +225,13 @@ public with sharing class LMS {
         }
     }
 
-    public static void doParticipantStatusChange(Set<ID> participantIds) {
+    public static List<String> doParticipantStatusChange(Set<ID> participantIds) {
         List<Programme_Participant__c> participants = [
             SELECT Id,
                 Status__c,
                 Programme__r.LMS_Course_Section_Id__c,
+                Programme__r.Programme_Name__c,
+                Programme__r.Cohort_Name__c,
                 Participant__r.Email,
                 Participant__r.Name,
                 Participant__r.Prefered_Name__c,
@@ -235,6 +243,7 @@ public with sharing class LMS {
                 Programme__r.LMS_Start_Date__c <= TODAY AND
                 Programme__r.LMS_End_Date__c >= TODAY
         ];
+        List<String> errors = new List<String>();
         
         for (Programme_Participant__c participant: participants) {
             TL_Programme__c programme = participant.Programme__r;
@@ -247,7 +256,7 @@ public with sharing class LMS {
                 if (participant.Status__c == 'Complete' ||
                     participant.Status__c == 'Deferred' ||
                     participant.Status__c == 'Withdrawn') {
-                        return;
+                        continue;
                 }
 
                 apiResultList.add(CanvasAPI.createUser(
@@ -257,13 +266,14 @@ public with sharing class LMS {
                     c.Participant_UID__c
                 ));
 
-                try {
-                    CanvasAPI.createCommunicationChannel(c.Participant_UID__c, c.Email);
-                } catch (CanvasAPIException caught) {
-                    if (!caught.getMessage().contains('unique!')) {
-                        throw caught;
-                    }
+                if (null == apiResultList[0]) {
+                    errors.add('There was a problem on programme "' + programme.Programme_Name__c + ' ' + programme.Cohort_Name__c +
+                    '" provisioning participant with email ' + c.Email + ' and UID ' + c.Participant_UID__c);
+
+                    continue;
                 }
+
+                CanvasAPI.createCommunicationChannel(c.Participant_UID__c, c.Email);
             }
 
             apiResult = (Map <String, Object>) apiResultList[0];
@@ -282,6 +292,8 @@ public with sharing class LMS {
                }
             }
         }
+
+        return errors;
     }
 
     @future(callout=true)
@@ -320,13 +332,7 @@ public with sharing class LMS {
                 }
             }
 
-            try {
-                CanvasAPI.createCommunicationChannel(c.Participant_UID__c, newEmail);
-            } catch (CanvasAPIException caught) {
-                if (!caught.getMessage().contains('unique!')) {
-                    throw caught;
-                }
-            }
+            CanvasAPI.createCommunicationChannel(c.Participant_UID__c, newEmail);
 
             CanvasAPI.updateUserEmail(c.Participant_UID__c, newEmail);
             
@@ -346,9 +352,11 @@ public with sharing class LMS {
     
     
 	//Updated method parameter from ID to Set<ID> to avoid Too many future calls: 51 and solve the Dataloader Error Case.
-    public static void doParticipantNameChange(Set<ID> participantId) {
+    public static List<String> doParticipantNameChange(Set<ID> participantId) {
         List<Programme_Participant__c> participants = [
             SELECT ParticipantName__c,
+                Programme__r.Programme_Name__c,
+                Programme__r.Cohort_Name__c,
                 Participant__r.Email,
                 Participant__r.Name,
                 Participant__r.Prefered_Name__c,
@@ -361,9 +369,11 @@ public with sharing class LMS {
                 Programme__r.LMS_End_Date__c >= TODAY
         ];
         List <Object> apiResultList;
+        List<String> errors = new List<String>();
 
         for (Programme_Participant__c participant: participants) {
             Contact c = participant.Participant__r;
+            TL_Programme__c programme = participant.Programme__r;
 
             apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
 
@@ -375,17 +385,20 @@ public with sharing class LMS {
                     c.Participant_UID__c
                 ));
 
-                try {
-                    CanvasAPI.createCommunicationChannel(c.Participant_UID__c, c.Email);
-                } catch (CanvasAPIException caught) {
-                    if (!caught.getMessage().contains('unique!')) {
-                        throw caught;
-                    }
+                if (null == apiResultList[0]) {
+                    errors.add('There was a problem on programme "' + programme.Programme_Name__c + ' ' + programme.Cohort_Name__c +
+                    '" provisioning participant with email ' + c.Email + ' and UID ' + c.Participant_UID__c);
+
+                    continue;
                 }
+
+                CanvasAPI.createCommunicationChannel(c.Participant_UID__c, c.Email);
             } else {
                 CanvasAPI.updateUser(c.Participant_UID__c, participant.ParticipantName__c, c.Prefered_Name__c);
             }
         }
+
+        return errors;
     }
 
     @future(callout=true)
@@ -467,7 +480,7 @@ public with sharing class LMS {
         );
     }
 
-    public static void doEventInsert(Set<ID> attendeeIds) {
+    public static List<String> doEventInsert(Set<ID> attendeeIds) {
         List<Attendees__c> attendees = [
             SELECT Id,
                 Contact__r.Email,
@@ -512,13 +525,11 @@ public with sharing class LMS {
                     c.Participant_UID__c
                 ));
 
-                try {
-                    CanvasAPI.createCommunicationChannel(c.Participant_UID__c, c.Email);
-                } catch (CanvasAPIException caught) {
-                    if (!caught.getMessage().contains('unique!')) {
-                        throw caught;
-                    }
+                if (null == apiResultList[0]) {
+                    continue;
                 }
+
+                CanvasAPI.createCommunicationChannel(c.Participant_UID__c, c.Email);
             }
 
             apiResult = (Map <String, Object>) apiResultList[0];
@@ -532,9 +543,11 @@ public with sharing class LMS {
             address = line1 + ' ' + line2 + ' ' + postalCode;
             CanvasAPI.createEvent('user', userId, userId, title, description, startAt, endAt, address);
         }
+
+        return new List<String>();
     }
 
-    public static void doEventDelete(Set<ID> attendeeIds, DateTime startAt, DateTime endAt) {
+    public static List<String> doEventDelete(Set<ID> attendeeIds, DateTime startAt, DateTime endAt) {
         List<Attendees__c> attendees = [
             SELECT Id,
                 Contact__r.Participant_UID__c,
@@ -579,9 +592,13 @@ public with sharing class LMS {
                 CanvasAPI.removeUserEvent(userId, eventId);
             }
         }
+
+        return new List<String>();
     }
 
-    public static void onEventUpdate(Set<ID> attendeeIds, DateTime startAt, DateTime endAt) {
-        System.enqueueJob(new LMSEventDeleteJob(attendeeIds, startAt, endAt, new LMSEventInsertJob(attendeeIds, null)));
+    public static void onEventUpdate(List<sObject> attendees, DateTime startAt, DateTime endAt) {
+        LMSEventDeleteJob job = new LMSEventDeleteJob(attendees, startAt, endAt, new LMSEventInsertJob(attendees, null));
+
+        Database.executeBatch(job, job.batchSize());
     }
 }

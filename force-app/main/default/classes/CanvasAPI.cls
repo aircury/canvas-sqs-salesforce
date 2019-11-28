@@ -133,7 +133,17 @@ public with sharing class CanvasAPI {
             '&pseudonym[authentication_provider_id]=saml' +
             '&pseudonym[force_self_registration]=false';
 
-        return (Map <String, Object>) apiCall('POST', 'accounts/:account_id/users', body);
+        Map <String, Object> result = null;
+
+        try {
+            result = (Map <String, Object>) apiCall('POST', 'accounts/:account_id/users', body);
+        } catch (CanvasAPIException caught) {
+            if (!caught.getMessage().contains('ID already in use for this account')) {
+                throw caught;
+            }
+        }
+
+        return result;
     }
     
     public static Map <String, Object> createCommunicationChannel(String participantUID, String email) {
@@ -142,7 +152,17 @@ public with sharing class CanvasAPI {
             '&communication_channel[type]=email' +
             '&skip_confirmation=true';
 
-        return (Map <String, Object>) apiCall('POST', 'users/sis_user_id:' + participantUID + '/communication_channels', body);
+        Map <String, Object> result = null;
+
+        try {
+            result = (Map <String, Object>) apiCall('POST', 'users/sis_user_id:' + participantUID + '/communication_channels', body);
+        } catch (CanvasAPIException caught) {
+            if (!caught.getMessage().contains('unique!')) {
+                throw caught;
+            }
+        }
+
+        return result;
     }
 
     public static Map <String, Object> deleteCommunicationChannel(String participantUID, String email) {

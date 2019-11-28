@@ -4,10 +4,14 @@ trigger LMSEventAttendeesProvisionTrigger on Attendees__c (after insert, before 
     }
     
     if (Trigger.isInsert) {
-         System.enqueueJob(new LMSEventInsertJob(Trigger.newMap.keySet(), null));
+        LMSEventInsertJob job = new LMSEventInsertJob(Trigger.new, null);
+
+        Database.executeBatch(job, job.batchSize());
     }
 
     if (Trigger.isDelete) {
-        System.enqueueJob(new LMSEventDeleteJob(Trigger.oldMap.keySet(), null, null, null));
+        LMSEventDeleteJob job = new LMSEventDeleteJob(Trigger.old, null, null, null);
+
+        Database.executeBatch(job, job.batchSize());
     }
 }

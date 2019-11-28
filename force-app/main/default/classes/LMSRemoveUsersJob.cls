@@ -1,38 +1,16 @@
-public with sharing class LMSRemoveUsersJob implements Queueable, Database.AllowsCallouts {
-    static final Integer BATCH_SIZE = 25; //doRemoveUsers can do 4 callouts at max, so 25*4 = 100 <= 100 callout limit
-    Set<Id> participants;
-    Queueable nextJob;
-
-    public LMSRemoveUsersJob(Set<Id> p, Queueable j) {
-        participants = p;
-        nextJob = j;
+global class LMSRemoveUsersJob extends LMSAbstractJob {
+    public LMSRemoveUsersJob(List<sObject> i, LMSAbstractJob j) {
+        super(i, j);
     }
 
-    public void execute(QueueableContext context) {
-        if (participants.size() <= BATCH_SIZE) {
-            LMS.doRemoveUsers(participants);
+    global override Integer batchSize() {
+        return 25; //doRemoveUsers can do 4 callouts at max, so 25*4 = 100 <= 100 callout limit
+    }
+    global override String emailSubject() {
+        return 'Remove Canvas Users Job ';
+    }
 
-            if (nextJob != null) {
-                System.enqueueJob(nextJob);
-            }
-
-            return;
-        }
-
-        Set<Id> participantsBatch = new Set<Id>();
-    
-        for (Id participantId: participants) {
-            participantsBatch.add(participantId);
-            if (participantsBatch.size() == BATCH_SIZE) { 
-                LMS.doRemoveUsers(participantsBatch);
-                break;
-            }
-        }
-
-        participants.removeAll(participantsBatch);
-
-        if (!Test.isRunningTest()) {
-            System.enqueueJob(new LMSRemoveUsersJob(participants, nextJob));
-        }
+    global override List<String> doExecute(Set<Id> i) {
+        return LMS.doRemoveUsers(i);
     }
 }
