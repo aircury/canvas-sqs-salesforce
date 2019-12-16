@@ -597,7 +597,7 @@ public with sharing class LMS {
     }
 
     public static void onEventUpdate(List<sObject> attendees, DateTime startAt, DateTime endAt) {
-        LMSEventDeleteJob job = new LMSEventDeleteJob(attendees, startAt, endAt, new LMSEventInsertJob(attendees, null));
+        LMSEventDeleteJob job = new LMSEventDeleteJob(attendees, startAt, endAt, new LMSEventInsertJob(attendees.clone(), null));
 
         Database.executeBatch(job, job.batchSize());
     }
