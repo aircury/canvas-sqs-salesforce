@@ -30,7 +30,7 @@ global abstract class LMSAbstractJob implements Database.Batchable<sObject>, Dat
     global abstract Integer batchSize();
 
     global void finish(Database.BatchableContext BC) {
-        if (errors.size() > 0) {
+        if (errors.size() > 0 || Test.isRunningTest()) {
             AsyncApexJob a = [
                 SELECT Id, Status, NumberOfErrors, JobItemsProcessed,
                 TotalJobItems, CreatedBy.Email
