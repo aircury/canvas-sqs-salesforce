@@ -126,7 +126,7 @@ def process_submission_created(actor, objectv, group):
     activity = 'Submission Created'
     
     grader = None
-    
+
     if submission.grader_id:
         grader = canvas.get_user(submission.grader_id)
         grader = grader.email
@@ -136,7 +136,8 @@ def process_submission_created(actor, objectv, group):
         'submission': submission,
         'assignment': assignment,
         'event_name': assignment.name,
-        'grader': grader
+        'grader': grader,
+        'resubmission': actor['extensions']['com.instructure.canvas']['entity_id'] == user_id
     })
 
 def process_submission_updated(actor, objectv, group):
