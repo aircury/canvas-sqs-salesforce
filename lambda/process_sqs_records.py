@@ -62,7 +62,8 @@ def lambda_handler(event, context):
 
             query = '''
                 SELECT Id,
-                    ParticipantName__c
+                    ParticipantName__c,
+                    Qualification__c
                 FROM Programme_Participant__c
                 WHERE Programme__r.LMS_Start_Date__c <= TODAY AND
                     Programme__r.LMS_End_Date__c > TODAY AND
@@ -85,13 +86,15 @@ def lambda_handler(event, context):
                             'Programme_Participant__c': participant['Id']
                     })
                     
+                    if participant['Qualification__c'] == None:
+                        continue
+
                     if activity == 'Submission Created':
                         sf.Assessment_Submission__c.create({
                             'Participant__c': participant['Id'],
                             'Name': data['assignment'].name,
                             'Submission_Date__c': date
                         })
-                        sf.Programme_Participant__c.update(participant['Id'], {'NPQ_Status__c': 'Submitted- pending allocation'})
 
                     if activity == 'Submission Updated':
                         query = '''
@@ -108,9 +111,11 @@ def lambda_handler(event, context):
                         
                         for assessment_submission in assessment_submissions['records']:
                             submission_data = {
-                                'Submission_Date__c': date,
                                 'Name': data['assignment'].name
                             }
+
+                            # if data['resubmission']:
+                            #     submission_data['Last_Resubmission_Date__c'] = date
 
                             if data['grader']:
                                 query = '''
@@ -125,7 +130,6 @@ def lambda_handler(event, context):
                                     submission_data['Marker__c'] = graders['records'][0]['Id']
 
                             sf.Assessment_Submission__c.update(assessment_submission['Id'], submission_data)
-                            sf.Programme_Participant__c.update(participant['Id'], {'NPQ_Status__c': 'Submitted (pending outcome)'})
 
             if not data:
                 continue
