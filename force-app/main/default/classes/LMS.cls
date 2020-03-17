@@ -491,11 +491,9 @@ public with sharing class LMS {
                 FLIP_Event__r.Event_End_Date__c,
                 FLIP_Event__r.Start_Time__c,
                 FLIP_Event__r.End_Time__c,
-                FLIP_Event__r.Event_Name__c,
+                FLIP_Event__r.Event_Full_Name__c,
                 FLIP_Event__r.Event_Description_Rich__c,
-                FLIP_Event__r.Address_Line_1__c,
-                FLIP_Event__r.Address_Line_2__c,
-                FLIP_Event__r.Postal_Code__c
+                FLIP_Event__r.Delivery_Address__c
             FROM Attendees__c
             WHERE Id IN :attendeeIds AND
                 FLIP_Event__r.Cohort_lkp__r.LMS_Access__c = true AND
@@ -535,12 +533,9 @@ public with sharing class LMS {
             apiResult = (Map <String, Object>) apiResultList[0];
 
             userId = String.valueOf(apiResult.get('id'));
-            title = event.Event_Name__c;
+            title = event.Event_Full_Name__c;
             description = null == event.Event_Description_Rich__c ? '' : event.Event_Description_Rich__c;
-            line1 = null == event.Address_Line_1__c ? '' : event.Address_Line_1__c;
-            line2 = null == event.Address_Line_2__c ? '' : event.Address_Line_2__c;
-            postalCode = null == event.Postal_Code__c ? '' : event.Postal_Code__c;
-            address = line1 + ' ' + line2 + ' ' + postalCode;
+            address = null == event.Delivery_Address__c ? '' : event.Delivery_Address__c;
             CanvasAPI.createEvent('user', userId, userId, title, description, startAt, endAt, address);
         }
 

@@ -95,7 +95,7 @@ def lambda_handler(event, context):
                     FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c <= TODAY AND
                     FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c > TODAY AND
                     Contact__r.Email != null AND
-                    FLIP_Event__r.Event_Name__c = '%s'
+                    FLIP_Event__r.Event_Full_Name__c = '%s'
             '''
 
             attendees = sf.query(query % (uid, event_name))

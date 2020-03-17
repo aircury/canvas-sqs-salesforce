@@ -11,11 +11,9 @@ trigger LMSEventTrigger on FLIP_Event__c (after update) {
             oldEvent.Event_End_Date__c != newEvent.Event_End_Date__c ||
             oldEvent.Start_Time__c != newEvent.Start_Time__c ||
             oldEvent.End_Time__c != newEvent.End_Time__c ||
-            oldEvent.Event_Name__c != newEvent.Event_Name__c ||
+            oldEvent.Event_Full_Name__c != newEvent.Event_Full_Name__c ||
             oldEvent.Event_Description_Rich__c != newEvent.Event_Description_Rich__c ||
-            oldEvent.Address_Line_1__c != newEvent.Address_Line_1__c ||
-            oldEvent.Address_Line_2__c != newEvent.Address_Line_2__c ||
-            oldEvent.Postal_Code__c != newEvent.Postal_Code__c
+            oldEvent.Delivery_Address__c != newEvent.Delivery_Address__c
         ) {
             List<Attendees__c> attendees = [
                 SELECT Id,

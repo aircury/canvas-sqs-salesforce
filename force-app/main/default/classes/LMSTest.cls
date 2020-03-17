@@ -217,13 +217,11 @@ private class LMSTest {
             Event_End_Date__c=Date.today(),
             Start_Time__c='10:00',
             End_Time__c='11:00',
-            Event_Name__c='Test Event',
+            Event_Full_Name__c='Test Event',
             Event_Description__c='Test Description',
-            Address_Line_1__c='Test Address Line 1',
-            Address_Line_2__c='Test Address Line 2',
-            Postal_Code__c='SE1 8JX',
             Send_to_LMS__c=true,
-            Cohort_lkp__c=cohort.Id
+            Cohort_lkp__c=cohort.Id,
+            Mandatory__c=true
         );
 
         insert event;
@@ -259,13 +257,11 @@ private class LMSTest {
             Event_End_Date__c=Date.today(),
             Start_Time__c='10:00',
             End_Time__c='11:00',
-            Event_Name__c='Test Event',
+            Event_Full_Name__c='Test Event',
             Event_Description__c='Test Description',
-            Address_Line_1__c='Test Address Line 1',
-            Address_Line_2__c='Test Address Line 2',
-            Postal_Code__c='SE1 8JX',
             Send_to_LMS__c=true,
-            Cohort_lkp__c=cohort.Id
+            Cohort_lkp__c=cohort.Id,
+            Mandatory__c=true
         );
 
         insert event;
@@ -301,13 +297,11 @@ private class LMSTest {
             Event_End_Date__c=Date.today(),
             Start_Time__c='10:00',
             End_Time__c='11:00',
-            Event_Name__c='Test Event',
+            Event_Full_Name__c='Test Event',
             Event_Description__c='Test Description',
-            Address_Line_1__c='Test Address Line 1',
-            Address_Line_2__c='Test Address Line 2',
-            Postal_Code__c='SE1 8JX',
             Send_to_LMS__c=true,
-            Cohort_lkp__c=cohort.Id
+            Cohort_lkp__c=cohort.Id,
+            Mandatory__c=true
         );
 
         insert event;
@@ -351,13 +345,11 @@ private class LMSTest {
             Event_End_Date__c=Date.today(),
             Start_Time__c='10:00',
             End_Time__c='11:00',
-            Event_Name__c='Test Event',
+            Event_Full_Name__c='Test Event',
             Event_Description__c='Test Description',
-            Address_Line_1__c='Test Address Line 1',
-            Address_Line_2__c='Test Address Line 2',
-            Postal_Code__c='SE1 8JX',
             Send_to_LMS__c=true,
-            Cohort_lkp__c=cohort.Id
+            Cohort_lkp__c=cohort.Id,
+            Mandatory__c=true
         );
 
         insert event;
