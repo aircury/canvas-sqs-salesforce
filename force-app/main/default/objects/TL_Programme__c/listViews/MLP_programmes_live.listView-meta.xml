@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>MLP_programmes_live</fullName>
+    <columns>NAME</columns>
+    <columns>Description__c</columns>
+    <columns>Cohort_Name__c</columns>
+    <columns>Programme_Status__c</columns>
+    <columns>Programme_Type__c</columns>
+    <columns>TL_Region__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Programme_Type__c</field>
+        <operation>equals</operation>
+        <value>Aspiring Leadership Programme (ALP),Middle Leadership Programme (MLP)</value>
+    </filters>
+    <filters>
+        <field>Programme_Status__c</field>
+        <operation>equals</operation>
+        <value>Programme In-Progress,Programme Planning Started</value>
+    </filters>
+    <label>MLP programmes live</label>
+    <language>en_US</language>
+</ListView>

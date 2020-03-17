@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Headship_2019</fullName>
+    <columns>NAME</columns>
+    <columns>Event_Name__c</columns>
+    <columns>Status__c</columns>
+    <columns>Event_End_Date__c</columns>
+    <columns>Event_Date__c</columns>
+    <columns>Event_Organiser__c</columns>
+    <columns>Facilitator_1__c</columns>
+    <columns>Facilitator_2__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Event_Name__c</field>
+        <operation>contains</operation>
+        <value>Headship</value>
+    </filters>
+    <filters>
+        <field>Event_Date__c</field>
+        <operation>greaterThan</operation>
+        <value>1/1/2019</value>
+    </filters>
+    <filters>
+        <field>Programme__c</field>
+        <operation>equals</operation>
+        <value>Headship Programme (inc. NPQH)</value>
+    </filters>
+    <filters>
+        <field>Session_Region__c</field>
+        <operation>equals</operation>
+        <value>National</value>
+    </filters>
+    <label>Headship 2019</label>
+</ListView>

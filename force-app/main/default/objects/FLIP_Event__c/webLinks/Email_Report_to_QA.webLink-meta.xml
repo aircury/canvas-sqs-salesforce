@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebLink xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Email_Report_to_QA</fullName>
+    <availability>online</availability>
+    <description>Copied from TL Event object</description>
+    <displayType>button</displayType>
+    <linkType>javascript</linkType>
+    <masterLabel>Email Report to QA</masterLabel>
+    <openType>onClickJavaScript</openType>
+    <protected>false</protected>
+    <url>{!REQUIRESCRIPT(&quot;/soap/ajax/22.0/connection.js&quot;)} 
+
+var e = new sforce.SObject(&quot;FLIP_Event__c&quot;); 
+e.id =&quot;{!FLIP_Event__c.Id}&quot;; 
+e.QA_er_Email__c=&quot;{!FLIP_Event__c.QA_er_Email__c}&quot;;
+
+var answer = confirm (&quot;Are you sure you want to send an email to the QAer which will include the link to the QA report? If yes, please click on OK to continue&quot;)
+if (answer)
+{
+if(e.QA_er_Email__c!=null &amp;&amp; e.QA_er_Email__c!=&#39;&#39;)
+{
+e.Email_Sent_to_QA_er__c=true;
+
+var result = sforce.connection.update([e]); 
+var success =result[0].getBoolean(&quot;success&quot;)
+
+if (success) 
+{
+alert(&#39;Email sent successfully&#39;);
+} 
+else
+{
+alert(&#39;Failed to send an Email&#39;);
+}
+window.location.reload();
+}
+
+
+else
+{
+alert(&#39;Please assign a QAer&#39;);
+}
+
+}</url>
+</WebLink>

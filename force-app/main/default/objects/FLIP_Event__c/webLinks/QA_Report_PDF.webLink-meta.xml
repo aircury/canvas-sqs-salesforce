@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebLink xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>QA_Report_PDF</fullName>
+    <availability>online</availability>
+    <description>Copied from TL Event object</description>
+    <displayType>button</displayType>
+    <linkType>javascript</linkType>
+    <masterLabel>QA Report PDF</masterLabel>
+    <openType>onClickJavaScript</openType>
+    <protected>false</protected>
+    <url>{!REQUIRESCRIPT(&quot;/soap/ajax/22.0/connection.js&quot;)}
+
+var e = new sforce.SObject(&quot;Event__c&quot;);
+e.id =&quot;{!FLIP_Event__c.Id}&quot;; 
+e.Facilitator_QA_ed__c=&quot;{!FLIP_Event__c.Facilitator_QA_ed__c}&quot;;
+e.Facilitator_1Id__c=&quot;{!FLIP_Event__c.Facilitator_1__c }&quot;;
+e.Facilitator_2Id__c =&quot;{!FLIP_Event__c.Facilitator_2__c}&quot;;
+
+if(e.Facilitator_QA_ed__c==&#39;Both&#39;)
+{
+var person=prompt(&quot;There are 2 reports available, one for each Facilitator. Please enter Facilitator1 or Facilitator2 only &quot;);
+if(person==&#39;Facilitator1&#39; || person==&#39;facilitator1&#39; || person==&#39;Facilitator 1&#39; || person==&#39;facilitator 1&#39; &amp;&amp; e.Facilitator_1Id__c!=&#39;&#39;)
+{
+window.open(&#39;/apex/qareport?type=event&amp;SessionId=&#39;+e.id+&#39;&amp;Facilitator=&#39;+e.Facilitator_1Id__c+&#39;&amp;FQA=Facilitator1&amp;export=pdf&#39;);
+}
+
+
+if(person==&#39;Facilitator2&#39; || person==&#39;facilitator2&#39; || person==&#39;Facilitator 2&#39; || person==&#39;facilitator 2&#39; &amp;&amp; e.Facilitator_2Id__c!=&#39;&#39;)
+{
+window.open(&#39;/apex/qareport?type=event&amp;SessionId=&#39;+e.id+&#39;&amp;Facilitator=&#39;+e.Facilitator_2Id__c+&#39;&amp;FQA=Facilitator2&amp;export=pdf&#39;);
+}
+}
+
+
+else if(e.Facilitator_QA_ed__c==&#39;Facilitator 1&#39; &amp;&amp; e.Facilitator_1Id__c!=&#39;&#39;)
+{
+window.open(&#39;/apex/qareport?type=event&amp;SessionId=&#39;+e.id+&#39;&amp;Facilitator=&#39;+e.Facilitator_1Id__c+&#39;&amp;FQA=Facilitator1&amp;export=pdf&#39;);
+}
+
+else if(e.Facilitator_QA_ed__c==&#39;Facilitator 2&#39; &amp;&amp; e.Facilitator_2Id__c!=&#39;&#39;)
+{
+window.open(&#39;/apex/qareport?type=event&amp;SessionId=&#39;+e.id+&#39;&amp;Facilitator=&#39;+e.Facilitator_2Id__c+&#39;&amp;FQA=Facilitator2&amp;export=pdf&#39;);
+}</url>
+</WebLink>

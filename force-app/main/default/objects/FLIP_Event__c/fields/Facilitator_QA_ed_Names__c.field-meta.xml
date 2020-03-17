@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Facilitator_QA_ed_Names__c</fullName>
+    <description>Copied from TL Event object</description>
+    <externalId>false</externalId>
+    <formula>IF(ISPICKVAL( Facilitator_QA_ed__c, &#39;Facilitator 1&#39; ), Facilitator_1__r.FirstName + &#39; &#39; +Facilitator_1__r.LastName , IF(ISPICKVAL(Facilitator_QA_ed__c, &#39;Facilitator 2&#39;),
+
+Facilitator_2__r.FirstName + &#39; &#39; + Facilitator_2__r.LastName ,
+
+
+IF(ISPICKVAL( Facilitator_QA_ed__c, &#39;Both&#39;),
+
+Facilitator_1__r.FirstName + &#39; &#39; +Facilitator_1__r.LastName +&#39; , &#39; + Facilitator_2__r.FirstName + &#39; &#39; + Facilitator_2__r.LastName ,
+
+
+&#39;&#39;)))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Facilitator QA&#39;ed Names</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

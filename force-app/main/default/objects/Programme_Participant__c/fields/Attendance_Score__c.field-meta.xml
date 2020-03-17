@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Attendance_Score__c</fullName>
+    <description>The participant&#39;s attendance score (percentage), calculated using the same Apex code performing attendance calculations in the My Ambition community.
+
+Full details of the calculation can be found here: https://oegenlimited.atlassian.net/browse/AS-157</description>
+    <externalId>false</externalId>
+    <inlineHelpText>The participant&#39;s attendance score (percentage), calculated using the same Apex code performing attendance calculations in the My Ambition community.</inlineHelpText>
+    <label>Attendance Score</label>
+    <precision>4</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

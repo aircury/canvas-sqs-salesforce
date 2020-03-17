@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Facilitators</fullName>
+    <columns>NAME</columns>
+    <columns>Cohort_lkp__c</columns>
+    <columns>Event_End_Date__c</columns>
+    <columns>Details_of_Expertise_1F__c</columns>
+    <columns>Details_of_Expertise_2F__c</columns>
+    <columns>Event_Organiser__c</columns>
+    <columns>Facilitator_1__c</columns>
+    <columns>Facilitator_1_Score__c</columns>
+    <columns>Facilitator_1_Scheduling_Status__c</columns>
+    <columns>Facilitator_2__c</columns>
+    <columns>Facilitator_2_Score__c</columns>
+    <columns>Facilitator_2_Scheduling_Status__c</columns>
+    <columns>Programme__c</columns>
+    <columns>Programme_Type__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Event_End_Date__c</field>
+        <operation>greaterThan</operation>
+        <value>12/6/2019</value>
+    </filters>
+    <label>Facilitators</label>
+</ListView>

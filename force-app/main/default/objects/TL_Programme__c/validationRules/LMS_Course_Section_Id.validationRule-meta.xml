@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LMS_Course_Section_Id</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND(
+   ISCHANGED(LMS_Course_Section_Id__c),
+   NOT ISBLANK(PRIORVALUE(LMS_Course_Section_Id__c))
+)</errorConditionFormula>
+    <errorDisplayField>LMS_Course_Section_Id__c</errorDisplayField>
+    <errorMessage>This field can&#39;t be changed after first initialization</errorMessage>
+</ValidationRule>

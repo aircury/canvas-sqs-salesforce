@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Relevance_of_Content_10_max</fullName>
+    <active>true</active>
+    <errorConditionFormula>OR(Relevance_of_content__c &gt; 10,Relevance_of_content__c &lt; 0)</errorConditionFormula>
+    <errorMessage>Relevance of Content must be between 0 and 10</errorMessage>
+</ValidationRule>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Participants_TL_Secondary1</fullName>
+    <columns>Participant__c</columns>
+    <columns>School__c</columns>
+    <columns>Programme__c</columns>
+    <columns>NAME</columns>
+    <columns>Contact__c</columns>
+    <columns>School_Mentor_Name_Prog__c</columns>
+    <columns>Cluster__c</columns>
+    <columns>Cohort_End_Date__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Programme_Name__c</field>
+        <operation>contains</operation>
+        <value>Teaching Leaders Secondary</value>
+    </filters>
+    <filters>
+        <field>Status__c</field>
+        <operation>equals</operation>
+        <value>Active</value>
+    </filters>
+    <label>Participants - TL Secondary</label>
+</ListView>

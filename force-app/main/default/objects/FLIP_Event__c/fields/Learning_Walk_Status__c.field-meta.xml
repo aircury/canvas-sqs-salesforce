@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Learning_Walk_Status__c</fullName>
+    <externalId>false</externalId>
+    <label>Learning Walk Status</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Type_of_QA__c</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Successful</fullName>
+                <default>false</default>
+                <label>Successful</label>
+            </value>
+            <value>
+                <fullName>Unsuccessful</fullName>
+                <default>false</default>
+                <label>Unsuccessful</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Learning Walk</controllingFieldValue>
+            <valueName>Successful</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Learning Walk</controllingFieldValue>
+            <valueName>Unsuccessful</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>All_alliance_participants</fullName>
+    <columns>Cohort_Name__c</columns>
+    <columns>Programme_Name__c</columns>
+    <columns>Participant__c</columns>
+    <columns>School__c</columns>
+    <columns>Programme__c</columns>
+    <columns>NAME</columns>
+    <columns>Contact__c</columns>
+    <columns>Status__c</columns>
+    <columns>School_Mentor_Name_Prog__c</columns>
+    <columns>Cluster__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Programme_Name__c</field>
+        <operation>contains</operation>
+        <value>NPQ</value>
+    </filters>
+    <filters>
+        <field>Programme_Name__c</field>
+        <operation>notContain</operation>
+        <value>Headship</value>
+    </filters>
+    <label>All alliance participants</label>
+</ListView>

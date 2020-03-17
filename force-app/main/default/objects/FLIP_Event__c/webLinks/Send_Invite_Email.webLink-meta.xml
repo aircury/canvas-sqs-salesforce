@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebLink xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Send_Invite_Email</fullName>
+    <availability>online</availability>
+    <description>This will trigger invite email to all attendees added to this event</description>
+    <displayType>button</displayType>
+    <linkType>javascript</linkType>
+    <masterLabel>Send Invite Email</masterLabel>
+    <openType>onClickJavaScript</openType>
+    <protected>false</protected>
+    <url>{!REQUIRESCRIPT(&quot;/soap/ajax/14.0/connection.js&quot;)}
+{!REQUIRESCRIPT(&quot;/soap/ajax/14.0/apex.js&quot;)}
+var idsToInsert= &#39;{!FLIP_Event__c.Id}&#39;;
+//alert(idsToInsert);
+var nurl=&quot;/&quot;+idsToInsert;
+//alert(nurl);
+
+var confirmMessage = confirm(&quot;This will trigger an invite email to everyone. Are you sure?&quot;)
+if (confirmMessage==true)
+{
+if (idsToInsert.length)
+{
+// Now make a synchronous call to the Apex Web service
+// method
+var result = sforce.apex.execute(
+&quot;NotificationForEvent&quot;, // class
+&quot;sendNotification&quot;, // method
+{
+eid: idsToInsert
+}
+);
+
+}
+else if
+(idsToInsert.length == 0)
+{
+alert(&quot;Please Assign participant to this event in order to send notification.&quot;);
+}
+window.location.replace(nurl);
+}</url>
+</WebLink>
