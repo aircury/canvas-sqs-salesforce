@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Role_2</fullName>
+    <active>true</active>
+    <description>Copied from TL Event object</description>
+    <errorConditionFormula>IF( AND($Profile.Name!=&#39;Core Participant&#39;, $Profile.Name!=&#39;Coach&#39;,$Profile.Name!=&#39;TLOD Participant&#39;,$Profile.Name!=&#39;School Mentor&#39;),IF(CONTAINS( TEXT(Facilitator_Group__c), &#39;2 Facilitators&#39;) 
+,IF(TEXT(Role_1F__c) ==&#39;&#39; || TEXT(Role_2F__c) ==&#39;&#39; ,true,false),false 
+),false)</errorConditionFormula>
+    <errorDisplayField>Role_2F__c</errorDisplayField>
+    <errorMessage>It is mandatory to fill Role for both Facilitator 1 and Facilitator 2</errorMessage>
+</ValidationRule>

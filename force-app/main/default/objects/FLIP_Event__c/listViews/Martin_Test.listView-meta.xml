@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Martin_Test</fullName>
+    <columns>NAME</columns>
+    <columns>Event_Name__c</columns>
+    <columns>Programme__c</columns>
+    <columns>Event_Date__c</columns>
+    <columns>Mandatory__c</columns>
+    <columns>Optional__c</columns>
+    <columns>Event_Weighting_Allowance__c</columns>
+    <columns>RECORDTYPE</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>RECORDTYPE</field>
+        <operation>equals</operation>
+        <value>FLIP_Event__c.TL_Event</value>
+    </filters>
+    <filters>
+        <field>Programme__c</field>
+        <operation>equals</operation>
+        <value>Teaching Leaders Primary Foundations</value>
+    </filters>
+    <label>Martin Test</label>
+    <language>en_US</language>
+    <sharedTo>
+        <allInternalUsers/>
+    </sharedTo>
+</ListView>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>End_Date_mandatory_on_TL_Events</fullName>
+    <active>true</active>
+    <description>End Date is mandatory on TL Events. This is necessary in order to only display attendance scores for events in the past within the My Ambition community.</description>
+    <errorConditionFormula>AND(
+  RecordType.DeveloperName == &#39;TL_Event&#39;,
+  ISBLANK(Event_End_Date__c)
+)</errorConditionFormula>
+    <errorDisplayField>Event_End_Date__c</errorDisplayField>
+    <errorMessage>End Date is mandatory for TL Events</errorMessage>
+</ValidationRule>

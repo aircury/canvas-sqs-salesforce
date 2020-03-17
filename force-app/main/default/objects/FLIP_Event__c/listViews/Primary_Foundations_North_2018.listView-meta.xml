@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Primary_Foundations_North_2018</fullName>
+    <columns>NAME</columns>
+    <columns>Event_Name__c</columns>
+    <columns>Event_Date__c</columns>
+    <columns>Session_Hubs__c</columns>
+    <columns>Facilitator_1_Name__c</columns>
+    <columns>Facilitator_2_Name__c</columns>
+    <columns>Programme__c</columns>
+    <columns>Total_Evals_Returned__c</columns>
+    <columns>Total_FP_invitee__c</columns>
+    <columns>Total_FP_Attendee__c</columns>
+    <columns>Total_CP_Attended__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Cohort_lkp__c</field>
+        <operation>equals</operation>
+        <value>P-00524</value>
+    </filters>
+    <filters>
+        <field>Session_Region__c</field>
+        <operation>equals</operation>
+        <value>North</value>
+    </filters>
+    <filters>
+        <field>Programme_Type__c</field>
+        <operation>equals</operation>
+        <value>Primary</value>
+    </filters>
+    <label>Primary Foundations North 2018</label>
+    <language>en_US</language>
+</ListView>

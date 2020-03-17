@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Parent_Event__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Copied from TL Event object</description>
+    <externalId>false</externalId>
+    <label>Parent Event</label>
+    <lookupFilter>
+        <active>false</active>
+        <errorMessage>Parent Event should have one of these Session Types- Residential, Induction, Super Saturday, Super Weekend, Day Conference, Learning Set, Peer Review,Evening Seminar.</errorMessage>
+        <filterItems>
+            <field>FLIP_Event__c.Event_Type__c</field>
+            <operation>equals</operation>
+            <value>Day Conference, Evening Seminar, Induction, Learning Set, Peer visit, Residential, Super Saturday, Super Weekend</value>
+        </filterItems>
+        <isOptional>false</isOptional>
+    </lookupFilter>
+    <referenceTo>FLIP_Event__c</referenceTo>
+    <relationshipLabel>Related Events</relationshipLabel>
+    <relationshipName>Events</relationshipName>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

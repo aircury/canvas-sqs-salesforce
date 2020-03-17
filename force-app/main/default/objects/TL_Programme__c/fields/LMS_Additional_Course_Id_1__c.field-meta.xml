@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LMS_Additional_Course_Id_1__c</fullName>
+    <externalId>true</externalId>
+    <inlineHelpText>Please note changing or removing a Course ID in this field will NOT result in the participants being removed from the course in Canvas. This has to be done manually. Please contact the system administrator for more information</inlineHelpText>
+    <label>Additional Canvas Course ID 1</label>
+    <precision>10</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

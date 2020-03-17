@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Facilitator_Group__c</fullName>
+    <description>Copied from the TL Event object</description>
+    <externalId>false</externalId>
+    <label>Facilitator Group</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>1 Facilitator</fullName>
+                <default>false</default>
+                <label>1 Facilitator</label>
+            </value>
+            <value>
+                <fullName>1 Facilitator 1 QAer</fullName>
+                <default>false</default>
+                <label>1 Facilitator 1 QAer</label>
+            </value>
+            <value>
+                <fullName>2 Facilitators</fullName>
+                <default>false</default>
+                <label>2 Facilitators</label>
+            </value>
+            <value>
+                <fullName>2 Facilitators 1 QAer</fullName>
+                <default>false</default>
+                <label>2 Facilitators 1 QAer</label>
+            </value>
+            <value>
+                <fullName>Self-guided</fullName>
+                <default>false</default>
+                <label>Self-guided</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

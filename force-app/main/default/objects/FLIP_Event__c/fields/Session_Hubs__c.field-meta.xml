@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Session_Hubs__c</fullName>
+    <description>Copied from the TL Event object</description>
+    <externalId>false</externalId>
+    <label>Session Hubs</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>Birmingham</fullName>
+                <default>false</default>
+                <label>Birmingham</label>
+            </value>
+            <value>
+                <fullName>Birmingham 1</fullName>
+                <default>false</default>
+                <label>Birmingham 1</label>
+            </value>
+            <value>
+                <fullName>Birmingham 2</fullName>
+                <default>false</default>
+                <label>Birmingham 2</label>
+            </value>
+            <value>
+                <fullName>Blackburn</fullName>
+                <default>false</default>
+                <label>Blackburn</label>
+            </value>
+            <value>
+                <fullName>Blackpool</fullName>
+                <default>false</default>
+                <label>Blackpool</label>
+            </value>
+            <value>
+                <fullName>Bolton</fullName>
+                <default>false</default>
+                <label>Bolton</label>
+            </value>
+            <value>
+                <fullName>Bradford</fullName>
+                <default>false</default>
+                <label>Bradford</label>
+            </value>
+            <value>
+                <fullName>Bristol</fullName>
+                <default>false</default>
+                <label>Bristol</label>
+            </value>
+            <value>
+                <fullName>Bury St Edmunds</fullName>
+                <default>false</default>
+                <label>Bury St Edmunds</label>
+            </value>
+            <value>
+                <fullName>Cambridge</fullName>
+                <default>false</default>
+                <label>Cambridge</label>
+            </value>
+            <value>
+                <fullName>Canterbury</fullName>
+                <default>false</default>
+                <label>Canterbury</label>
+            </value>
+            <value>
+                <fullName>Coventry</fullName>
+                <default>false</default>
+                <label>Coventry</label>
+            </value>
+            <value>
+                <fullName>Derbyshire (Shirebrook)</fullName>
+                <default>false</default>
+                <label>Derbyshire (Shirebrook)</label>
+            </value>
+            <value>
+                <fullName>Doncaster</fullName>
+                <default>false</default>
+                <label>Doncaster</label>
+            </value>
+            <value>
+                <fullName>Eastbourne</fullName>
+                <default>false</default>
+                <label>Eastbourne</label>
+            </value>
+            <value>
+                <fullName>East Manchester</fullName>
+                <default>false</default>
+                <label>East Manchester</label>
+            </value>
+            <value>
+                <fullName>East Midlands</fullName>
+                <default>false</default>
+                <label>East Midlands</label>
+            </value>
+            <value>
+                <fullName>East Yorkshire</fullName>
+                <default>false</default>
+                <label>East Yorkshire</label>
+            </value>
+            <value>
+                <fullName>Essex</fullName>
+                <default>false</default>
+                <label>Essex</label>
+            </value>
+            <value>
+                <fullName>Greater Manchester</fullName>
+                <default>false</default>
+                <label>Greater Manchester</label>
+            </value>
+            <value>
+                <fullName>Hull</fullName>
+                <default>false</default>
+                <label>Hull</label>
+            </value>
+            <value>
+                <fullName>Humberside</fullName>
+                <default>false</default>
+                <label>Humberside</label>
+            </value>
+            <value>
+                <fullName>Kent</fullName>
+                <default>false</default>
+                <label>Kent</label>
+            </value>
+            <value>
+                <fullName>Lancashire</fullName>
+                <default>false</default>
+                <label>Lancashire</label>
+            </value>
+            <value>
+                <fullName>Leeds</fullName>
+                <default>false</default>
+                <label>Leeds</label>
+            </value>
+            <value>
+                <fullName>Leicester</fullName>
+                <default>false</default>
+                <label>Leicester</label>
+            </value>
+            <value>
+                <fullName>Liverpool</fullName>
+                <default>false</default>
+                <label>Liverpool</label>
+            </value>
+            <value>
+                <fullName>London</fullName>
+                <default>false</default>
+                <label>London</label>
+            </value>
+            <value>
+                <fullName>London 1</fullName>
+                <default>false</default>
+                <label>London 1</label>
+            </value>
+            <value>
+                <fullName>London 2</fullName>
+                <default>false</default>
+                <label>London 2</label>
+            </value>
+            <value>
+                <fullName>London 3</fullName>
+                <default>false</default>
+                <label>London 3</label>
+            </value>
+            <value>
+                <fullName>London A</fullName>
+                <default>false</default>
+                <label>London A</label>
+            </value>
+            <value>
+                <fullName>London B</fullName>
+                <default>false</default>
+                <label>London B</label>
+            </value>
+            <value>
+                <fullName>London C</fullName>
+                <default>false</default>
+                <label>London C</label>
+            </value>
+            <value>
+                <fullName>London D</fullName>
+                <default>false</default>
+                <label>London D</label>
+            </value>
+            <value>
+                <fullName>London delivery - from outside M25</fullName>
+                <default>false</default>
+                <label>London delivery - from outside M25</label>
+            </value>
+            <value>
+                <fullName>London delivery - from within M25</fullName>
+                <default>false</default>
+                <label>London delivery - from within M25</label>
+            </value>
+            <value>
+                <fullName>Lowestoft</fullName>
+                <default>false</default>
+                <label>Lowestoft</label>
+            </value>
+            <value>
+                <fullName>Luton</fullName>
+                <default>false</default>
+                <label>Luton</label>
+            </value>
+            <value>
+                <fullName>Manchester</fullName>
+                <default>false</default>
+                <label>Manchester</label>
+            </value>
+            <value>
+                <fullName>Manchester 1</fullName>
+                <default>false</default>
+                <label>Manchester 1</label>
+            </value>
+            <value>
+                <fullName>Manchester 2</fullName>
+                <default>false</default>
+                <label>Manchester 2</label>
+            </value>
+            <value>
+                <fullName>Medway</fullName>
+                <default>false</default>
+                <label>Medway</label>
+            </value>
+            <value>
+                <fullName>Merseyside</fullName>
+                <default>false</default>
+                <label>Merseyside</label>
+            </value>
+            <value>
+                <fullName>Middlesbrough</fullName>
+                <default>false</default>
+                <label>Middlesbrough</label>
+            </value>
+            <value>
+                <fullName>Milton Keynes</fullName>
+                <default>false</default>
+                <label>Milton Keynes</label>
+            </value>
+            <value>
+                <fullName>Norfolk</fullName>
+                <default>false</default>
+                <label>Norfolk</label>
+            </value>
+            <value>
+                <fullName>Northampton</fullName>
+                <default>false</default>
+                <label>Northampton</label>
+            </value>
+            <value>
+                <fullName>North East</fullName>
+                <default>false</default>
+                <label>North East</label>
+            </value>
+            <value>
+                <fullName>North East SMART</fullName>
+                <default>false</default>
+                <label>North East SMART</label>
+            </value>
+            <value>
+                <fullName>North London</fullName>
+                <default>false</default>
+                <label>North London</label>
+            </value>
+            <value>
+                <fullName>North Manchester</fullName>
+                <default>false</default>
+                <label>North Manchester</label>
+            </value>
+            <value>
+                <fullName>North of the Tyne</fullName>
+                <default>false</default>
+                <label>North of the Tyne</label>
+            </value>
+            <value>
+                <fullName>North West</fullName>
+                <default>false</default>
+                <label>North West</label>
+            </value>
+            <value>
+                <fullName>Norwich</fullName>
+                <default>false</default>
+                <label>Norwich</label>
+            </value>
+            <value>
+                <fullName>Notthingham</fullName>
+                <default>false</default>
+                <label>Nottingham</label>
+            </value>
+            <value>
+                <fullName>Oldham</fullName>
+                <default>false</default>
+                <label>Oldham</label>
+            </value>
+            <value>
+                <fullName>Oxford</fullName>
+                <default>false</default>
+                <label>Oxford</label>
+            </value>
+            <value>
+                <fullName>Peterborough</fullName>
+                <default>false</default>
+                <label>Peterborough</label>
+            </value>
+            <value>
+                <fullName>Portsmouth</fullName>
+                <default>false</default>
+                <label>Portsmouth</label>
+            </value>
+            <value>
+                <fullName>Preston</fullName>
+                <default>false</default>
+                <label>Preston</label>
+            </value>
+            <value>
+                <fullName>Scunthorpe</fullName>
+                <default>false</default>
+                <label>Scunthorpe</label>
+            </value>
+            <value>
+                <fullName>Shirebrook</fullName>
+                <default>false</default>
+                <label>Shirebrook</label>
+            </value>
+            <value>
+                <fullName>Southampton</fullName>
+                <default>false</default>
+                <label>Southampton</label>
+            </value>
+            <value>
+                <fullName>South London</fullName>
+                <default>false</default>
+                <label>South London</label>
+            </value>
+            <value>
+                <fullName>South Manchester</fullName>
+                <default>false</default>
+                <label>South Manchester</label>
+            </value>
+            <value>
+                <fullName>South of the Tyne</fullName>
+                <default>false</default>
+                <label>South of the Tyne</label>
+            </value>
+            <value>
+                <fullName>South Yorkshire</fullName>
+                <default>false</default>
+                <label>South Yorkshire</label>
+            </value>
+            <value>
+                <fullName>Stoke</fullName>
+                <default>false</default>
+                <label>Stoke</label>
+            </value>
+            <value>
+                <fullName>Suffolk</fullName>
+                <default>false</default>
+                <label>Suffolk</label>
+            </value>
+            <value>
+                <fullName>West Sussex</fullName>
+                <default>false</default>
+                <label>West Sussex</label>
+            </value>
+            <value>
+                <fullName>West Yorkshire</fullName>
+                <default>false</default>
+                <label>West Yorkshire</label>
+            </value>
+            <value>
+                <fullName>Wirral</fullName>
+                <default>false</default>
+                <label>Wirral</label>
+            </value>
+            <value>
+                <fullName>Worthing</fullName>
+                <default>false</default>
+                <label>Worthing</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>5</visibleLines>
+</CustomField>

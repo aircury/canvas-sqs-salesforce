@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Programme_Elements_purchased__c</fullName>
+    <externalId>false</externalId>
+    <label>Programme Elements purchased</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Session top up, 4</fullName>
+                <default>false</default>
+                <label>Session top up, 4</label>
+            </value>
+            <value>
+                <fullName>Session top up, 8</fullName>
+                <default>false</default>
+                <label>Session top up, 8</label>
+            </value>
+            <value>
+                <fullName>DIY coaching</fullName>
+                <default>false</default>
+                <label>DIY coaching</label>
+            </value>
+            <value>
+                <fullName>Coaching skills</fullName>
+                <default>false</default>
+                <label>Coaching skills</label>
+            </value>
+            <value>
+                <fullName>Facilitation skills</fullName>
+                <default>false</default>
+                <label>Facilitation skills</label>
+            </value>
+            <value>
+                <fullName>Schools viva</fullName>
+                <default>false</default>
+                <label>Schools viva</label>
+            </value>
+            <value>
+                <fullName>Audit and planning review</fullName>
+                <default>false</default>
+                <label>Audit and planning review</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>4</visibleLines>
+</CustomField>

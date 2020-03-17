@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebLink xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Send_Message</fullName>
+    <availability>online</availability>
+    <displayType>button</displayType>
+    <encodingKey>UTF-8</encodingKey>
+    <height>600</height>
+    <linkType>url</linkType>
+    <masterLabel>Send Message</masterLabel>
+    <openType>noSidebar</openType>
+    <protected>false</protected>
+    <url>/apex/CustomMessageToAttendees?eid={!FLIP_Event__c.Id}&amp;returnURL=/{!FLIP_Event__c.Id}&amp;eventName={!FLIP_Event__c.Event_Name__c}&amp;isEvent=true</url>
+</WebLink>

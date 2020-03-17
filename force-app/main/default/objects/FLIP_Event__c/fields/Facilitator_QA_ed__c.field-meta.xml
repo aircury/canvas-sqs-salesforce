@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Facilitator_QA_ed__c</fullName>
+    <description>Copied from the TL Event object</description>
+    <externalId>false</externalId>
+    <label>Facilitator QA&#39;ed</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Facilitator 1</fullName>
+                <default>false</default>
+                <label>Facilitator 1</label>
+            </value>
+            <value>
+                <fullName>Facilitator 2</fullName>
+                <default>false</default>
+                <label>Facilitator 2</label>
+            </value>
+            <value>
+                <fullName>Both</fullName>
+                <default>false</default>
+                <label>Both</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

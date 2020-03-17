@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Prevent_Participant_if_Cohort_Inactive</fullName>
+    <active>true</active>
+    <errorConditionFormula>AND( ISNEW() ,
+ OR(ISPICKVAL(Cohort__r.Cohort_Status__c,&quot;Inactive&quot;),
+ISPICKVAL(Cohort__r.Cohort_Status__c,&quot;Complete&quot;)),
+Cohort__r.RecordType.DeveloperName == &quot;Cohort&quot;
+)</errorConditionFormula>
+    <errorMessage>You cannot create Programme Participant if Cohort is Inactive or Complete.</errorMessage>
+</ValidationRule>

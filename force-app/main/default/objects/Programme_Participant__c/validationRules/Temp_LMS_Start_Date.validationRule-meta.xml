@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Temp_LMS_Start_Date</fullName>
+    <active>true</active>
+    <description>Temporary Canvas Access Start Date should be no more than 12 months of canvas end date</description>
+    <errorConditionFormula>AND(
+  Temp_LMS_Start_Date__c &gt; (Programme__r.LMS_End_Date__c + 365),
+  NOT ISBLANK(Temp_LMS_Start_Date__c)
+)</errorConditionFormula>
+    <errorDisplayField>Temp_LMS_Start_Date__c</errorDisplayField>
+    <errorMessage>This date can&#39;t be more than 12 months of Cohort Canvas End Date</errorMessage>
+</ValidationRule>

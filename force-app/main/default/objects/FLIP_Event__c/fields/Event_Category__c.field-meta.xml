@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Event_Category__c</fullName>
+    <externalId>false</externalId>
+    <label>Event Category</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Introduction to the topic</fullName>
+                <default>false</default>
+                <label>Introduction to the topic</label>
+            </value>
+            <value>
+                <fullName>Advancing skills and knowledge</fullName>
+                <default>false</default>
+                <label>Advancing skills and knowledge</label>
+            </value>
+            <value>
+                <fullName>Making a whole school impact</fullName>
+                <default>false</default>
+                <label>Making a whole school impact</label>
+            </value>
+            <value>
+                <fullName>Phase 1</fullName>
+                <default>false</default>
+                <label>Phase 1</label>
+            </value>
+            <value>
+                <fullName>Phase 2</fullName>
+                <default>false</default>
+                <label>Phase 2</label>
+            </value>
+            <value>
+                <fullName>Phase 3</fullName>
+                <default>false</default>
+                <label>Phase 3</label>
+            </value>
+            <value>
+                <fullName>Phase 4</fullName>
+                <default>false</default>
+                <label>Phase 4</label>
+            </value>
+            <value>
+                <fullName>Phase 5</fullName>
+                <default>false</default>
+                <label>Phase 5</label>
+            </value>
+            <value>
+                <fullName>Suitable for all</fullName>
+                <default>false</default>
+                <label>Suitable for all</label>
+            </value>
+            <value>
+                <fullName>Phase 6</fullName>
+                <default>false</default>
+                <label>Phase 6</label>
+            </value>
+            <value>
+                <fullName>Phase 7</fullName>
+                <default>false</default>
+                <label>Phase 7</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

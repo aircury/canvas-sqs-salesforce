@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Summary_of_Events__c</fullName>
+    <externalId>false</externalId>
+    <inlineHelpText>This is a summary of the event types, and not specific events.  For example &quot;1 x Residental, 10 x Mandatory Event&quot;</inlineHelpText>
+    <label>Summary of Events</label>
+    <length>2000</length>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Html</type>
+    <visibleLines>10</visibleLines>
+</CustomField>

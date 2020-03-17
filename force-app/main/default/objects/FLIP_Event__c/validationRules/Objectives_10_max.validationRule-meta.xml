@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Objectives_10_max</fullName>
+    <active>true</active>
+    <errorConditionFormula>OR(Objectives__c &gt; 10,Objectives__c &lt; 0)</errorConditionFormula>
+    <errorDisplayField>Objectives__c</errorDisplayField>
+    <errorMessage>Objectives score must be between 0 and 10</errorMessage>
+</ValidationRule>
