@@ -3,7 +3,7 @@
     <fullName>Cohort__c</fullName>
     <description>Copied from TL Event object</description>
     <externalId>false</externalId>
-    <label>Cohort</label>
+    <label>Cohort old</label>
     <required>false</required>
     <trackHistory>true</trackHistory>
     <trackTrending>false</trackTrending>
