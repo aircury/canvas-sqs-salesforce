@@ -17,19 +17,39 @@
                 <label>Active</label>
             </value>
             <value>
+                <fullName>Pass</fullName>
+                <default>false</default>
+                <label>Pass</label>
+            </value>
+            <value>
+                <fullName>1st Fail</fullName>
+                <default>false</default>
+                <label>1st Fail</label>
+            </value>
+            <value>
+                <fullName>2nd Fail</fullName>
+                <default>false</default>
+                <label>2nd Fail</label>
+            </value>
+            <value>
+                <fullName>Final Fail</fullName>
+                <default>false</default>
+                <label>Final Fail</label>
+            </value>
+            <value>
                 <fullName>Ready to Submit</fullName>
                 <default>false</default>
                 <label>Ready to Submit</label>
             </value>
             <value>
+                <fullName>Submitted- pending allocation</fullName>
+                <default>false</default>
+                <label>Submitted- pending allocation</label>
+            </value>
+            <value>
                 <fullName>Submitted (pending outcome)</fullName>
                 <default>false</default>
                 <label>Submitted (pending outcome)</label>
-            </value>
-            <value>
-                <fullName>Awarded</fullName>
-                <default>false</default>
-                <label>1st Fail</label>
             </value>
             <value>
                 <fullName>Extension</fullName>
@@ -45,26 +65,6 @@
                 <fullName>Withdrawn</fullName>
                 <default>false</default>
                 <label>Withdrawn</label>
-            </value>
-            <value>
-                <fullName>2nd Fail</fullName>
-                <default>false</default>
-                <label>2nd Fail</label>
-            </value>
-            <value>
-                <fullName>Final Fail</fullName>
-                <default>false</default>
-                <label>Final Fail</label>
-            </value>
-            <value>
-                <fullName>Pass</fullName>
-                <default>false</default>
-                <label>Pass</label>
-            </value>
-            <value>
-                <fullName>Submitted- pending allocation</fullName>
-                <default>false</default>
-                <label>Submitted- pending allocation</label>
             </value>
             <value>
                 <fullName>Completed</fullName>

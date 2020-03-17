@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Current_Submissions</fullName>
+    <columns>NAME</columns>
+    <columns>Final_Outcome__c</columns>
+    <columns>Participant_Name__c</columns>
+    <columns>Submission_Date__c</columns>
+    <columns>Approved_for_Assessment__c</columns>
+    <columns>Participant__c</columns>
+    <columns>Marker__c</columns>
+    <filterScope>Everything</filterScope>
+    <filters>
+        <field>Submission_Date__c</field>
+        <operation>greaterThan</operation>
+        <value>11/9/2019</value>
+    </filters>
+    <label>Current Submissions</label>
+</ListView>
