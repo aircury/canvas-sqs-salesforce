@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Applicability_Between_0_and_100</fullName>
-    <active>true</active>
-    <errorConditionFormula>OR(Applicability__c &gt; 1,Applicability__c &lt; 0)</errorConditionFormula>
-    <errorDisplayField>Applicability__c</errorDisplayField>
-    <errorMessage>Applicability must be between 0 to 100</errorMessage>
-</ValidationRule>

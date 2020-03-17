@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Recommend_a_colleague_100_max</fullName>
-    <active>true</active>
-    <errorConditionFormula>OR(Recommend_a_colleague__c &gt; 1,Recommend_a_colleague__c &lt; 0)</errorConditionFormula>
-    <errorMessage>Recommend a Colleague score must be 0-100</errorMessage>
-</ValidationRule>
