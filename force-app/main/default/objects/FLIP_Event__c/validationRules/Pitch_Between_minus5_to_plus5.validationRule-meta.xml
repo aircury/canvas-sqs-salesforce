@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Pitch_Between_minus5_to_plus5</fullName>
-    <active>true</active>
-    <errorConditionFormula>OR(Pitch__c &gt; 5,Pitch__c &lt; -5)</errorConditionFormula>
-    <errorDisplayField>Pitch__c</errorDisplayField>
-    <errorMessage>Pitch score must be between -5 and 5.</errorMessage>
-</ValidationRule>

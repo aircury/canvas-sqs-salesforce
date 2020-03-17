@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Complete_Reasons_for_Extension</fullName>
-    <active>true</active>
-    <description>Complete reasons for extension field if the NPQ Status is Extension</description>
-    <errorConditionFormula>AND(ISPICKVAL(NPQ_Status__c,&quot;Extension&quot;),(ISBLANK(Reason_for_Extension__c)))</errorConditionFormula>
-    <errorMessage>You have selected a NPQ Status of &#39;Extension&#39;, please complete the Reason for Extension field</errorMessage>
-</ValidationRule>

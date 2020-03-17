@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Overall_score_10_max</fullName>
-    <active>true</active>
-    <errorConditionFormula>OR(Overall_score__c &gt; 10,Overall_score__c &lt; 0)</errorConditionFormula>
-    <errorDisplayField>Overall_score__c</errorDisplayField>
-    <errorMessage>Overall score must be between 0 and 10</errorMessage>
-</ValidationRule>

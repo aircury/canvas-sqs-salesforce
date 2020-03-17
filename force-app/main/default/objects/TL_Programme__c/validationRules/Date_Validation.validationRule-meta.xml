@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Date_Validation</fullName>
-    <active>true</active>
-    <description>Start date must not be after end date.</description>
-    <errorConditionFormula>Cohort_Start_Date__c &gt; Cohort_End_Date__c</errorConditionFormula>
-    <errorMessage>Start date must not be after end date.</errorMessage>
-</ValidationRule>

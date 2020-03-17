@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>No_Optional_or_Mandatory_if_NW</fullName>
-    <active>true</active>
-    <description>AND(RecordType.DeveloperName == &#39;TL_Event&#39;,  Network__c = true,  Optional__c = true,  Mandatory__c = true)</description>
-    <errorConditionFormula>AND( Network__c = true, OR( Optional__c = true,  Mandatory__c = true))</errorConditionFormula>
-    <errorDisplayField>Account__c</errorDisplayField>
-    <errorMessage>You cannot check Mandatory or Optional if it&#39;s a Network event</errorMessage>
-</ValidationRule>

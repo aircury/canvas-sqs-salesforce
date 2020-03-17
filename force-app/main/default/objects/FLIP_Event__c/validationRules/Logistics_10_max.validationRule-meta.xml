@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Logistics_10_max</fullName>
-    <active>true</active>
-    <errorConditionFormula>OR(Logistics__c &gt; 10,Logistics__c &lt; 0)</errorConditionFormula>
-    <errorDisplayField>Logistics__c</errorDisplayField>
-    <errorMessage>Logistics score must be between 0 and 10</errorMessage>
-</ValidationRule>

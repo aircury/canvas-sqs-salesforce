@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>Check_Opportunity_exists_for_Programme</fullName>
-    <active>true</active>
-    <errorConditionFormula>AND(OR(ISBLANK(Opportunity__c),ISNULL(Opportunity__c)),
- RecordType.DeveloperName = &#39;School_Programme&#39;)</errorConditionFormula>
-    <errorDisplayField>Content_Folder_Name__c</errorDisplayField>
-    <errorMessage>Please pick an Opportunity to associate with the new Programme.</errorMessage>
-</ValidationRule>
