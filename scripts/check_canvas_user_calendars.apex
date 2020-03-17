@@ -7,7 +7,7 @@ SELECT FLIP_Event__r.Cohort_lkp__r.Name,
     FLIP_Event__r.Event_End_Date__c,
     FLIP_Event__r.Start_Time__c,
     FLIP_Event__r.End_Time__c,
-    FLIP_Event__r.Event_Name__c
+    FLIP_Event__r.Event_Full_Name__c
 FROM Attendees__c
 WHERE 
     FLIP_Event__r.Cohort_lkp__r.LMS_Access__c = true AND
@@ -46,7 +46,7 @@ for (Attendees__c attendee: attendees) {
     i = i + 1;
 
     if (0 == apiResultList.size()) {
-        System.debug(LoggingLevel.INFO, 'Non existent user ' + start + '-' + (start+maxIterations) + ': ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Cohort_lkp__r.Name + ' ' + event.Event_Name__c);
+        System.debug(LoggingLevel.INFO, 'Non existent user ' + start + '-' + (start+maxIterations) + ': ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Cohort_lkp__r.Name + ' ' + event.Event_Full_Name__c);
         continue;
     }
 
@@ -55,7 +55,7 @@ for (Attendees__c attendee: attendees) {
     userId = String.valueOf(apiResult.get('id'));
     apiResultList = CanvasAPI.listUserEvents(userId, startAt, endAt);
     if (0 == apiResultList.size()) {
-        System.debug(LoggingLevel.INFO, 'Non existent user calendar event ' + start + '-' + (start+maxIterations) + ': ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Cohort_lkp__r.Name + ' ' + event.Event_Name__c);
+        System.debug(LoggingLevel.INFO, 'Non existent user calendar event ' + start + '-' + (start+maxIterations) + ': ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Cohort_lkp__r.Name + ' ' + event.Event_Full_Name__c);
     } else {
         Set<Object> eventNames = new Set<Object>();
 

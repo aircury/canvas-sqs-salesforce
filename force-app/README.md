@@ -153,9 +153,9 @@ The Canvas User data is setted like defined in [Canvas User data sources](#canva
 
 The Canvas Calendar Event attached to the Canvas User fields are:
 
-* title: from FLIP_Event__c Event_Name__c field.
+* title: from FLIP_Event__c Event_Full_Name__c field.
 * description: from FLIP_Event__c Event_Description_Rich__c field if not empty.
-* address: built from FLIP_Event__c Address_Line_1__c, Address_Line_2__c  and Postal_Code__c fields. If any field is null, then an empty string is used to provide that field.
+* address: built from FLIP_Event__c Delivery_Address__c field or blank string if null.
 
 ### [LMSContactTrigger](main/default/classes/LMSContactTrigger.trigger)
 
@@ -225,11 +225,9 @@ It acts when an FLIP_Event__c is updated but only when any of the next FLIP_Even
 * Event_End_Date__c
 * Start_Time__c
 * End_Time__c
-* Event_Name__c
+* Event_Full_Name__c
 * Event_Description_Rich__c
-* Address_Line_1__c
-* Address_Line_2__c
-* Postal_Code__c
+* Delivery_Address__c
 
 The actions are executed inmediatelly (live) and consists on:
 
