@@ -4,6 +4,7 @@ trigger LMSProgrammeParticipantStatusTrigger on Programme_Participant__c (after 
     LMSAbstractJob job;
     Queueable queueableJob;
     Date today = Date.today();
+    Integer totalParticipants = Trigger.new.size();
 
     if (Trigger.isUpdate) {
         for (Id participantId : Trigger.newMap.keySet() ) {
@@ -35,12 +36,12 @@ trigger LMSProgrammeParticipantStatusTrigger on Programme_Participant__c (after 
 
                 if (Status_Changed) {
                     job = new LMSParticipantStatusChangeJob(Trigger.new, null);
-                    queueableJob = new LMSParticipantStatusChangeQueueableJob(Trigger.newMap.keySet(), null);
+                    queueableJob = new LMSParticipantStatusChangeQueueableJob(Trigger.newMap.keySet(), null, null, totalParticipants);
                 }
             }
         } else {
             job = new LMSParticipantNPQStatusChangeJob(Trigger.new, null);
-            queueableJob = new LMSPartNPQStatusChangeQueueableJob(Trigger.newMap.keySet(), null);
+            queueableJob = new LMSPartNPQStatusChangeQueueableJob(Trigger.newMap.keySet(), null, null, totalParticipants);
 
             if (Status_Changed && participantsWithChangedName.size() > 0) {
                 job = new LMSParticipantStatusChangeJob(Trigger.new, new LMSParticipantNPQStatusChangeJob(Trigger.new, new LMSParticipantNameChangeJob(participantsWithChangedName, null)));
@@ -51,7 +52,7 @@ trigger LMSProgrammeParticipantStatusTrigger on Programme_Participant__c (after 
 
                 if (Status_Changed) {
                     job = new LMSParticipantStatusChangeJob(Trigger.new, new LMSParticipantNPQStatusChangeJob(Trigger.new, null));
-                    queueableJob = new LMSParticipantStatusChangeQueueableJob(Trigger.newMap.keySet(), new LMSPartNPQStatusChangeQueueableJob(Trigger.newMap.keySet(), null));
+                    queueableJob = new LMSParticipantStatusChangeQueueableJob(Trigger.newMap.keySet(), new LMSPartNPQStatusChangeQueueableJob(Trigger.newMap.keySet(), null, null, totalParticipants), null, totalParticipants);
                 }
             }
         }
@@ -86,15 +87,15 @@ trigger LMSProgrammeParticipantStatusTrigger on Programme_Participant__c (after 
         if (!NPQ_Status_Changed) {
             if (Status_Changed) {
                 job = new LMSParticipantStatusChangeJob(Trigger.new, null);
-                queueableJob = new LMSParticipantStatusChangeQueueableJob(Trigger.newMap.keySet(), null);
+                queueableJob = new LMSParticipantStatusChangeQueueableJob(Trigger.newMap.keySet(), null, null, totalParticipants);
             }
         } else {
             job = new LMSParticipantNPQStatusChangeJob(Trigger.new, null);
-            queueableJob = new LMSPartNPQStatusChangeQueueableJob(Trigger.newMap.keySet(), null);
+            queueableJob = new LMSPartNPQStatusChangeQueueableJob(Trigger.newMap.keySet(), null, null, totalParticipants);
 
             if (Status_Changed) {
                 job = new LMSParticipantStatusChangeJob(Trigger.new, new LMSParticipantNPQStatusChangeJob(Trigger.new, null));
-                queueableJob = new LMSParticipantStatusChangeQueueableJob(Trigger.newMap.keySet(), new LMSPartNPQStatusChangeQueueableJob(Trigger.newMap.keySet(), null));
+                queueableJob = new LMSParticipantStatusChangeQueueableJob(Trigger.newMap.keySet(), new LMSPartNPQStatusChangeQueueableJob(Trigger.newMap.keySet(), null, null, totalParticipants), null, totalParticipants);
             }
         }
     }
