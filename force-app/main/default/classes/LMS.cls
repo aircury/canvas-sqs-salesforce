@@ -533,9 +533,9 @@ public with sharing class LMS {
             apiResult = (Map <String, Object>) apiResultList[0];
 
             userId = String.valueOf(apiResult.get('id'));
-            title = event.Event_Full_Name__c;
+            title = null == event.Event_Full_Name__c ? '' : event.Event_Full_Name__c;
             description = null == event.Event_Description_Rich__c ? '' : event.Event_Description_Rich__c;
-            address = null == event.Delivery_Address__c ? '' : event.Delivery_Address__c;
+            address = null == event.Delivery_Address__c ? '' : event.Delivery_Address__c.stripHTMLTags();
             CanvasAPI.createEvent('user', userId, userId, title, description, startAt, endAt, address);
         }
 
