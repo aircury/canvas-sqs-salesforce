@@ -114,8 +114,8 @@ def lambda_handler(event, context):
                                 'Name': data['assignment'].name
                             }
 
-                            # if data['resubmission']:
-                            #     submission_data['Last_Resubmission_Date__c'] = date
+                            if data['resubmission']:
+                                submission_data['Last_Resubmission_Date__c'] = date
 
                             if data['grader']:
                                 query = '''
