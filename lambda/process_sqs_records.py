@@ -63,16 +63,12 @@ def lambda_handler(event, context):
             query = '''
                 SELECT Id,
                     ParticipantName__c,
-                    Qualification__c
+                    Qualification__c,
+                    Programme__r.LMS_Course_Id__c
                 FROM Programme_Participant__c
-                WHERE Programme__r.LMS_Start_Date__c <= TODAY AND
-                    Programme__r.LMS_End_Date__c > TODAY AND
-                    Participant_UID__c = '%s'
+                WHERE Participant_UID__c = '%s'
             '''
 
-            if course_id:
-                query += "AND Programme__r.LMS_Course_Id__c = %s" % course_id
-            
             participants = sf.query(query % uid)
 
             if participants['totalSize'] > 0:
