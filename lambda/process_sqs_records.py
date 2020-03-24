@@ -25,7 +25,7 @@ sf = Salesforce(instance=instance, session_id=session_id, domain=domain)
 
 
 def complete_details(detail, participant, date):
-    return detail.replace('<participant>', participant).replace('<date>', date[:10])
+    return detail.replace('<participant>', '' if None == participant else participant).replace('<date>', date[:10])
 
 def lambda_handler(event, context):
     for record in event['Records']:
@@ -73,10 +73,11 @@ def lambda_handler(event, context):
 
             if participants['totalSize'] > 0:
                 for participant in participants['records']:
-                    detail = complete_details(detail, participant['ParticipantName__c'], date)
+                    participant_detail = detail
+                    participant_detail = complete_details(participant_detail, participant['ParticipantName__c'], date)
                     sf.Canvas_Activitiy__c.create({
                             'Canvas_Activity__c': activity,
-                            'Canvas_Activity_Detail__c': detail,
+                            'Canvas_Activity_Detail__c': participant_detail,
                             'Date__c': date,
                             'Time__c': time,
                             'Programme_Participant__c': participant['Id']
