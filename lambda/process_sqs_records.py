@@ -13,6 +13,13 @@ if __name__ == '__main__':
     load_dotenv(join(dirname(__file__), '.env'))
 
 
+NPQ_COURSES = [
+    '324', # NPQML
+    '305', # NPQH
+    '325', # NPQSL
+    '326', # NPQEL
+]
+
 logging.getLogger().setLevel(os.environ.get('LOG_LEVEL', 'DEBUG'))
 domain = os.environ.get('SALESFORCE_DOMAIN', 'test')
 
@@ -83,7 +90,7 @@ def lambda_handler(event, context):
                             'Programme_Participant__c': participant['Id']
                     })
                     
-                    if participant['Qualification__c'] == None:
+                    if participant['Qualification__c'] == None or str(course_id) not in NPQ_COURSES:
                         continue
 
                     if activity == 'Submission Created':
