@@ -384,6 +384,43 @@ private class LMSTest {
         Test.stopTest();
     }
 
+    @isTest private static void TestLMSAssessmentSubmissionTrigger() {
+        TL_Programme__c cohort = new TL_Programme__c(
+            Programme_Definition__c=prDef.Id,
+            Opportunity__c=o.Id,
+            Cohort_Name__c='Test 1',
+            LMS_Access__c=true,
+            LMS_Start_Date__c=Date.today(),
+            LMS_End_Date__c=Date.today() + 1
+        );
+
+        insert cohort;
+
+        Programme_Participant__c participant = new Programme_Participant__c(
+            Cohort__c=cohort.Id,
+            Participant__c=c1.Id,
+            Status__c='Active'
+        );
+        
+        insert participant;
+        
+        Test.startTest();
+        
+        Assessment_Submission__c submission = new Assessment_Submission__c(
+            Participant__c=participant.Id,
+            Submission_Date__c=Date.today(),
+            Name='Test'
+        );
+
+        insert submission;
+
+        submission.Marker__c = c1.Id;
+
+        update submission;
+        
+        Test.stopTest();
+    }
+
     @isTest private static void TestLMSException() {
         TL_Programme__c cohort = new TL_Programme__c(
             Programme_Definition__c=prDef.Id,

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>NPQ_Tasks_No__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(ISBLANK(NPQ_Qualification__c), 0, IF((INCLUDES(NPQ_Qualification__c, &#39;NPQSL&#39;) || INCLUDES(NPQ_Qualification__c, &#39;NPQML&#39;)) &amp;&amp; !INCLUDES(NPQ_Qualification__c, &#39;NPQEL&#39;) &amp;&amp; !INCLUDES(NPQ_Qualification__c, &#39;NPQH&#39;), 1, 2))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>NPQ Task No.</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>
