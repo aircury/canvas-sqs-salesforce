@@ -309,12 +309,16 @@ public with sharing class CanvasAPI {
     */
     public static Map <String, Object> removeUser(String userId) {
         return (Map <String, Object>) apiCall('DELETE', 'accounts/:account_id/users/' + userId, '');
-    }    
+    }
+
+    public static Boolean runningInASandbox() {
+        return System.URL.getSalesforceBaseUrl().getHost() != 'ambitionorg.my.salesforce.com';
+    }
 
     private static Object apiCall(String method, String endpoint, String body) {
         CanvasAPISettings__c customSettings = CanvasAPISettings__c.getOrgDefaults();
-        String token = customSettings.Token__c;
-        String baseUrl = customSettings.Base_Url__c;
+        String token = runningInASandbox() ? customSettings.Test_Token__c : customSettings.Token__c;
+        String baseUrl = runningInASandbox() ? customSettings.Test_Base_Url__c : customSettings.Base_Url__c;
         String accountId = null == customSettings.Account_Id__c ? '1' : customSettings.Account_Id__c.format();
         String roleId = null == customSettings.Participant_Role_Id__c ? '13' : customSettings.Participant_Role_Id__c.format();
         HttpRequest req = new HttpRequest();
