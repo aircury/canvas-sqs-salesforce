@@ -547,14 +547,15 @@ public with sharing class LMS {
         return new List<String>();
     }
 
-    public static List<String> doEventDelete(Set<ID> attendeeIds, DateTime startAt, DateTime endAt) {
+    public static List<String> doEventDelete(Set<ID> attendeeIds, DateTime startAt, DateTime endAt, String eventName) {
         List<Attendees__c> attendees = [
             SELECT Id,
                 Contact__r.Participant_UID__c,
                 FLIP_Event__r.Event_Date__c,
                 FLIP_Event__r.Event_End_Date__c,
                 FLIP_Event__r.Start_Time__c,
-                FLIP_Event__r.End_Time__c
+                FLIP_Event__r.End_Time__c,
+                FLIP_Event__r.Event_Name__c
             FROM Attendees__c
             WHERE Id IN :attendeeIds  AND
                 FLIP_Event__r.Cohort_lkp__r.LMS_Access__c = true AND
@@ -573,6 +574,7 @@ public with sharing class LMS {
             Contact c = attendee.Contact__r;
             startAt = null == startAt ? getEventDateTime(event.Event_Date__c, event.Start_Time__c) : startAt;
             endAt = null == endAt ? getEventDateTime(event.Event_End_Date__c, event.End_Time__c) : endAt;
+            eventName = null == eventName ? event.Event_Name__c : eventName;
             
             apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
 
@@ -589,15 +591,17 @@ public with sharing class LMS {
             for (Object result: apiResultList) {
                 Map <String, Object> apiEvent = (Map <String, Object>) result;
                 String eventId = String.valueOf(apiEvent.get('id'));
-                CanvasAPI.removeUserEvent(userId, eventId);
+                if (eventName == apiEvent.get('title')) {
+                    CanvasAPI.removeUserEvent(userId, eventId);
+                }
             }
         }
 
         return new List<String>();
     }
 
-    public static void onEventUpdate(List<sObject> attendees, DateTime startAt, DateTime endAt) {
-        LMSEventDeleteJob job = new LMSEventDeleteJob(attendees, startAt, endAt, new LMSEventInsertJob(attendees.clone(), null));
+    public static void onEventUpdate(List<sObject> attendees, DateTime startAt, DateTime endAt, String eventName) {
+        LMSEventDeleteJob job = new LMSEventDeleteJob(attendees, startAt, endAt, eventName, new LMSEventInsertJob(attendees.clone(), null));
 
         Database.executeBatch(job, job.batchSize());
     }

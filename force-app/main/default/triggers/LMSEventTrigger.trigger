@@ -27,7 +27,7 @@ trigger LMSEventTrigger on FLIP_Event__c (after update) {
             Datetime oldStart = LMS.getEventDateTime(oldEvent.Event_Date__c, oldEvent.Start_Time__c),
                 oldEnd = LMS.getEventDateTime(oldEvent.Event_End_Date__c, oldEvent.End_Time__c);
             
-            LMS.onEventUpdate(attendees, oldStart, oldEnd);
+            LMS.onEventUpdate(attendees, oldStart, oldEnd, oldEvent.Event_Name__c);
         }
     }
 }

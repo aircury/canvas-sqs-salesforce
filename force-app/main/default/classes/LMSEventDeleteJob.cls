@@ -1,10 +1,12 @@
 global class LMSEventDeleteJob extends LMSAbstractJob {
     DateTime startAt, endAt;
+    String eventName;
 
-    public LMSEventDeleteJob(List<sObject> i, DateTime s, DateTime e, LMSAbstractJob j) {
+    public LMSEventDeleteJob(List<sObject> i, DateTime s, DateTime e, String n, LMSAbstractJob j) {
         super(i, j);
         startAt = s;
         endAt = e;
+        eventName = n;
     }
 
     global override Integer batchSize() {
@@ -15,6 +17,6 @@ global class LMSEventDeleteJob extends LMSAbstractJob {
     }
 
     global override List<String> doExecute(Set<Id> i) {
-        return LMS.doEventDelete(i, startAt, endAt);
+        return LMS.doEventDelete(i, startAt, endAt, eventName);
     }
 }

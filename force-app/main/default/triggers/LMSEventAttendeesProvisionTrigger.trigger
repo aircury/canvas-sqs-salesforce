@@ -10,7 +10,7 @@ trigger LMSEventAttendeesProvisionTrigger on Attendees__c (after insert, before 
     }
 
     if (Trigger.isDelete) {
-        LMSEventDeleteJob job = new LMSEventDeleteJob(Trigger.old, null, null, null);
+        LMSEventDeleteJob job = new LMSEventDeleteJob(Trigger.old, null, null, null, null);
 
         Database.executeBatch(job, job.batchSize());
     }
