@@ -550,7 +550,7 @@ public with sharing class LMS {
                 FLIP_Event__r.Event_End_Date__c,
                 FLIP_Event__r.Start_Time__c,
                 FLIP_Event__r.End_Time__c,
-                FLIP_Event__r.Event_Name__c
+                FLIP_Event__r.Event_Full_Name__c
             FROM Attendees__c
             WHERE Id IN :attendeeIds  AND
                 FLIP_Event__r.Cohort_lkp__r.LMS_Access__c = true AND
@@ -569,7 +569,7 @@ public with sharing class LMS {
             Contact c = attendee.Contact__r;
             startAt = null == startAt ? getEventDateTime(event.Event_Date__c, event.Start_Time__c) : startAt;
             endAt = null == endAt ? getEventDateTime(event.Event_End_Date__c, event.End_Time__c) : endAt;
-            eventName = null == eventName ? event.Event_Name__c : eventName;
+            eventName = null == eventName ? event.Event_Full_Name__c : eventName;
             
             apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
 
