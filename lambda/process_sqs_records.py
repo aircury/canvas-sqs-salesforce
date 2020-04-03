@@ -13,12 +13,12 @@ if __name__ == '__main__':
     load_dotenv(join(dirname(__file__), '.env'))
 
 
-NPQ_COURSES = [
-    '324', # NPQML
-    '305', # NPQH
-    '325', # NPQSL
-    '326', # NPQEL
-]
+NPQ_COURSES = {
+    '324': 'NPQML',
+    '305': 'NPQH',
+    '325': 'NPQSL',
+    '326': 'NPQEL',
+}
 
 logging.getLogger().setLevel(os.environ.get('LOG_LEVEL', 'DEBUG'))
 domain = os.environ.get('SALESFORCE_DOMAIN', 'test')
@@ -90,7 +90,10 @@ def lambda_handler(event, context):
                             'Programme_Participant__c': participant['Id']
                     })
                     
-                    if participant['Qualification__c'] == None or str(course_id) not in NPQ_COURSES:
+                    if participant['Qualification__c'] == None:
+                        continue
+
+                    if NPQ_COURSES.get(str(course_id)) != participant['Qualification__c']:
                         continue
 
                     if activity == 'Submission Created':
@@ -111,6 +114,29 @@ def lambda_handler(event, context):
                         assessment_submissions = sf.query(query % (participant['Id'],  data['assignment'].name))
                         
                         if assessment_submissions['totalSize'] == 0:
+                            submission_data = {
+                                'Participant__c': participant['Id'],
+                                'Name': data['assignment'].name,
+                                'Submission_Date__c': date
+                            }
+                            
+                            if data['resubmission']:
+                                submission_data['Last_Resubmission_Date__c'] = date
+
+                            if data['grader']:
+                                query = '''
+                                    SELECT Id
+                                    FROM Contact
+                                    WHERE Email = '%s'
+                                '''
+
+                                graders = sf.query(query % data['grader'])
+                                
+                                if graders['totalSize'] > 0:
+                                    submission_data['Marker__c'] = graders['records'][0]['Id']
+                            
+                            sf.Assessment_Submission__c.create(submission_data)
+
                             continue
                         
                         for assessment_submission in assessment_submissions['records']:
