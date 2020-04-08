@@ -11,7 +11,9 @@ trigger LMSCourseProvisionTrigger on TL_Programme__c (after insert, after update
 
         TL_Programme__c oldCourse = Trigger.oldMap.get( courseId ), newCourse = Trigger.newMap.get( courseId );
 
-        if (oldCourse.LMS_Access__c != newCourse.LMS_Access__c) {
+        if (oldCourse.LMS_Access__c != newCourse.LMS_Access__c ||
+            oldCourse.LMS_Provision_Primary_Course__c != newCourse.LMS_Provision_Primary_Course__c
+        ) {
             LMS.onCourseInsert(courseId);
         }
 

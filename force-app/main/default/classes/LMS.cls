@@ -159,6 +159,7 @@ public with sharing class LMS {
                 Programme__r.LMS_Additional_Course_Section_Id_1__c,
                 Programme__r.LMS_Additional_Course_Section_Id_2__c,
                 Programme__r.Id,
+                Programme__r.LMS_Provision_Primary_Course__c,
                 Participant__r.Email,
                 Participant__r.Participant_UID__c
             FROM Programme_Participant__c
@@ -195,7 +196,12 @@ public with sharing class LMS {
                 programme.LMS_Additional_Course_Section_Id_1__c,
                 programme.LMS_Additional_Course_Section_Id_2__c
             }) {
-                if (null == sectionIdInt) {
+                if (null == sectionIdInt ||
+                    (
+                        false == programme.LMS_Provision_Primary_Course__c &&
+                        sectionIdInt == programme.LMS_Course_Section_Id__c
+                    )
+                ) {
                     continue;
                 }
 
@@ -275,6 +281,7 @@ public with sharing class LMS {
                 Programme__r.LMS_Additional_Course_Section_Id_2__c,
                 Programme__r.Programme_Name__c,
                 Programme__r.Cohort_Name__c,
+                Programme__r.LMS_Provision_Primary_Course__c,
                 Participant__r.Email,
                 Participant__r.Name,
                 Participant__r.Prefered_Name__c,
@@ -334,7 +341,12 @@ public with sharing class LMS {
                 programme.LMS_Additional_Course_Section_Id_1__c,
                 programme.LMS_Additional_Course_Section_Id_2__c
             }) {
-                if (null == sectionIdInt) {
+                if (null == sectionIdInt ||
+                    (
+                        false == programme.LMS_Provision_Primary_Course__c &&
+                        sectionIdInt == programme.LMS_Course_Section_Id__c
+                    )
+                ) {
                     continue;
                 }
 
@@ -478,13 +490,14 @@ public with sharing class LMS {
     public static void onCourseInsert(ID programmeId) {
         List<TL_Programme__c> programmes = [
             SELECT Id,
-                LMS_Access__c
+                LMS_Access__c,
+                LMS_Provision_Primary_Course__c
             FROM TL_Programme__c
             WHERE Id = :programmeId
         ];
 
         for (TL_Programme__c programme: programmes) {
-            if (true == programme.LMS_Access__c) {
+            if (true == programme.LMS_Access__c && true == programme.LMS_Provision_Primary_Course__c) {
                 createCourse(programme);
             }
         }
@@ -570,6 +583,7 @@ public with sharing class LMS {
             FROM Attendees__c
             WHERE Id IN :attendeeIds AND
                 FLIP_Event__r.Cohort_lkp__r.LMS_Access__c = true AND
+                FLIP_Event__r.Cohort_lkp__r.LMS_Provision_Primary_Course__c = true AND
                 FLIP_Event__r.Send_to_LMS__c = true AND
                 FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c <= TODAY AND
                 FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c > TODAY AND
