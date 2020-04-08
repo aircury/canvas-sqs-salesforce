@@ -155,7 +155,7 @@ public with sharing class LMS {
         List<Programme_Participant__c> participants = [
             SELECT Id,
                 Programme__r.LMS_Course_Section_Id__c,
-                Programme__r.LMS_NPQ_Assessment_Course_Section_Id__c,
+                Qualification__c,
                 Programme__r.LMS_Additional_Course_Section_Id_1__c,
                 Programme__r.LMS_Additional_Course_Section_Id_2__c,
                 Programme__r.Id,
@@ -174,6 +174,11 @@ public with sharing class LMS {
                     Temp_LMS_End_Date__c >= TODAY)
                 )                
         ];
+        CanvasAPISettings__c customSettings = CanvasAPISettings__c.getOrgDefaults();
+        Decimal NPQELSectionId = null == customSettings.NPQEL_Course_Section_Id__c ? 481 : customSettings.NPQEL_Course_Section_Id__c;
+        Decimal NPQHSectionId = null == customSettings.NPQH_Course_Section_Id__c ? 482 : customSettings.NPQH_Course_Section_Id__c;
+        Decimal NPQMLSectionId = null == customSettings.NPQML_Course_Section_Id__c ? 484 : customSettings.NPQML_Course_Section_Id__c;
+        Decimal NPQSLSectionId = null == customSettings.NPQSL_Course_Section_Id__c ? 483 : customSettings.NPQSL_Course_Section_Id__c;
         
         for (Programme_Participant__c participant: participants) {
             Contact c = participant.Participant__r;
@@ -181,6 +186,7 @@ public with sharing class LMS {
             List <Object> apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
             Map <String, Object> apiResult;
             String userId, sectionId;
+            Decimal NPQSectionId;
 
             if (0 == apiResultList.size()) {
                 continue;
@@ -190,9 +196,24 @@ public with sharing class LMS {
 
             userId = String.valueOf(apiResult.get('id'));
 
+            switch on participant.Qualification__c {
+                when 'NPQEL' {
+                    NPQSectionId = NPQELSectionId;
+                }
+                when 'NPQH' {
+                    NPQSectionId = NPQHSectionId;
+                }
+                when 'NPQML' {
+                    NPQSectionId = NPQMLSectionId;
+                }
+                when 'NPQSL' {
+                    NPQSectionId = NPQSLSectionId;
+                }
+            }
+
             for (Decimal sectionIdInt: new List<Decimal>{
                 programme.LMS_Course_Section_Id__c,
-                programme.LMS_NPQ_Assessment_Course_Section_Id__c,
+                NPQSectionId,
                 programme.LMS_Additional_Course_Section_Id_1__c,
                 programme.LMS_Additional_Course_Section_Id_2__c
             }) {
@@ -270,13 +291,12 @@ public with sharing class LMS {
         return true;
     }
 
-    // Max callouts: 3 + 4 * 3 = 15
+    // Max callouts: 3 + 3 * 3 = 12
     public static List<String> doParticipantStatusChange(Set<ID> participantIds) {
         List<Programme_Participant__c> participants = [
             SELECT Id,
                 Status__c,
                 Programme__r.LMS_Course_Section_Id__c,
-                Programme__r.LMS_NPQ_Assessment_Course_Section_Id__c,
                 Programme__r.LMS_Additional_Course_Section_Id_1__c,
                 Programme__r.LMS_Additional_Course_Section_Id_2__c,
                 Programme__r.Programme_Name__c,
@@ -337,7 +357,6 @@ public with sharing class LMS {
 
             for (Decimal sectionIdInt: new List<Decimal>{
                 programme.LMS_Course_Section_Id__c,
-                programme.LMS_NPQ_Assessment_Course_Section_Id__c,
                 programme.LMS_Additional_Course_Section_Id_1__c,
                 programme.LMS_Additional_Course_Section_Id_2__c
             }) {
@@ -366,6 +385,96 @@ public with sharing class LMS {
                     }
                 }
             }
+        }
+
+        return errors;
+    }
+
+    // Max callouts: 3 + 3 = 6
+    public static List<String> doParticipantNPQStatusChange(Set<ID> participantIds) {
+        List<Programme_Participant__c> participants = [
+            SELECT Id,
+                NPQ_Status__c,
+                Programme__r.Programme_Name__c,
+                Programme__r.Cohort_Name__c,
+                Participant__r.Email,
+                Participant__r.Name,
+                Participant__r.Prefered_Name__c,
+                Participant__r.Participant_UID__c,
+                Qualification__c
+            FROM Programme_Participant__c
+            WHERE Id IN :participantIds AND
+                Programme__r.LMS_Access__c = true AND
+                Participant__r.Email != null AND
+                (
+                    (Programme__r.LMS_Start_Date__c <= TODAY AND
+                    Programme__r.LMS_End_Date__c >= TODAY)
+                    OR
+                    (Temp_LMS_Start_Date__c <= TODAY AND
+                    Temp_LMS_End_Date__c >= TODAY)
+                )
+        ];
+        List<String> errors = new List<String>();
+        CanvasAPISettings__c customSettings = CanvasAPISettings__c.getOrgDefaults();
+        String NPQELSectionId = null == customSettings.NPQEL_Course_Section_Id__c ? '481' : customSettings.NPQEL_Course_Section_Id__c.format();
+        String NPQHSectionId = null == customSettings.NPQH_Course_Section_Id__c ? '482' : customSettings.NPQH_Course_Section_Id__c.format();
+        String NPQMLSectionId = null == customSettings.NPQML_Course_Section_Id__c ? '484' : customSettings.NPQML_Course_Section_Id__c.format();
+        String NPQSLSectionId = null == customSettings.NPQSL_Course_Section_Id__c ? '483' : customSettings.NPQSL_Course_Section_Id__c.format();
+        
+        for (Programme_Participant__c participant: participants) {
+            TL_Programme__c programme = participant.Programme__r;
+            Contact c = participant.Participant__r;
+            List <Object> apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
+            Map <String, Object> apiResult;
+            String userId, sectionId;
+
+            if (0 == apiResultList.size()) {
+                if (participant.NPQ_Status__c == null ||
+                    participant.NPQ_Status__c == 'Deferral' ||
+                    participant.NPQ_Status__c == 'Withdrawn') {
+                        continue;
+                }
+
+                apiResultList.add(CanvasAPI.createUser(
+                    c.Email,
+                    c.Name,
+                    c.Prefered_Name__c,
+                    c.Participant_UID__c
+                ));
+
+                if (null == apiResultList[0]) {
+                    errors.add('There was a problem on programme "' + programme.Programme_Name__c + ' ' + programme.Cohort_Name__c +
+                    '" provisioning participant with email ' + c.Email + ' and UID ' + c.Participant_UID__c);
+
+                    continue;
+                }
+
+                CanvasAPI.createCommunicationChannel(c.Participant_UID__c, c.Email);
+            }
+
+            apiResult = (Map <String, Object>) apiResultList[0];
+
+            userId = String.valueOf(apiResult.get('id'));
+    
+            switch on participant.Qualification__c {
+                when 'NPQEL' {
+                    sectionId = NPQELSectionId;
+                }
+                when 'NPQH' {
+                    sectionId = NPQHSectionId;
+                }
+                when 'NPQML' {
+                    sectionId = NPQMLSectionId;
+                }
+                when 'NPQSL' {
+                    sectionId = NPQSLSectionId;
+                }
+                when else {
+                    continue;
+                }
+            }
+
+            enrollUser(userId, sectionId, false, null);
         }
 
         return errors;

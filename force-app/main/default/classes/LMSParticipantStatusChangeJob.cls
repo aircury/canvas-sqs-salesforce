@@ -4,7 +4,7 @@ global class LMSParticipantStatusChangeJob extends LMSAbstractJob {
     }
 
     global override Integer batchSize() {
-        return 6; //doParticipantStatusChange can do 15 callouts at max, so 15*6 = 90 <= 100 callout limit
+        return 8; //doParticipantStatusChange can do 12 callouts at max, so 12*8 = 96 <= 100 callout limit
     }
     global override String emailSubject() {
         return 'Participants Status Change Job ';
