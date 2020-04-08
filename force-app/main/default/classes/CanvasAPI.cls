@@ -127,6 +127,7 @@ public with sharing class CanvasAPI {
             '&user[birthdate]=' +
             '&user[terms_of_use]=false' +
             '&user[skip_registration]=true' +
+            '&communication_channel[skip_confirmation]=true' +
             '&pseudonym[send_confirmation]=false' +
             '&pseudonym[sis_user_id]=' + participantUID +
             '&enable_sis_reactivation=true' +
