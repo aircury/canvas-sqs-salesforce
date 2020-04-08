@@ -110,10 +110,10 @@ def process_quiz_submitted(actor, objectv, group):
         (quiz.title, course.name, submission.score, submission.quiz_points_possible)
     activity = 'Quiz Submitted'
 
-    return (uid, clean_course_id(course_id), detail, activity, quiz.title)
+    return (uid, clean_course_id(course_id), detail, activity, {'course': course, 'submission': submission, 'quiz': quiz, 'event_name': quiz.title})
 
 def process_submission_created(actor, objectv, group):
-    user_id = actor['extensions']['com.instructure.canvas']['entity_id']
+    user_id = objectv['assignee']['id'].split(':')[-1]
     user = canvas.get_user(user_id)
     uid = user.sis_user_id
     course_id = group['extensions']['com.instructure.canvas']['entity_id']
@@ -124,13 +124,25 @@ def process_submission_created(actor, objectv, group):
     detail = '<participant> created submission for the assignment "%s" from programme "%s" with grade %s on <date>' % \
         (assignment.name, course.name, submission.grade)
     activity = 'Submission Created'
-
-    return (uid, clean_course_id(course_id), detail, activity, assignment.name)
+    
+    grader = None
+    
+    if submission.grader_id:
+        grader = canvas.get_user(submission.grader_id)
+        grader = grader.email
+    
+    return (uid, clean_course_id(course_id), detail, activity, {
+        'course': course,
+        'submission': submission,
+        'assignment': assignment,
+        'event_name': assignment.name,
+        'grader': grader
+    })
 
 def process_submission_updated(actor, objectv, group):
-    uid, course_id, detail, activity, event_name = process_submission_created(actor, objectv, group)
+    uid, course_id, detail, activity, data = process_submission_created(actor, objectv, group)
 
-    return (uid, course_id, detail.replace('created submission', 'updated submission'), activity.replace('Created', 'Updated'), event_name)
+    return (uid, course_id, detail.replace('created submission', 'updated submission'), activity.replace('Created', 'Updated'), data)
 
 def process_discussion_topic_created(actor, objectv, group):
     user_id = actor['extensions']['com.instructure.canvas']['entity_id']
@@ -154,9 +166,9 @@ def process_discussion_entry_created(actor, objectv, group):
     return (uid, clean_course_id(course_id), detail, activity, None)
 
 def process_enrollment_created(actor, objectv, group):
-    uid, course_id, detail, activity, event_name = process_enrollment_updated(actor, objectv, group)
+    uid, course_id, detail, activity, data = process_enrollment_updated(actor, objectv, group)
 
-    return (uid, course_id, detail, activity.replace('Updated', 'Created'), event_name)
+    return (uid, course_id, detail, activity.replace('Updated', 'Created'), data)
 
 def process_enrollment_updated(actor, objectv, group):
     enrollment_id = objectv['extensions']['com.instructure.canvas']['entity_id']

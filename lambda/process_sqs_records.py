@@ -49,7 +49,7 @@ def lambda_handler(event, context):
                 continue
             
             try:
-                uid, course_id, detail, activity, event_name = getattr(canvas_live_events, 'process_' + liveEvent)(actor, objectv, group)
+                uid, course_id, detail, activity, data = getattr(canvas_live_events, 'process_' + liveEvent)(actor, objectv, group)
                 logging.debug(detail)
             except AttributeError as e:
                 logging.warning('process_%s not implemented yet' % liveEvent)
@@ -64,13 +64,8 @@ def lambda_handler(event, context):
                 SELECT Id,
                     ParticipantName__c
                 FROM Programme_Participant__c
-                WHERE (
-                        (Programme__r.LMS_Start_Date__c <= TODAY AND
-                        Programme__r.LMS_End_Date__c >= TODAY)
-                        OR
-                        (Temp_LMS_Start_Date__c <= TODAY AND
-                        Temp_LMS_End_Date__c >= TODAY)
-                    )
+                WHERE Programme__r.LMS_Start_Date__c <= TODAY AND
+                    Programme__r.LMS_End_Date__c > TODAY AND
                     Participant_UID__c = '%s'
             '''
 
@@ -89,8 +84,50 @@ def lambda_handler(event, context):
                             'Time__c': time,
                             'Programme_Participant__c': participant['Id']
                     })
+                    
+                    if activity == 'Submission Created':
+                        sf.Assessment_Submission__c.create({
+                            'Participant__c': participant['Id'],
+                            'Name': data['assignment'].name,
+                            'Submission_Date__c': date
+                        })
+                        sf.Programme_Participant__c.update(participant['Id'], {'NPQ_Status__c': 'Submitted- pending allocation'})
 
-            if not event_name:
+                    if activity == 'Submission Updated':
+                        query = '''
+                            SELECT Id
+                            FROM Assessment_Submission__c
+                            WHERE Participant__r.Id = '%s' AND
+                                  Name = '%s'
+                        '''
+
+                        assessment_submissions = sf.query(query % (participant['Id'],  data['assignment'].name))
+                        
+                        if assessment_submissions['totalSize'] == 0:
+                            continue
+                        
+                        for assessment_submission in assessment_submissions['records']:
+                            submission_data = {
+                                'Submission_Date__c': date,
+                                'Name': data['assignment'].name
+                            }
+
+                            if data['grader']:
+                                query = '''
+                                    SELECT Id
+                                    FROM Contact
+                                    WHERE Email = '%s'
+                                '''
+
+                                graders = sf.query(query % data['grader'])
+                                
+                                if graders['totalSize'] > 0:
+                                    submission_data['Marker__c'] = graders['records'][0]['Id']
+
+                            sf.Assessment_Submission__c.update(assessment_submission['Id'], submission_data)
+                            sf.Programme_Participant__c.update(participant['Id'], {'NPQ_Status__c': 'Submitted (pending outcome)'})
+
+            if not data:
                 continue
             
             query = '''
@@ -103,7 +140,7 @@ def lambda_handler(event, context):
                     FLIP_Event__r.Event_Full_Name__c = '%s'
             '''
 
-            attendees = sf.query(query % (uid, event_name))
+            attendees = sf.query(query % (uid, data['event_name']))
 
             if attendees['totalSize'] <= 0:
                 continue
