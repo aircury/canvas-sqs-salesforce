@@ -150,24 +150,36 @@ public with sharing class LMS {
         Database.executeBatch(job, job.batchSize());
     }
 
+    // Max callouts: 1 + 4 * 3 = 13
     public static List<String> doRemoveUsers(Set<ID> participantIds) {
         List<Programme_Participant__c> participants = [
             SELECT Id,
                 Programme__r.LMS_Course_Section_Id__c,
+                Programme__r.LMS_NPQ_Assessment_Course_Section_Id__c,
+                Programme__r.LMS_Additional_Course_Section_Id_1__c,
+                Programme__r.LMS_Additional_Course_Section_Id_2__c,
                 Programme__r.Id,
                 Participant__r.Email,
                 Participant__r.Participant_UID__c
             FROM Programme_Participant__c
             WHERE Id IN :participantIds AND
                 Programme__r.LMS_Access__c = true AND
-                Participant__r.Email != null
+                Participant__r.Email != null AND
+                (
+                    (Programme__r.LMS_Start_Date__c <= TODAY AND
+                    Programme__r.LMS_End_Date__c >= TODAY)
+                    OR
+                    (Temp_LMS_Start_Date__c <= TODAY AND
+                    Temp_LMS_End_Date__c >= TODAY)
+                )                
         ];
         
         for (Programme_Participant__c participant: participants) {
             Contact c = participant.Participant__r;
+            TL_Programme__c programme = participant.Programme__r;
             List <Object> apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
             Map <String, Object> apiResult;
-            String userId, sectionId = String.valueOf(participant.Programme__r.LMS_Course_Section_Id__c);
+            String userId, sectionId;
 
             if (0 == apiResultList.size()) {
                 continue;
@@ -177,12 +189,29 @@ public with sharing class LMS {
 
             userId = String.valueOf(apiResult.get('id'));
 
-            removeUser(userId, sectionId, participant.Programme__r.Id, c.Email);
+            for (Decimal sectionIdInt: new List<Decimal>{
+                programme.LMS_Course_Section_Id__c,
+                programme.LMS_NPQ_Assessment_Course_Section_Id__c,
+                programme.LMS_Additional_Course_Section_Id_1__c,
+                programme.LMS_Additional_Course_Section_Id_2__c
+            }) {
+                if (null == sectionIdInt) {
+                    continue;
+                }
+
+                sectionId = String.valueOf(sectionIdInt);
+
+
+                if (removeUser(userId, sectionId, participant.Programme__r.Id, c.Email)) {
+                    break;
+                }
+            }
         }
 
         return new List<String>();
     }
 
+    // Max callouts: 3
     public static void enrollUser(String userId, String courseSectionId, Boolean deactivate, String task) {
         List <Object> apiResultList = CanvasAPI.findEnrollmentId(userId, courseSectionId);
         Map <String, Object> apiResult;
@@ -208,7 +237,8 @@ public with sharing class LMS {
         }
     }
 
-    public static void removeUser(String userId, String sectionId, Id programmeId, String email) {
+    // Max callouts: 3
+    public static Boolean removeUser(String userId, String sectionId, Id programmeId, String email) {
         Integer otherUserCourses = [SELECT COUNT()
             FROM Programme_Participant__c
             WHERE Participant__r.Email = :email AND
@@ -225,16 +255,24 @@ public with sharing class LMS {
 
         if (0 < otherUserCourses) {
             enrollUser(userId, sectionId, true, 'conclude');
-        } else {
-            CanvasAPI.removeUser(userId);
+
+            return false;
         }
+
+        CanvasAPI.removeUser(userId);
+
+        return true;
     }
 
+    // Max callouts: 3 + 4 * 3 = 15
     public static List<String> doParticipantStatusChange(Set<ID> participantIds) {
         List<Programme_Participant__c> participants = [
             SELECT Id,
                 Status__c,
                 Programme__r.LMS_Course_Section_Id__c,
+                Programme__r.LMS_NPQ_Assessment_Course_Section_Id__c,
+                Programme__r.LMS_Additional_Course_Section_Id_1__c,
+                Programme__r.LMS_Additional_Course_Section_Id_2__c,
                 Programme__r.Programme_Name__c,
                 Programme__r.Cohort_Name__c,
                 Participant__r.Email,
@@ -260,7 +298,7 @@ public with sharing class LMS {
             Contact c = participant.Participant__r;
             List <Object> apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
             Map <String, Object> apiResult;
-            String userId, sectionId = String.valueOf(programme.LMS_Course_Section_Id__c);
+            String userId, sectionId;
 
             if (0 == apiResultList.size()) {
                 if (participant.Status__c == 'Complete' ||
@@ -290,16 +328,31 @@ public with sharing class LMS {
 
             userId = String.valueOf(apiResult.get('id'));
 
-            switch on participant.Status__c {
-               when 'Active' {
-                    enrollUser(userId, sectionId, false, null);
-               }
-               when 'Inactive' {
-                    enrollUser(userId, sectionId, true, 'deactivate');
-               }
-               when 'Complete', 'Deferred', 'Withdrawn' {
-                    removeUser(userId, sectionId, programme.Id, c.Email);
-               }
+            for (Decimal sectionIdInt: new List<Decimal>{
+                programme.LMS_Course_Section_Id__c,
+                programme.LMS_NPQ_Assessment_Course_Section_Id__c,
+                programme.LMS_Additional_Course_Section_Id_1__c,
+                programme.LMS_Additional_Course_Section_Id_2__c
+            }) {
+                if (null == sectionIdInt) {
+                    continue;
+                }
+
+                sectionId = String.valueOf(sectionIdInt);
+
+                switch on participant.Status__c {
+                    when 'Active' {
+                        enrollUser(userId, sectionId, false, null);
+                    }
+                    when 'Inactive' {
+                        enrollUser(userId, sectionId, true, 'deactivate');
+                    }
+                    when 'Complete', 'Deferred', 'Withdrawn' {
+                        if (removeUser(userId, sectionId, programme.Id, c.Email)) {
+                            break;
+                        }
+                    }
+                }
             }
         }
 

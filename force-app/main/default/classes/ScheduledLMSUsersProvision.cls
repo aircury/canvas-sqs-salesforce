@@ -19,5 +19,33 @@ global class ScheduledLMSUsersProvision implements Schedulable {
                 LMS.removeUsers(p);
             }
         }
+
+        List<Programme_Participant__c> participants = [
+            SELECT Id
+            FROM Programme_Participant__c
+            WHERE Programme__r.LMS_Access__c = true AND
+                Participant__r.Email != null AND
+                Temp_LMS_Start_Date__c = :today
+        ];
+
+        if (0 != participants.size()) {
+            LMSParticipantStatusChangeJob job = new LMSParticipantStatusChangeJob(participants, null);
+            
+            Database.executeBatch(job, job.batchSize());
+        }
+
+        participants = [
+            SELECT Id
+            FROM Programme_Participant__c
+            WHERE Programme__r.LMS_Access__c = true AND
+                Participant__r.Email != null AND
+                Temp_LMS_End_Date__c = :today
+        ];
+
+        if (0 != participants.size()) {
+            LMSRemoveUsersJob job = new LMSRemoveUsersJob(participants, null);
+            
+            Database.executeBatch(job, job.batchSize());
+        }
     }
 }
