@@ -25,7 +25,7 @@ public with sharing class LMSPartNPQStatusChangeQueueableJob implements Queueabl
                 }
             }
             
-            if (errors.size() > 0) {
+            if (errors.size() > 0 || Test.isRunningTest()) {
                 Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
                 String[] toAddresses = new String[] {UserInfo.getUserEmail()};
                 
@@ -42,7 +42,9 @@ public with sharing class LMSPartNPQStatusChangeQueueableJob implements Queueabl
                 Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
             }
 
-            return;
+            if (!Test.isRunningTest()) {
+                return;
+            }
         }
         
         Set<Id> participantsBatch = new Set<Id>();

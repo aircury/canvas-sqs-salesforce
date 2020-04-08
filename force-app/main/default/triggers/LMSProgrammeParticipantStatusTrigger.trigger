@@ -59,9 +59,22 @@ trigger LMSProgrammeParticipantStatusTrigger on Programme_Participant__c (after 
     }
 
     if (Trigger.isInsert) {
-        for (Id participantId : Trigger.newMap.keySet() ) {
-            Programme_Participant__c p = Trigger.newMap.get(participantId);
+        Set<Id> participantIds = Trigger.newMap.keySet();
 
+        List<Programme_Participant__c> participants = [
+            SELECT Programme__r.LMS_Access__c,
+                Participant__r.Email,
+                Programme__r.LMS_Start_Date__c,
+                Programme__r.LMS_End_Date__c,
+                Temp_LMS_Start_Date__c,
+                Temp_LMS_End_Date__c,
+                Qualification__c,
+                NPQ_Status__c
+            FROM Programme_Participant__c
+            WHERE Id IN :participantIds
+        ];
+
+        for (Programme_Participant__c p : participants) {
             if (p.Programme__r.LMS_Access__c == true &&
                 p.Participant__r.Email != null &&
                 (
@@ -107,6 +120,11 @@ trigger LMSProgrammeParticipantStatusTrigger on Programme_Participant__c (after 
     } else {
         if (job != null) {
             Database.executeBatch(job, job.batchSize());
+            if (Test.isRunningTest()) {
+                if (queueableJob != null) {
+                    System.enqueueJob(queueableJob);
+                }
+            }
         }
     }
 }

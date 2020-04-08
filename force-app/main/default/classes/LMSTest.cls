@@ -79,8 +79,11 @@ private class LMSTest {
         Test.startTest();
         Programme_Participant__c participant = new Programme_Participant__c(
             Cohort__c=cohort.Id,
+            Programme__c=cohort.Id,
             Participant__c=c1.Id,
-            Status__c='Active'
+            Status__c='Active',
+            NPQ_Status__c='Active',
+            Qualification__c='NPQH'
         );
         insert participant;
         
@@ -194,6 +197,34 @@ private class LMSTest {
         Test.startTest();
         
         participant.Status__c='Complete';
+        update participant;
+
+        Test.stopTest();
+    }
+
+    @isTest private static void TestLMSProgrammeParticipantStatusTriggerQualification() {
+        TL_Programme__c cohort = new TL_Programme__c(
+            Programme_Definition__c=prDef.Id,
+            Opportunity__c=o.Id,
+            Cohort_Name__c='Test 1',
+            LMS_Access__c=true,
+            LMS_Start_Date__c=Date.today(),
+            LMS_End_Date__c=Date.today() + 1
+        );
+
+        insert cohort;
+
+        Programme_Participant__c participant = new Programme_Participant__c(
+            Cohort__c=cohort.Id,
+            Participant__c=c1.Id,
+            Status__c='Active',
+            NPQ_Status__c='Active'
+        );
+        insert participant;
+       
+        Test.startTest();
+        
+        participant.Qualification__c='NPQH';
         update participant;
 
         Test.stopTest();
@@ -373,43 +404,6 @@ private class LMSTest {
 
         System.schedule('ScheduleApexTest', '0 0 0 1 1 ?', new ScheduledLMSUsersProvision());
 
-        Test.stopTest();
-    }
-
-    @isTest private static void TestLMSAssessmentSubmissionTrigger() {
-        TL_Programme__c cohort = new TL_Programme__c(
-            Programme_Definition__c=prDef.Id,
-            Opportunity__c=o.Id,
-            Cohort_Name__c='Test 1',
-            LMS_Access__c=true,
-            LMS_Start_Date__c=Date.today(),
-            LMS_End_Date__c=Date.today() + 1
-        );
-
-        insert cohort;
-
-        Programme_Participant__c participant = new Programme_Participant__c(
-            Cohort__c=cohort.Id,
-            Participant__c=c1.Id,
-            Status__c='Active'
-        );
-        
-        insert participant;
-        
-        Test.startTest();
-        
-        Assessment_Submission__c submission = new Assessment_Submission__c(
-            Participant__c=participant.Id,
-            Submission_Date__c=Date.today(),
-            Name='Test'
-        );
-
-        insert submission;
-
-        submission.Marker__c = c1.Id;
-
-        update submission;
-        
         Test.stopTest();
     }
 

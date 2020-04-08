@@ -22,6 +22,7 @@ global class CanvasAPIMock implements HttpCalloutMock {
         
         if ((endpoint.contains('accounts/1/users?search_term=') && !emptySearch) ||
             endpoint.contains('sections/1/enrollments') ||
+            endpoint.contains('sections/482/enrollments') ||
             endpoint.contains('calendar_events?start_date')
         ) {
             res.setBody('[{"id":"1", "enrollment_state": "deactivate"}]');

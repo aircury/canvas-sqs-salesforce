@@ -16,6 +16,10 @@
                 <field>Programme__c</field>
             </layoutItems>
             <layoutItems>
+                <behavior>Edit</behavior>
+                <field>programme_group__c</field>
+            </layoutItems>
+            <layoutItems>
                 <behavior>Readonly</behavior>
                 <field>Programme_Code__c</field>
             </layoutItems>
@@ -36,6 +40,10 @@
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>Application_Status__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Participant_Support_Email__c</field>
             </layoutItems>
         </layoutColumns>
         <style>TwoColumnsTopToBottom</style>
@@ -152,6 +160,21 @@
         <layoutColumns/>
         <style>CustomLinks</style>
     </layoutSections>
+    <relatedLists>
+        <fields>NAME</fields>
+        <relatedList>Groupings_Master__c.Programme_Definition__c</relatedList>
+    </relatedLists>
+    <relatedLists>
+        <fields>Order__c</fields>
+        <fields>Event_Title__c</fields>
+        <fields>Event_Type__c</fields>
+        <fields>NAME</fields>
+        <fields>Replicated_by__c</fields>
+        <fields>Medium__c</fields>
+        <relatedList>Event_Specs__c.Programme_Definition__c</relatedList>
+        <sortField>Order__c</sortField>
+        <sortOrder>Asc</sortOrder>
+    </relatedLists>
     <relatedLists>
         <customButtons>New_Cohort</customButtons>
         <excludeButtons>New</excludeButtons>
