@@ -214,8 +214,13 @@ public with sharing class LMS {
             WHERE Participant__r.Email = :email AND
                 Programme__r.Id != :programmeId AND
                 Programme__r.LMS_Access__c = true AND
-                Programme__r.LMS_Start_Date__c <= TODAY AND
-                Programme__r.LMS_End_Date__c > TODAY
+                (
+                    (Programme__r.LMS_Start_Date__c <= TODAY AND
+                    Programme__r.LMS_End_Date__c >= TODAY)
+                    OR
+                    (Temp_LMS_Start_Date__c <= TODAY AND
+                    Temp_LMS_End_Date__c >= TODAY)
+                )
         ];
 
         if (0 < otherUserCourses) {
@@ -240,8 +245,13 @@ public with sharing class LMS {
             WHERE Id IN :participantIds AND
                 Programme__r.LMS_Access__c = true AND
                 Participant__r.Email != null AND
-                Programme__r.LMS_Start_Date__c <= TODAY AND
-                Programme__r.LMS_End_Date__c >= TODAY
+                (
+                    (Programme__r.LMS_Start_Date__c <= TODAY AND
+                    Programme__r.LMS_End_Date__c >= TODAY)
+                    OR
+                    (Temp_LMS_Start_Date__c <= TODAY AND
+                    Temp_LMS_End_Date__c >= TODAY)
+                )
         ];
         List<String> errors = new List<String>();
         
@@ -311,8 +321,13 @@ public with sharing class LMS {
             WHERE Participant__r.Id = :contactId AND
                 Programme__r.LMS_Access__c = true AND
                 Participant__r.Email != null AND
-                Programme__r.LMS_Start_Date__c <= TODAY AND
-                Programme__r.LMS_End_Date__c >= TODAY
+                (
+                    (Programme__r.LMS_Start_Date__c <= TODAY AND
+                    Programme__r.LMS_End_Date__c >= TODAY)
+                    OR
+                    (Temp_LMS_Start_Date__c <= TODAY AND
+                    Temp_LMS_End_Date__c >= TODAY)
+                )
         ];
         
         for (Programme_Participant__c participant: participants) {
@@ -365,8 +380,13 @@ public with sharing class LMS {
             WHERE Id = :participantId AND
                 Programme__r.LMS_Access__c = true AND
                 Participant__r.Email != null AND
-                Programme__r.LMS_Start_Date__c <= TODAY AND
-                Programme__r.LMS_End_Date__c >= TODAY
+                (
+                    (Programme__r.LMS_Start_Date__c <= TODAY AND
+                    Programme__r.LMS_End_Date__c >= TODAY)
+                    OR
+                    (Temp_LMS_Start_Date__c <= TODAY AND
+                    Temp_LMS_End_Date__c >= TODAY)
+                )
         ];
         List <Object> apiResultList;
         List<String> errors = new List<String>();
