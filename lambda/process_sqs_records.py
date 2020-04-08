@@ -64,8 +64,13 @@ def lambda_handler(event, context):
                 SELECT Id,
                     ParticipantName__c
                 FROM Programme_Participant__c
-                WHERE Programme__r.LMS_Start_Date__c <= TODAY AND
-                    Programme__r.LMS_End_Date__c > TODAY AND
+                WHERE (
+                        (Programme__r.LMS_Start_Date__c <= TODAY AND
+                        Programme__r.LMS_End_Date__c >= TODAY)
+                        OR
+                        (Temp_LMS_Start_Date__c <= TODAY AND
+                        Temp_LMS_End_Date__c >= TODAY)
+                    )
                     Participant_UID__c = '%s'
             '''
 
