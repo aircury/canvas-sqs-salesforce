@@ -41,10 +41,6 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ECF_Reason_for_Withdrawal_Deferral__c</field>
-            </layoutItems>
-            <layoutItems>
-                <behavior>Edit</behavior>
                 <field>Temp_LMS_Start_Date__c</field>
             </layoutItems>
             <layoutItems>
@@ -189,6 +185,14 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
+                <field>Tribal_Regisration_Failed_Reason__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Tribal_Validation_Issue_Reason__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
                 <field>Eligible_for_Scholarship__c</field>
             </layoutItems>
             <layoutItems>
@@ -207,7 +211,23 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
+                <field>Date_extension_requested__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
                 <field>Extension_date__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Tribal_Registration_Failed_Status__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Tribal_Validation_Issue__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>QAA_Survey_completed__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
@@ -304,12 +324,14 @@
     </relatedLists>
     <relatedLists>
         <fields>NAME</fields>
-        <fields>Type__c</fields>
-        <fields>DfE_Index_Number__c</fields>
-        <fields>Status__c</fields>
-        <fields>Funding_Amount__c</fields>
-        <fields>Clawback_Amount__c</fields>
-        <fields>Funding_Date__c</fields>
+        <fields>DfE_scholarship_application_status__c</fields>
+        <fields>Ambition_Payment_status__c</fields>
+        <fields>Date_Submitted__c</fields>
+        <fields>DfE_Payment_Round__c</fields>
+        <fields>DfE_index_number__c</fields>
+        <fields>DfE_Date_scholarship_paid_by_DfE__c</fields>
+        <fields>Ambition_Payment_Amount__c</fields>
+        <fields>Ambition_Payment_Ambition_payment_round__c</fields>
         <relatedList>Scholarship__c.Participant__c</relatedList>
     </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
