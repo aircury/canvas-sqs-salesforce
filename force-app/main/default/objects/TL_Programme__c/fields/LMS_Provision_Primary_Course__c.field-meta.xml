@@ -4,6 +4,7 @@
     <defaultValue>true</defaultValue>
     <description>Controls if the automatic provision for the Primary Canvas course should happen or not</description>
     <externalId>false</externalId>
+    <inlineHelpText>Ticking this box will created a course on Canvas which is associated with his cohort and the ID will be recorded in the Primary Course ID field. These courses normally contain all the Canvas learning materials used on a direct programme.</inlineHelpText>
     <label>Provision Primary Canvas Course</label>
     <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
