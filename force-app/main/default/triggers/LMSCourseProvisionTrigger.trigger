@@ -2,7 +2,7 @@ trigger LMSCourseProvisionTrigger on TL_Programme__c (after insert, after update
     if (system.isFuture()) {
         return;
     }
-    
+
     for (Id courseId : Trigger.newMap.keySet() ) {
         if (Trigger.isInsert) {
             LMS.onCourseInsert(courseId);
@@ -17,10 +17,11 @@ trigger LMSCourseProvisionTrigger on TL_Programme__c (after insert, after update
             LMS.onCourseInsert(courseId);
         }
 
-        if (oldCourse.Programme_Name__c != newCourse.Programme_Name__c ||
+        if (newCourse.LMS_Course_Id__c && newCourse.LMS_Course_Section_Id__c &&
+            (oldCourse.Programme_Name__c != newCourse.Programme_Name__c ||
             oldCourse.Cohort_Name__c != newCourse.Cohort_Name__c ||
             oldCourse.LMS_Start_Date__c != newCourse.LMS_Start_Date__c ||
-            oldCourse.LMS_End_Date__c != newCourse.LMS_End_Date__c
+            oldCourse.LMS_End_Date__c != newCourse.LMS_End_Date__c)
         ) {
             LMS.onCourseUpdate(courseId);
         }
