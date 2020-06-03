@@ -54,7 +54,7 @@ def lambda_handler(event, context):
                 logging.error('Error mapping live event:\n%s' % str(e))
                 logging.error(payload)
                 continue
-            
+
             try:
                 uid, course_id, detail, activity, data = getattr(canvas_live_events, 'process_' + liveEvent)(actor, objectv, group)
                 logging.debug(detail)
@@ -89,17 +89,19 @@ def lambda_handler(event, context):
                             'Time__c': time,
                             'Programme_Participant__c': participant['Id']
                     })
-                    
+
                     if participant['Qualification__c'] == None:
                         continue
 
                     if NPQ_COURSES.get(str(course_id)) != participant['Qualification__c']:
                         continue
 
+                    assignment_name = str(data['assignment'].name).strip()
+
                     if activity == 'Submission Created':
                         sf.Assessment_Submission__c.create({
                             'Participant__c': participant['Id'],
-                            'Name': data['assignment'].name,
+                            'Name': assignment_name,
                             'Submission_Date__c': date
                         })
 
@@ -111,15 +113,15 @@ def lambda_handler(event, context):
                                   Name = '%s'
                         '''
 
-                        assessment_submissions = sf.query(query % (participant['Id'],  data['assignment'].name))
-                        
+                        assessment_submissions = sf.query(query % (participant['Id'],  assignment_name))
+
                         if assessment_submissions['totalSize'] == 0:
                             submission_data = {
                                 'Participant__c': participant['Id'],
-                                'Name': data['assignment'].name,
+                                'Name': assignment_name,
                                 'Submission_Date__c': date
                             }
-                            
+
                             if data['resubmission']:
                                 submission_data['Last_Resubmission_Date__c'] = date
 
@@ -131,17 +133,17 @@ def lambda_handler(event, context):
                                 '''
 
                                 graders = sf.query(query % data['grader'])
-                                
+
                                 if graders['totalSize'] > 0:
                                     submission_data['Marker__c'] = graders['records'][0]['Id']
-                            
+
                             sf.Assessment_Submission__c.create(submission_data)
 
                             continue
-                        
+
                         for assessment_submission in assessment_submissions['records']:
                             submission_data = {
-                                'Name': data['assignment'].name
+                                'Name': assignment_name
                             }
 
                             if data['resubmission']:
@@ -155,7 +157,7 @@ def lambda_handler(event, context):
                                 '''
 
                                 graders = sf.query(query % data['grader'])
-                                
+
                                 if graders['totalSize'] > 0:
                                     submission_data['Marker__c'] = graders['records'][0]['Id']
 
@@ -163,7 +165,7 @@ def lambda_handler(event, context):
 
             if not data:
                 continue
-            
+
             query = '''
                 SELECT Id
                 FROM Attendees__c
@@ -178,7 +180,7 @@ def lambda_handler(event, context):
 
             if attendees['totalSize'] <= 0:
                 continue
-            
+
             for attendee in attendees['records']:
                 sf.Attendees__c.update(attendee['Id'], {'Event_Attended__c': True})
 
