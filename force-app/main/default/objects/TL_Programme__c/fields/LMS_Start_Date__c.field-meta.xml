@@ -2,6 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>LMS_Start_Date__c</fullName>
     <externalId>false</externalId>
+    <inlineHelpText>Please note that access to Canvas can also be set on the Programme Participant object if it is not required by the whole cohort. Giving access at a participant level is a more cost effective use of Canvas licences</inlineHelpText>
     <label>Canvas Start Date</label>
     <required>false</required>
     <trackHistory>false</trackHistory>
