@@ -176,7 +176,7 @@ def lambda_handler(event, context):
                     FLIP_Event__r.Event_Full_Name__c = '%s'
             '''
 
-            attendees = sf.query(query % (uid, data['event_name']))
+            attendees = sf.query(query % (uid, str(data['event_name']).strip()))
 
             if attendees['totalSize'] <= 0:
                 continue
