@@ -9,7 +9,7 @@
 */
 public with sharing class CanvasAPI {
     /* Sample test code:
-        CanvasAPI.createCourse('Test Course', 'Test', 
+        CanvasAPI.createCourse('Test Course', 'Test',
             DateTime.newInstance(2019, 3, 30), DateTime.newInstance(2019, 4, 30));
     */
     public static Map <String, Object> createCourse(String name, String code, DateTime startAt, DateTime endAt) {
@@ -24,7 +24,7 @@ public with sharing class CanvasAPI {
             '&course[term_id]=' + //empty to set "Default term"
             '&course[time_zone]=Europe/London' +
             '&course[course_format]=blended';
-        
+
         if (null != startAt) {
             body += '&course[start_at]=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
         }
@@ -37,7 +37,7 @@ public with sharing class CanvasAPI {
     }
 
     /* Sample test code:
-        CanvasAPI.updateCourse('37', 'Test Course', 'Test', 
+        CanvasAPI.updateCourse('37', 'Test Course', 'Test',
             DateTime.newInstance(2019, 3, 30), DateTime.newInstance(2019, 4, 30));
     */
     public static Map <String, Object> updateCourse(String courseId, String name, String code, DateTime startAt, DateTime endAt) {
@@ -52,18 +52,18 @@ public with sharing class CanvasAPI {
         if (null != endAt) {
             body += '&course[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
         }
-        
+
         return (Map <String, Object>) apiCall('PUT', 'courses/' + courseId, body);
     }
 
     /* Sample test code:
-        CanvasAPI.createSection('Test Course', '91', 
+        CanvasAPI.createSection('Test Course', '91',
             DateTime.newInstance(2019, 3, 30), DateTime.newInstance(2019, 4, 30));
     */
     public static Map <String, Object> createSection(String name, String courseId, DateTime startAt, DateTime endAt) {
         String body =
             'course_section[name]=' + name;
-        
+
         if (null != startAt) {
             body += '&course_section[start_at]=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
         }
@@ -76,7 +76,7 @@ public with sharing class CanvasAPI {
     }
 
     /* Sample test code:
-        CanvasAPI.updateSection('13', 'Test Course', '91', 
+        CanvasAPI.updateSection('13', 'Test Course', '91',
             DateTime.newInstance(2019, 3, 30), DateTime.newInstance(2019, 4, 30));
     */
     public static Map <String, Object> updateSection(String sectionId, String name, DateTime startAt, DateTime endAt) {
@@ -90,7 +90,7 @@ public with sharing class CanvasAPI {
         if (null != endAt) {
             body += '&course_section[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'');
         }
-        
+
         return (Map <String, Object>) apiCall('PUT', 'sections/' + sectionId, body);
     }
 
@@ -119,8 +119,8 @@ public with sharing class CanvasAPI {
         CanvasAPI.createUser('test@example.org', 'Test User', 'Test Short Name', 'participant123');
     */
     public static Map <String, Object> createUser(String email, String name, String shortName, String participantUID) {
-        String body = 
-            'pseudonym[unique_id]=' + email + 
+        String body =
+            'pseudonym[unique_id]=' + email +
             '&user[name]=' + name +
             '&user[short_name]=' + (null != shortName ? shortName : name) +
             '&user[time_zone]=Europe/London' +
@@ -146,10 +146,10 @@ public with sharing class CanvasAPI {
 
         return result;
     }
-    
+
     public static Map <String, Object> createCommunicationChannel(String participantUID, String email) {
-        String body = 
-            'communication_channel[address]=' + email + 
+        String body =
+            'communication_channel[address]=' + email +
             '&communication_channel[type]=email' +
             '&skip_confirmation=true';
 
@@ -171,7 +171,7 @@ public with sharing class CanvasAPI {
     }
 
     public static Map <String, Object> updateUser(String participantUID, String name, String shortName) {
-        String body = 
+        String body =
             'user[name]=' + name +
             '&user[short_name]=' + (null != shortName ? shortName : name);
 
@@ -188,8 +188,8 @@ public with sharing class CanvasAPI {
         CanvasAPI.findUserByUID('123456');
     */
     public static List <Object> findUserByUID(String participantUID) {
-        String query = 
-            '?search_term=' + participantUID + 
+        String query =
+            '?search_term=' + participantUID +
             '&sort=sis_id';
 
         return (List <Object>) apiCall('GET', 'accounts/:account_id/users' + query, '');
@@ -206,9 +206,9 @@ public with sharing class CanvasAPI {
         CanvasAPI.findEnrollmentId('19', '60');
     */
     public static List <Object> findEnrollmentId(String userId, String courseSectionId) {
-        String query = 
-            '?user_id=' + userId + 
-            '&state[]=active' + 
+        String query =
+            '?user_id=' + userId +
+            '&state[]=active' +
             '&state[]=inactive';
 
         return (List <Object>) apiCall('GET', 'sections/' + courseSectionId + '/enrollments' + query, '');
@@ -261,9 +261,9 @@ public with sharing class CanvasAPI {
         DateTime endAt,
         String address
     ) {
-        String body = 
+        String body =
             'calendar_event[context_code]=' + context + '_' + id +
-            '&calendar_event[title]=' + title + 
+            '&calendar_event[title]=' + title +
             '&calendar_event[description]=' + description +
             '&calendar_event[start_at]=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
             '&calendar_event[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
@@ -282,8 +282,8 @@ public with sharing class CanvasAPI {
             DateTime.newInstance(2019, 3, 30, 12, 0, 0));
     */
     public static List <Object> listUserEvents(String userId, DateTime startAt, DateTime endAt) {
-        String query = 
-            '?start_date=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') + 
+        String query =
+            '?start_date=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
             '&end_date=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
             '&as_user_id=' + userId;
 
@@ -336,8 +336,13 @@ public with sharing class CanvasAPI {
         }
 
         Http http = new Http();
+        HTTPResponse res;
 
-        HTTPResponse res = http.send(req);
+        if (Test.isRunningTest()) {
+            res = LMSTest.apiMock.respond(req);
+        } else {
+            res = http.send(req);
+        }
 
         String resBody = res.getBody();
         String status = res.getStatus();

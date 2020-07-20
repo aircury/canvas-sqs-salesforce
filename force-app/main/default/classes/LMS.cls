@@ -3,9 +3,9 @@
  * Date           Developer   Comment
  * 19-06-2019     Ekta        Updated onParticipantNameChange method parameter from ID to Set<ID>
  * 							  to avoid Too many future calls: 51 and solve the Dataloader Error Case.
- * 	
- * 	 
-*/ 
+ *
+ *
+*/
 
 public with sharing class LMS {
     /* Sample test code:
@@ -43,7 +43,6 @@ public with sharing class LMS {
             );
         }
 
-        
         if (null != programme.LMS_Course_Id__c) {
             try {
                 CanvasAPI.findCourseById(String.valueOf(programme.LMS_Course_Id__c));
@@ -73,7 +72,7 @@ public with sharing class LMS {
     */
     // public static void deleteCourse(TL_Programme__c p) {
     //     TL_Programme__c programme = [
-    //         SELECT LMS_Course_Id__c 
+    //         SELECT LMS_Course_Id__c
     //         FROM TL_Programme__c
     //         WHERE Id = :p.Id
     //     ][0];
@@ -93,7 +92,7 @@ public with sharing class LMS {
     //     Boolean providerFound = false;
     //     List <Object> apiResultList = CanvasAPI.listUserLogins(userId);
     //     List <String[]> loginsToRemove = new List <String[]>();
-        
+
     //     for (Object result: apiResultList) {
     //         Map <String, Object> login = (Map <String, Object>) result;
     //         String providerType = String.valueOf(login.get('authentication_provider_type'));
@@ -134,7 +133,7 @@ public with sharing class LMS {
         ];
 
         LMSParticipantStatusChangeJob job = new LMSParticipantStatusChangeJob(participants, new LMSEventInsertJob(attendees, null));
-        
+
         Database.executeBatch(job, job.batchSize());
     }
 
@@ -172,14 +171,14 @@ public with sharing class LMS {
                     OR
                     (Temp_LMS_Start_Date__c <= TODAY AND
                     Temp_LMS_End_Date__c >= TODAY)
-                )                
+                )
         ];
         CanvasAPISettings__c customSettings = CanvasAPISettings__c.getOrgDefaults();
         Decimal NPQELSectionId = null == customSettings.NPQEL_Course_Section_Id__c ? 481 : customSettings.NPQEL_Course_Section_Id__c;
         Decimal NPQHSectionId = null == customSettings.NPQH_Course_Section_Id__c ? 482 : customSettings.NPQH_Course_Section_Id__c;
         Decimal NPQMLSectionId = null == customSettings.NPQML_Course_Section_Id__c ? 484 : customSettings.NPQML_Course_Section_Id__c;
         Decimal NPQSLSectionId = null == customSettings.NPQSL_Course_Section_Id__c ? 483 : customSettings.NPQSL_Course_Section_Id__c;
-        
+
         for (Programme_Participant__c participant: participants) {
             Contact c = participant.Participant__r;
             TL_Programme__c programme = participant.Programme__r;
@@ -250,7 +249,7 @@ public with sharing class LMS {
         }
 
         apiResult = (Map <String, Object>) apiResultList[0];
-        
+
         if (desiredState != String.valueOf(apiResult.get('enrollment_state'))) {
             return;
         }
@@ -319,7 +318,7 @@ public with sharing class LMS {
                 )
         ];
         List<String> errors = new List<String>();
-        
+
         for (Programme_Participant__c participant: participants) {
             TL_Programme__c programme = participant.Programme__r;
             Contact c = participant.Participant__r;
@@ -420,7 +419,7 @@ public with sharing class LMS {
         String NPQHSectionId = null == customSettings.NPQH_Course_Section_Id__c ? '482' : customSettings.NPQH_Course_Section_Id__c.format();
         String NPQMLSectionId = null == customSettings.NPQML_Course_Section_Id__c ? '484' : customSettings.NPQML_Course_Section_Id__c.format();
         String NPQSLSectionId = null == customSettings.NPQSL_Course_Section_Id__c ? '483' : customSettings.NPQSL_Course_Section_Id__c.format();
-        
+
         for (Programme_Participant__c participant: participants) {
             TL_Programme__c programme = participant.Programme__r;
             Contact c = participant.Participant__r;
@@ -455,7 +454,7 @@ public with sharing class LMS {
             apiResult = (Map <String, Object>) apiResultList[0];
 
             userId = String.valueOf(apiResult.get('id'));
-    
+
             switch on participant.Qualification__c {
                 when 'NPQEL' {
                     sectionId = NPQELSectionId;
@@ -503,7 +502,7 @@ public with sharing class LMS {
                     Temp_LMS_End_Date__c >= TODAY)
                 )
         ];
-        
+
         for (Programme_Participant__c participant: participants) {
             Contact c = participant.Participant__r;
 
@@ -524,7 +523,7 @@ public with sharing class LMS {
             CanvasAPI.createCommunicationChannel(c.Participant_UID__c, newEmail);
 
             CanvasAPI.updateUserEmail(c.Participant_UID__c, newEmail);
-            
+
             //Update user login
             List<Object> apiResultList = CanvasAPI.listUserLogins(c.Participant_UID__c);
 
@@ -538,8 +537,8 @@ public with sharing class LMS {
             break;
         }
     }
-    
-    
+
+
 	//Updated method parameter from ID to Set<ID> to avoid Too many future calls: 51 and solve the Dataloader Error Case.
     public static List<String> doParticipantNameChange(Set<ID> participantId) {
         List<Programme_Participant__c> participants = [
@@ -708,7 +707,7 @@ public with sharing class LMS {
             Contact c = attendee.Contact__r;
             DateTime startAt = getEventDateTime(event.Event_Date__c, event.Start_Time__c);
             DateTime endAt = getEventDateTime(event.Event_End_Date__c, event.End_Time__c);
-            
+
             apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
 
             if (0 == apiResultList.size()) {
@@ -730,7 +729,7 @@ public with sharing class LMS {
 
             userId = String.valueOf(apiResult.get('id'));
             title = null == event.Event_Full_Name__c ? '' : event.Event_Full_Name__c;
-            description = null == event.Event_Description_Rich__c ? '' : event.Event_Description_Rich__c;
+            description = null == event.Event_Description_Rich__c ? '' : event.Event_Description_Rich__c.unescapeHtml4();
             address = null == event.Delivery_Address__c ? '' : event.Delivery_Address__c.stripHTMLTags();
             CanvasAPI.createEvent('user', userId, userId, title, description, startAt, endAt, address);
         }
@@ -766,7 +765,7 @@ public with sharing class LMS {
             startAt = null == startAt ? getEventDateTime(event.Event_Date__c, event.Start_Time__c) : startAt;
             endAt = null == endAt ? getEventDateTime(event.Event_End_Date__c, event.End_Time__c) : endAt;
             eventName = null == eventName ? event.Event_Full_Name__c : eventName;
-            
+
             apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
 
             if (0 == apiResultList.size()) {
@@ -776,7 +775,7 @@ public with sharing class LMS {
             apiResult = (Map <String, Object>) apiResultList[0];
 
             userId = String.valueOf(apiResult.get('id'));
-            
+
             apiResultList = CanvasAPI.listUserEvents(userId, startAt, endAt);
 
             for (Object result: apiResultList) {

@@ -3,17 +3,17 @@ private class LMSTest {
     static Programme_Definition__c prDef;
     static Opportunity o;
     static Contact c1, c2;
-    static CanvasAPIMock apiMock;
+    public static CanvasAPIMock apiMock;
     static {
         apiMock = new CanvasAPIMock();
         Test.setMock(HttpCalloutMock.class, apiMock);
 
         prDef = new Programme_Definition__c(Programme__c='Test', Status__c='Active');
         insert prDef;
-        
+
         Account a = new Account(Name='TestAccount');
         insert a;
-        
+
         c1 = new Contact(FirstName = 'Test', LastName= 'Test', AccountId = a.Id, Email='test1@example.org');
         insert c1;
 
@@ -86,10 +86,10 @@ private class LMSTest {
             Qualification__c='NPQH'
         );
         insert participant;
-        
+
         Test.stopTest();
     }
-    
+
     @isTest private static void TestLMSProgrammeParticipantStatusTriggerName() {
         TL_Programme__c cohort = new TL_Programme__c(
             Programme_Definition__c=prDef.Id,
@@ -108,7 +108,7 @@ private class LMSTest {
             Status__c='Active'
         );
         insert participant;
-        
+
         Test.startTest();
 
         participant.ParticipantName__c = 'New Name';
@@ -138,9 +138,9 @@ private class LMSTest {
         );
         apiMock.setEmptySearch(true);
         insert participant;
-       
+
         Test.startTest();
-        
+
         participant.Status__c='Inactive';
         update participant;
 
@@ -166,9 +166,9 @@ private class LMSTest {
             Status__c='Active'
         );
         insert participant;
-       
+
         Test.startTest();
-        
+
         c1.Email = 'test11@example.org';
         update c1;
 
@@ -193,9 +193,9 @@ private class LMSTest {
             Status__c='Active'
         );
         insert participant;
-       
+
         Test.startTest();
-        
+
         participant.Status__c='Complete';
         update participant;
 
@@ -221,9 +221,9 @@ private class LMSTest {
             NPQ_Status__c='Active'
         );
         insert participant;
-       
+
         Test.startTest();
-        
+
         participant.Qualification__c='NPQH';
         update participant;
 
@@ -349,7 +349,7 @@ private class LMSTest {
             Participant__c=c1.Id,
             Status__c='Active'
         );
-        
+
         insert participant;
 
         Test.startTest();
@@ -397,7 +397,7 @@ private class LMSTest {
             Participant__c=c1.Id,
             Status__c='Active'
         );
-        
+
         insert participant;
 
         Test.startTest();
@@ -424,11 +424,11 @@ private class LMSTest {
             Participant__c=c1.Id,
             Status__c='Active'
         );
-        
+
         insert participant;
-        
+
         Test.startTest();
-        
+
         Assessment_Submission__c submission = new Assessment_Submission__c(
             Participant__c=participant.Id,
             Submission_Date__c=Date.today(),
@@ -440,7 +440,7 @@ private class LMSTest {
         submission.Marker__c = c1.Id;
 
         update submission;
-        
+
         Test.stopTest();
     }
 

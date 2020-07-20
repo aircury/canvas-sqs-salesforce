@@ -3,3 +3,6 @@ apex_tests:
 
 apex_deploy:
 	sfdx force:source:deploy --sourcepath force-app
+
+production_deploy:
+	sfdx force:source:deploy --checkonly -m ApexClass:LMS,ApexClass:LMSTest,ApexClass:CanvasAPI --testlevel RunSpecifiedTests -r LMSTest
