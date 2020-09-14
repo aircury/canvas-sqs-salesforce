@@ -1,4 +1,3 @@
-from __future__ import print_function
 from simple_salesforce import Salesforce, SalesforceLogin
 
 import os
@@ -57,7 +56,7 @@ def lambda_handler(event, context):
 
             try:
                 uid, course_id, detail, activity, data = getattr(canvas_live_events, 'process_' + liveEvent)(actor, objectv, group)
-                logging.debug(detail)
+                logging.info(detail)
             except AttributeError as e:
                 logging.warning('process_%s not implemented yet' % liveEvent)
                 logging.warning(payload)
@@ -96,7 +95,7 @@ def lambda_handler(event, context):
                     if NPQ_COURSES.get(str(course_id)) != participant['Qualification__c']:
                         continue
 
-                    assignment_name = str(data['assignment'].name).strip()
+                    assignment_name = str(data['assignment'].name).strip()[:80]
 
                     if activity == 'Submission Created':
                         sf.Assessment_Submission__c.create({
