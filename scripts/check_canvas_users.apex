@@ -9,22 +9,26 @@ Programme__r.LMS_End_Date__c >= TODAY AND
 ];
 
 List<Programme_Participant__c> canvas_users = new List<Programme_Participant__c>();
-Integer i = 0, start = 1300, maxIterations = 100;
+Integer i = 0, start = 2000, maxIterations = 100;
 
-System.debug(LoggingLevel.INFO, 'Participants: ' + participants.size());
+// System.debug(LoggingLevel.INFO, 'Participants: ' + participants.size());
 
 for (Programme_Participant__c participant: participants) {
     if (i < start) {
         i = i + 1;
         continue;
     }
+
     if (i >= (start+maxIterations)) {
         break;
     }
+
     Contact c = participant.Participant__r;
     List <Object> apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
+
     if (0 == apiResultList.size()) {
-        System.debug(LoggingLevel.INFO, 'Non existent user ' + start + '-' + (start+maxIterations) + ': ' + c.Participant_UID__c + ' ' + c.Email + ' ' + participant.Programme__r.Name);
+        System.debug(LoggingLevel.INFO, 'Non existent user: ' + participant.Programme__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email);
     }
+
     i = i + 1;
 }

@@ -11,7 +11,7 @@ WHERE LMS_Access__c = true AND
     LMS_Course_Id__c != null
 ];
 
-System.debug(LoggingLevel.INFO, 'Programmes: ' + programmes.size());
+// System.debug(LoggingLevel.INFO, 'Programmes: ' + programmes.size());
 
 for (TL_Programme__c programme: programmes) {
     try {
