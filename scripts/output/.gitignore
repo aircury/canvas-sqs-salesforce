@@ -1,2 +1,2 @@
-*/*.out.*
-*/checks.log
+*/*.out*
+*/*.log
