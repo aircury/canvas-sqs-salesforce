@@ -1,5 +1,7 @@
 List<Attendees__c> attendees = [
-SELECT FLIP_Event__r.Cohort_lkp__r.Name,
+SELECT
+    Id,
+    FLIP_Event__r.Cohort_lkp__r.Name,
     Contact__r.Email,
     Contact__r.Name,
     Contact__r.Participant_UID__c,
@@ -11,6 +13,7 @@ SELECT FLIP_Event__r.Cohort_lkp__r.Name,
 FROM Attendees__c
 WHERE
     FLIP_Event__r.Cohort_lkp__r.LMS_Access__c = true AND
+    FLIP_Event__r.Cohort_lkp__r.LMS_Provision_Primary_Course__c = true AND
     FLIP_Event__r.Send_to_LMS__c = true AND
     FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c <= TODAY AND
     FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c > TODAY AND
@@ -18,8 +21,8 @@ WHERE
     Contact__r.Email != null
 ];
 
-List<Attendees__c> canvas_attendees = new List<Attendees__c>();
-Integer i = 0, start = 6501, maxIterations = 33;
+List<Attendees__c> attendeesWithMissingEvents = new List<Attendees__c>();
+Integer i = 0, start = 6996, maxIterations = 33;
 List <Object> apiResultList;
 Map <String, Object> apiResult;
 String userId;
@@ -47,6 +50,7 @@ for (Attendees__c attendee: attendees) {
 
     if (0 == apiResultList.size()) {
         System.debug(LoggingLevel.INFO, 'Non existent attendee: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Event_Full_Name__c);
+        attendeesWithMissingEvents.add(attendee);
         continue;
     }
 
@@ -56,6 +60,7 @@ for (Attendees__c attendee: attendees) {
     apiResultList = CanvasAPI.listUserEvents(userId, startAt, endAt);
     if (0 == apiResultList.size()) {
         System.debug(LoggingLevel.INFO, 'Non existent user calendar event: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Event_Full_Name__c);
+        attendeesWithMissingEvents.add(attendee);
     } else {
         Set<Object> eventNames = new Set<Object>();
 
@@ -70,9 +75,17 @@ for (Attendees__c attendee: attendees) {
 
             if (apiResult.get('title') != event.Event_Full_Name__c) {
                 System.debug(LoggingLevel.INFO, 'User calendar event name (' + apiResult.get('title') + ') doesn\'t match: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Event_Full_Name__c + ' ' + eventId);
+                CanvasAPI.removeUserEvent(userId, eventId);
+                attendeesWithMissingEvents.add(attendee);
             }
 
             eventNames.add(apiResult.get('title'));
         }
     }
+}
+
+if (attendeesWithMissingEvents.size() > 0) {
+    LMSEventInsertJob job = new LMSEventInsertJob(attendeesWithMissingEvents, null);
+
+    Database.executeBatch(job, job.batchSize());
 }
