@@ -3,7 +3,7 @@ List<AsyncApexJob> jobs = [
     FROM AsyncApexJob
     WHERE ApexClass.Name LIKE '%LMS%'
         AND (Status = 'Failed' or NumberOfErrors > 0)
-        AND CompletedDate < TODAY
+        AND CompletedDate <= TODAY
         AND CompletedDate >= YESTERDAY
 ];
 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 output_dir=output/$(date +"%Y_%m_%d")
 

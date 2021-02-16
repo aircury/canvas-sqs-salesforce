@@ -1,5 +1,7 @@
 List<Attendees__c> attendees = [
-SELECT FLIP_Event__r.Cohort_lkp__r.Name,
+SELECT
+    Id,
+    FLIP_Event__r.Cohort_lkp__r.Name,
     Contact__r.Email,
     Contact__r.Name,
     Contact__r.Participant_UID__c,
@@ -11,6 +13,7 @@ SELECT FLIP_Event__r.Cohort_lkp__r.Name,
 FROM Attendees__c
 WHERE
     FLIP_Event__r.Cohort_lkp__r.LMS_Access__c = true AND
+    FLIP_Event__r.Cohort_lkp__r.LMS_Provision_Primary_Course__c = true AND
     FLIP_Event__r.Send_to_LMS__c = true AND
     FLIP_Event__r.Cohort_lkp__r.LMS_Start_Date__c <= TODAY AND
     FLIP_Event__r.Cohort_lkp__r.LMS_End_Date__c > TODAY AND

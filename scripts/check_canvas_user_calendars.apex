@@ -22,10 +22,11 @@ WHERE
 ];
 
 List<Attendees__c> attendeesWithMissingEvents = new List<Attendees__c>();
-Integer i = 0, start = 6996, maxIterations = 33;
+Integer i = 0, start = 0, maxIterations = 33;
 List <Object> apiResultList;
 Map <String, Object> apiResult;
-String userId;
+Boolean fix = True;
+String userId, sisId;
 
 // System.debug(LoggingLevel.INFO, 'Attendees: ' + attendees.size() + ' ' + String.valueOf(start) + '..' + String.valueOf(start+maxIterations));
 
@@ -50,7 +51,44 @@ for (Attendees__c attendee: attendees) {
 
     if (0 == apiResultList.size()) {
         System.debug(LoggingLevel.INFO, 'Non existent attendee: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Event_Full_Name__c);
-        attendeesWithMissingEvents.add(attendee);
+
+        apiResultList = CanvasAPI.findUserByUID(c.Email);
+
+        if (0 == apiResultList.size()) {
+            System.debug(LoggingLevel.INFO, 'Email not found on Canvas: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email);
+            continue;
+        }
+
+        if (apiResultList.size() > 1) {
+            System.debug(LoggingLevel.INFO, 'Repeated email on Canvas: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email);
+            continue;
+        }
+
+        apiResult = (Map <String, Object>) apiResultList[0];
+
+        sisId = String.valueOf(apiResult.get('sis_user_id'));
+        userId = String.valueOf(apiResult.get('id'));
+
+        if (c.Participant_UID__c != sisId) {
+            System.debug(LoggingLevel.INFO, 'Participant UID doesn\'t match with Canvas SIS user id: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + sisId);
+
+            if (fix) {
+                CanvasAPI.listUserLoginsByUserId(userId);
+                apiResultList = CanvasAPI.listUserLoginsByUserId(userId);
+
+                for (Object result: apiResultList) {
+                    Map <String, Object> apiResult = (Map <String, Object>) result;
+                    if (c.Email == String.valueOf(apiResult.get('unique_id'))) {
+                        CanvasAPI.editUserSISId(String.valueOf(apiResult.get('id')), c.Participant_UID__c);
+                    }
+                }
+            }
+        }
+
+        if (fix) {
+            attendeesWithMissingEvents.add(attendee);
+        }
+
         continue;
     }
 
@@ -60,7 +98,10 @@ for (Attendees__c attendee: attendees) {
     apiResultList = CanvasAPI.listUserEvents(userId, startAt, endAt);
     if (0 == apiResultList.size()) {
         System.debug(LoggingLevel.INFO, 'Non existent user calendar event: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Event_Full_Name__c);
-        attendeesWithMissingEvents.add(attendee);
+
+        if (fix) {
+            attendeesWithMissingEvents.add(attendee);
+        }
     } else {
         Set<Object> eventNames = new Set<Object>();
 
@@ -70,13 +111,19 @@ for (Attendees__c attendee: attendees) {
 
             if (eventNames.contains(apiResult.get('title'))) {
                 System.debug(LoggingLevel.INFO, 'User calendar event name duplicated: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Event_Full_Name__c + ' ' + eventId);
-                CanvasAPI.removeUserEvent(userId, eventId);
+
+                if (fix) {
+                    CanvasAPI.removeUserEvent(userId, eventId);
+                }
             }
 
             if (apiResult.get('title') != event.Event_Full_Name__c) {
                 System.debug(LoggingLevel.INFO, 'User calendar event name (' + apiResult.get('title') + ') doesn\'t match: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Event_Full_Name__c + ' ' + eventId);
-                CanvasAPI.removeUserEvent(userId, eventId);
-                attendeesWithMissingEvents.add(attendee);
+
+                if (fix) {
+                    CanvasAPI.removeUserEvent(userId, eventId);
+                    attendeesWithMissingEvents.add(attendee);
+                }
             }
 
             eventNames.add(apiResult.get('title'));
