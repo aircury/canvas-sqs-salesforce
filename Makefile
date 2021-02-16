@@ -5,4 +5,4 @@ apex_deploy:
 	sfdx force:source:deploy --sourcepath force-app
 
 production_deploy:
-	sfdx force:source:deploy --checkonly -m ApexClass:LMS,ApexClass:LMSTest,ApexClass:CanvasAPI --testlevel RunSpecifiedTests -r LMSTest
+	sfdx force:source:deploy --targetusername production --checkonly -m ApexClass:LMS,ApexClass:LMSTest,ApexClass:CanvasAPI --testlevel RunSpecifiedTests -r LMSTest

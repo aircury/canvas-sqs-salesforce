@@ -237,11 +237,21 @@ public with sharing class CanvasAPI {
         return (List <Object>) apiCall('GET', 'users/sis_user_id:' + participantUID + '/logins', '');
     }
 
+    public static List <Object> listUserLoginsByUserId(String userId) {
+        return (List <Object>) apiCall('GET', 'users/' + userId + '/logins', '');
+    }
+
     /* Sample test code:
         CanvasAPI.editUserLogin('123', 'test@example.org');
     */
     public static Map <String, Object> editUserLogin(String loginId, String email) {
         String body = 'login[unique_id]=' + email;
+
+        return (Map <String, Object>) apiCall('PUT', 'accounts/:account_id/logins/' + loginId, body);
+    }
+
+    public static Map <String, Object> editUserSISId(String loginId, String sisId) {
+        String body = 'login[sis_user_id]=' + sisId;
 
         return (Map <String, Object>) apiCall('PUT', 'accounts/:account_id/logins/' + loginId, body);
     }
@@ -264,7 +274,7 @@ public with sharing class CanvasAPI {
         String body =
             'calendar_event[context_code]=' + context + '_' + id +
             '&calendar_event[title]=' + title +
-            '&calendar_event[description]=' + description +
+            '&calendar_event[description]=' + EncodingUtil.urlEncode(description, 'UTF-8') +
             '&calendar_event[start_at]=' + startAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
             '&calendar_event[end_at]=' + endAt.formatGMT('yyyy-MM-dd\'T\'HH:mm:ss.SSS\'Z\'') +
             '&calendar_event[location_address]=' + address;
