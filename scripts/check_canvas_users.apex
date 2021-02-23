@@ -17,11 +17,12 @@ List<Programme_Participant__c> participants = [
             (Temp_LMS_Start_Date__c <= TODAY AND
             Temp_LMS_End_Date__c >= TODAY)
         ) AND
-        (Status__c = 'Active' OR Status__c = 'Inactive')
+        (Status__c = 'Active' OR Status__c = 'Inactive') AND
+        Programme__r.LMS_Provision_Primary_Course__c = true
 ];
 
 List<Programme_Participant__c> missingParticipants = new List<Programme_Participant__c>();
-Integer i = 0, start = 0, maxIterations = 100;
+Integer i = 0, start = 0, maxIterations = 33;
 Map <String, Object> apiResult;
 Boolean fix = True;
 String userId, sectionId, sisId;
@@ -41,8 +42,6 @@ for (Programme_Participant__c participant: participants) {
     Contact c = participant.Participant__r;
     List <Object> apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
     TL_Programme__c programme = participant.Programme__r;
-    apiResult = (Map <String, Object>) apiResultList[0];
-    userId = String.valueOf(apiResult.get('id'));
 
     i = i + 1;
 
@@ -53,6 +52,11 @@ for (Programme_Participant__c participant: participants) {
 
         if (0 == apiResultList.size()) {
             System.debug(LoggingLevel.INFO, 'Email not found on Canvas: ' + participant.Programme__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email);
+
+            if (fix) {
+                missingParticipants.add(participant);
+            }
+
             continue;
         }
 
@@ -64,9 +68,21 @@ for (Programme_Participant__c participant: participants) {
         apiResult = (Map <String, Object>) apiResultList[0];
 
         sisId = String.valueOf(apiResult.get('sis_user_id'));
+        userId = String.valueOf(apiResult.get('id'));
 
         if (c.Participant_UID__c != sisId) {
-            System.debug(LoggingLevel.INFO, 'Participant UID doesnt match with Canvas SIS user id: ' + participant.Programme__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + sisId);
+            System.debug(LoggingLevel.INFO, 'Participant UID doesn\'t match with Canvas SIS user id: ' + participant.Programme__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + sisId);
+
+            if (fix) {
+                apiResultList = CanvasAPI.listUserLoginsByUserId(userId);
+
+                for (Object result: apiResultList) {
+                    Map <String, Object> apiResult = (Map <String, Object>) result;
+                    if (c.Email == String.valueOf(apiResult.get('unique_id'))) {
+                        CanvasAPI.editUserSISId(String.valueOf(apiResult.get('id')), c.Participant_UID__c);
+                    }
+                }
+            }
         }
 
         if (fix) {
@@ -75,6 +91,9 @@ for (Programme_Participant__c participant: participants) {
 
         continue;
     }
+
+    apiResult = (Map <String, Object>) apiResultList[0];
+    userId = String.valueOf(apiResult.get('id'));
 
     for (Decimal sectionIdInt: new List<Decimal>{
         programme.LMS_Course_Section_Id__c,

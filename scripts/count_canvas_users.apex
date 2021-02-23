@@ -16,7 +16,8 @@ List<Programme_Participant__c> participants = [
             (Temp_LMS_Start_Date__c <= TODAY AND
             Temp_LMS_End_Date__c >= TODAY)
         ) AND
-        (Status__c = 'Active' OR Status__c = 'Inactive')
+        (Status__c = 'Active' OR Status__c = 'Inactive') AND
+        Programme__r.LMS_Provision_Primary_Course__c = true
 ];
 
 System.debug(LoggingLevel.INFO, 'Participants: ' + participants.size());

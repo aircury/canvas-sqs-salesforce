@@ -73,7 +73,6 @@ for (Attendees__c attendee: attendees) {
             System.debug(LoggingLevel.INFO, 'Participant UID doesn\'t match with Canvas SIS user id: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + sisId);
 
             if (fix) {
-                CanvasAPI.listUserLoginsByUserId(userId);
                 apiResultList = CanvasAPI.listUserLoginsByUserId(userId);
 
                 for (Object result: apiResultList) {
