@@ -4,7 +4,7 @@ global class LMSEventInsertJob extends LMSAbstractJob {
     }
 
     global override Integer batchSize() {
-        return 25; //doEventInsert can do 4 callouts at max, so 25*4 = 100 <= 100 callout limit
+        return 20; //doEventInsert can do 5 callouts at max, so 20*5 = 100 <= 100 callout limit
     }
     global override String emailSubject() {
         return 'Canvas Calendar Events Insert Job ';

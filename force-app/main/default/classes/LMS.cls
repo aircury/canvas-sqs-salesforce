@@ -707,6 +707,7 @@ public with sharing class LMS {
             Contact c = attendee.Contact__r;
             DateTime startAt = getEventDateTime(event.Event_Date__c, event.Start_Time__c);
             DateTime endAt = getEventDateTime(event.Event_End_Date__c, event.End_Time__c);
+            boolean alreadyExisting = false;
 
             apiResultList = CanvasAPI.findUserByUID(c.Participant_UID__c);
 
@@ -731,7 +732,19 @@ public with sharing class LMS {
             title = null == event.Event_Full_Name__c ? '' : event.Event_Full_Name__c;
             description = null == event.Event_Description_Rich__c ? '' : event.Event_Description_Rich__c.unescapeHtml4();
             address = null == event.Delivery_Address__c ? '' : event.Delivery_Address__c.stripHTMLTags();
-            CanvasAPI.createEvent('user', userId, userId, title, description, startAt, endAt, address);
+            apiResultList = CanvasAPI.listUserEvents(userId, startAt, endAt);
+
+            for (Object result: apiResultList) {
+                Map <String, Object> apiEvent = (Map <String, Object>) result;
+
+                if (title == apiEvent.get('title')) {
+                    alreadyExisting = true;
+                }
+            }
+
+            if (!alreadyExisting) {
+                CanvasAPI.createEvent('user', userId, userId, title, description, startAt, endAt, address);
+            }
         }
 
         return new List<String>();
