@@ -9,7 +9,8 @@ SELECT
     FLIP_Event__r.Event_End_Date__c,
     FLIP_Event__r.Start_Time__c,
     FLIP_Event__r.End_Time__c,
-    FLIP_Event__r.Event_Full_Name__c
+    FLIP_Event__r.Event_Full_Name__c,
+    FLIP_Event__r.Name
 FROM Attendees__c
 WHERE
     FLIP_Event__r.Cohort_lkp__r.LMS_Access__c = true AND
@@ -50,17 +51,22 @@ for (Attendees__c attendee: attendees) {
     i = i + 1;
 
     if (0 == apiResultList.size()) {
-        System.debug(LoggingLevel.INFO, 'Non existent attendee: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Event_Full_Name__c);
+        System.debug(LoggingLevel.INFO, 'Non existent attendee: ' + event.Name + ' ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Event_Full_Name__c);
 
         apiResultList = CanvasAPI.findUserByUID(c.Email);
 
         if (0 == apiResultList.size()) {
-            System.debug(LoggingLevel.INFO, 'Email not found on Canvas: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email);
+            System.debug(LoggingLevel.INFO, 'Email not found on Canvas: ' + event.Name + ' ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email);
+
+            if (fix) {
+                attendeesWithMissingEvents.add(attendee);
+            }
+
             continue;
         }
 
         if (apiResultList.size() > 1) {
-            System.debug(LoggingLevel.INFO, 'Repeated email on Canvas: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email);
+            System.debug(LoggingLevel.INFO, 'Repeated email on Canvas: ' + event.Name + ' ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email);
             continue;
         }
 
@@ -70,7 +76,7 @@ for (Attendees__c attendee: attendees) {
         userId = String.valueOf(apiResult.get('id'));
 
         if (c.Participant_UID__c != sisId) {
-            System.debug(LoggingLevel.INFO, 'Participant UID doesn\'t match with Canvas SIS user id: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + sisId);
+            System.debug(LoggingLevel.INFO, 'Participant UID doesn\'t match with Canvas SIS user id: ' + event.Name + ' ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + sisId);
 
             if (fix) {
                 apiResultList = CanvasAPI.listUserLoginsByUserId(userId);
@@ -96,7 +102,7 @@ for (Attendees__c attendee: attendees) {
     userId = String.valueOf(apiResult.get('id'));
     apiResultList = CanvasAPI.listUserEvents(userId, startAt, endAt);
     if (0 == apiResultList.size()) {
-        System.debug(LoggingLevel.INFO, 'Non existent user calendar event: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Event_Full_Name__c);
+        System.debug(LoggingLevel.INFO, 'Non existent user calendar event: ' + event.Name + ' ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Event_Full_Name__c);
 
         if (fix) {
             attendeesWithMissingEvents.add(attendee);
@@ -109,7 +115,7 @@ for (Attendees__c attendee: attendees) {
             String eventId = String.valueOf(apiResult.get('id'));
 
             if (eventNames.contains(apiResult.get('title'))) {
-                System.debug(LoggingLevel.INFO, 'User calendar event name duplicated: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Event_Full_Name__c + ' ' + eventId);
+                System.debug(LoggingLevel.INFO, 'User calendar event name duplicated: ' + event.Name + ' ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Event_Full_Name__c + ' ' + eventId);
 
                 if (fix) {
                     CanvasAPI.removeUserEvent(userId, eventId);
@@ -117,9 +123,9 @@ for (Attendees__c attendee: attendees) {
             }
 
             if (apiResult.get('title') != event.Event_Full_Name__c) {
-                System.debug(LoggingLevel.INFO, 'User calendar event name (' + apiResult.get('title') + ') doesn\'t match: ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Event_Full_Name__c + ' ' + eventId);
+                System.debug(LoggingLevel.INFO, 'User calendar event name (' + apiResult.get('title') + ') doesn\'t match: ' + event.Name + ' ' + event.Cohort_lkp__r.Name + ' ' + c.Participant_UID__c + ' ' + c.Email + ' ' + event.Event_Full_Name__c + ' ' + eventId);
 
-                if (fix) {
+                if (false) {
                     CanvasAPI.removeUserEvent(userId, eventId);
                     attendeesWithMissingEvents.add(attendee);
                 }
