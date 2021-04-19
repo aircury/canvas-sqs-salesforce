@@ -98,11 +98,15 @@ def lambda_handler(event, context):
                     assignment_name = str(data['assignment'].name).strip()[:80]
 
                     if activity == 'Submission Created':
-                        sf.Assessment_Submission__c.create({
-                            'Participant__c': participant['Id'],
-                            'Name': assignment_name,
-                            'Submission_Date__c': date
-                        })
+                        try:
+                            sf.Assessment_Submission__c.create({
+                                'Participant__c': participant['Id'],
+                                'Name': assignment_name,
+                                'Submission_Date__c': date
+                            })
+                        except Exception as e:
+                            logging.error('Error creating Assessment Submission %s:\n%s' % (liveEvent, str(e)))
+                            logging.error(payload)
 
                     if activity == 'Submission Updated':
                         query = '''
@@ -136,7 +140,11 @@ def lambda_handler(event, context):
                                 if graders['totalSize'] > 0:
                                     submission_data['Marker__c'] = graders['records'][0]['Id']
 
-                            sf.Assessment_Submission__c.create(submission_data)
+                            try:
+                                sf.Assessment_Submission__c.create(submission_data)
+                            except Exception as e:
+                                logging.error('Error creating Assessment Submission %s:\n%s' % (liveEvent, str(e)))
+                                logging.error(payload)
 
                             continue
 
@@ -160,7 +168,11 @@ def lambda_handler(event, context):
                                 if graders['totalSize'] > 0:
                                     submission_data['Marker__c'] = graders['records'][0]['Id']
 
-                            sf.Assessment_Submission__c.update(assessment_submission['Id'], submission_data)
+                            try:
+                                sf.Assessment_Submission__c.update(assessment_submission['Id'], submission_data)
+                            except Exception as e:
+                                logging.error('Error updating Assessment Submission %s:\n%s' % (liveEvent, str(e)))
+                                logging.error(payload)
 
             if not data:
                 continue
