@@ -12,3 +12,5 @@ for i in $(seq 0 33 $attendees); do
     sfdx force:apex:execute --targetusername production -f check_canvas_user_calendars.apex --loglevel INFO | tee $output_dir/check_canvas_user_calendars.out.$i | grep \|INFO\| | cut -d "|" -f 5
     grep -q Error: $output_dir/check_canvas_user_calendars.out.$i && echo "Error in batch $i"
 done
+
+sed -i s/start\ =.*,/start\ =\ 0,/ check_canvas_user_calendars.apex
